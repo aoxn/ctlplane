@@ -1,0 +1,50 @@
+{{define "index"}}
+{{template "header" .}}
+<h1 class="page-header"></h1>
+<div class="main">
+    {{if .has}}
+    {{range $item :=.page.Data}}
+    <div class="container panel panel-default panel-success">
+        <div class="row panel-body padded-right-middle btn-block">
+                <span class="col-xs-8 col-md-8 center-block">
+                    <span class="col-xs-1 col-md-1 center-block"><span class="glyphicon glyphicon-th-list"></span></span>
+                    <span class="col-xs-11 col-md-11 center-block"><span class="strong"><a href="/detail?it={{$item.RepoName}}">{{$item.RepoName}}</a></span></span>
+                </span>
+                <span class="col-xs-4 col-md-4 center-block">
+                    <span class="col-xs-4 col-md-5 center-block">520 <strong>STARS</strong></span>
+                    <span class="col-xs-4 col-md-5 center-block">500k <strong>PULL</strong></span>
+                    <span class="col-xs-4 col-md-2 center-block ">
+                        <a class="center-block" href="/detail?it={{$item.RepoName}}">Detail</a>
+                    </span>
+                </span>
+        </div>
+    </div>
+    {{$Last := $item}}
+    {{end}}
+    {{else}}
+    <div class="container panel panel-default panel-success">
+        <div class="row panel-body padded-right-middle btn-block">
+            No more results!
+        </div>
+    </div>
+    {{end}}
+    <nav>
+        <ul class="pager">
+            <li>
+                <a href="/repository?index={{.page.Previous}}&search={{.page.Search}}">
+                    <span aria-hidden="true">&laquo;Prev</span>
+                </a>
+            </li>
+            <li> <a href="/repository?index={{.page.Index}}&search={{.page.Search}}">1</a></li>
+            <li>
+                <a href="/repository?index={{.page.Next}}&search={{.page.Search}}">
+                    <span aria-hidden="true">Next&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+</div>
+
+{{template "footer" .}}
+{{end}}

@@ -1,0 +1,18 @@
+{{define "help"}}
+{{template "header" .}}
+
+<div class="container main">
+    <h1 class="page-header">Sigma HUB</h1>
+    <p>Sigma HUB可以用来查看后端Registry存放的image以及相应的tag。并提供对相应的image添加描述功能 </p>
+
+    <h2 class="sub-header">常用</h2>
+    <ul>
+        <li><a href="https://61.160.36.122/swagger-ui/">HTTP REST API</a></li><li><a href="https://61.160.36.122/api/v1/proxy/namespaces/kube-system/services/kubedash">实时资源查看</a></li>
+        <li><a href="http://61.160.36.122:9100">Jenkins</a></li><li><a href="http://61.160.36.122:8080/v2/_catalog">私有 Image 仓库</a></li>
+        <li><a href="https://docs.docker.com/registry/spec/api/">Docker Registry HTTP API V2</a></li>
+    </ul>
+
+</div>
+
+{{template "footer" .}}
+{{end}}

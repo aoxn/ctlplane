@@ -1,0 +1,91 @@
+{{define "tags"}}
+{{template "header" .}}
+
+<div class="main">
+
+    <div class="container">
+        <h5 class="page-header">Image Tags Description>> <strong>[{{.repo.RepoName}}]</strong></h5>
+    </div>
+    {{if not .has }}
+    <div class="container">
+        <p><strong>{{.errorinfo}}</strong></p>
+    </div>
+    {{else}}
+    <div class="container">
+
+        <div class="row">
+            <ul class="hidden-xs col-sm-3 ">
+                <div class="list-group">
+                    {{$repName:= .repo.RepoName}}
+                    {{range $item := .repo.Tags}}
+                    <a href="/detail?it={{$repName}}&tag={{$item.Name}}" class="list-group-item">
+                        {{$item.Name}}
+                    </a>
+                    {{end}}
+                </div>
+            </ul>
+
+            <ul class="col-xs-12 col-sm-9">
+                <form role="form" id="descform" method="post" name="descform" action="/detail?it={{.repo.RepoName}}&tag={{.currtag.Name}}">
+                    <div class="panel panel-default">
+                        <div class="panel panel-heading">
+                            <div class="row ">
+                                <div class="col-xs-12 col-sm-7">Description <strong>[{{.currtag.Name}}]</strong></div>
+                                <ul class="hidden-xs col-sm-5 list-inline text-right ccby-op">
+                                    <button id="edit" class="btn" name="edit">Edit</button>
+                                </ul>
+                            </div>
+
+
+                        </div>
+                        <div class="panel-body ">
+                            <span id="content" name="content">{{.currtag.Description}}</span>
+                            <textarea id="txtbody" name="txtbody" class="hidden center-block">{{.currtag.Description}}</textarea>
+                        </div>
+                    </div>
+                </form>
+            </ul>
+
+        </div>
+    </div>
+    {{end}}
+
+</div>
+<script src='https://cdn.tinymce.com/4/tinymce.min.js'></script>
+<script src="/js/jquery-1.11.3.min.js"></script>
+<script>
+    function edit(e) {
+        $("#content").hide()
+        var txt = $("#edit").text()
+        if (txt == "Edit"){
+            $("#edit").text("Save")
+            tinymce.init({
+                selector: 'textarea',
+                height: 500,
+                plugins: [
+                    'advlist autolink lists link image charmap print preview anchor',
+                    'searchreplace visualblocks code fullscreen',
+                    'insertdatetime media table contextmenu paste code'
+                ],
+                toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+                content_css: [
+                    '//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
+                    '//www.tinymce.com/css/codepen.min.css'
+                ]
+            });
+            e.preventDefault()
+        }
+
+        if (txt == "Save"){
+            $("descform").submit()
+        }
+
+    }
+    $(document).ready(function(){
+        $("#edit").click(edit)
+        $("#content").html($("#content").text())
+    });
+
+</script>
+{{template "footer" .}}
+{{end}}

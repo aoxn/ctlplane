@@ -1,0 +1,54 @@
+{{define "tagdetail"}}
+{{template "header" .}}
+
+<div class="main">
+
+    <div class="container">
+        <div class="nav nav-tabs">
+            <li role="presentation" ><a href="/detail?role=desc&it={{.name}}">Description</a></li>
+            <li role="presentation" class="active"><a href="#">Tag List</a></li>
+        </div>
+        <h1 class="page-header"></h1>
+    </div>
+
+    <div class="container">
+        <!-- Tag List -->
+        <div class="row">
+            <ul class="col-xs-12 col-sm-8">
+                {{if not .has}}
+                <div class="container">
+                    No Results!
+                </div>
+                {{else}}
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Size</th>
+                        <th>LastUpdate</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{range $item := .tags}}
+                    <tr>
+                        <td>{{$item.Name}}</td>
+                        <td>668 KB</td>
+                        <td>6 days ago</td>
+                        <td>{{$item.Description}}</td>
+                    </tr>
+                    {{end}}
+                    </tbody>
+                </table>
+                {{end}}
+            </ul>
+            <ul class="hidden-xs col-sm-4 ">
+            </ul>
+        </div>
+    </div>
+
+    
+</div>
+
+{{template "footer" .}}
+{{end}}

@@ -1,0 +1,12 @@
+{{define "error"}}
+{{template "header" .}}
+
+<div class="main">
+
+<h1 class="page-header">Error</h1>
+<div class="alert alert-danger" role="alert">{{.error}}</div>
+
+</div>
+
+{{template "footer" .}}
+{{end}}
