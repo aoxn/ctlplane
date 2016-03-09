@@ -25,9 +25,7 @@ func main() {
 	flag.Set("logtostderr", "true")
 	flag.Parse()
 
-	util.InitDB()
-
-//	util.InitSync()
+	util.InitSync()
 //	web.GetRepository("bamboo/controller")
 	r := gin.Default()
 	r.Static("/js", "js")

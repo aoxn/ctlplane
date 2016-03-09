@@ -7,7 +7,6 @@ import (
 //    "github.com/spacexnice/ctlplane/pkg/api"
     "net/http"
     "io/ioutil"
-    "fmt"
     "encoding/json"
     "github.com/spacexnice/ctlplane/pkg/api"
 )
@@ -32,7 +31,6 @@ func List() (*Repos,error){
     }
     defer res.Body.Close()
     body, err := ioutil.ReadAll(res.Body)
-    fmt.Println(string(body))
     if err != nil{
         return nil,err
     }
@@ -53,7 +51,6 @@ func ListAll() (api.Repos,error){
     }
     defer res.Body.Close()
     body, err := ioutil.ReadAll(res.Body)
-    fmt.Println(string(body))
     if err != nil{
         return nil,err
     }
@@ -70,21 +67,18 @@ func ListAll() (api.Repos,error){
         }
         result = append(result,api.Repository{RepoName:it,Tags:nTag})
     }
-    fmt.Printf("Repos:   %#v\n",result)
     return result,nil
 }
 
 func ListTag(repo string) (*Tag,error){
     tags := &Tag{}
     url := REPO_SERVER + "v2/"+repo+"/tags/list"
-    fmt.Println(url)
     res,err := http.Get(url)
     if err != nil{
         return nil,err
     }
     defer res.Body.Close()
     body, err := ioutil.ReadAll(res.Body)
-    fmt.Println(string(body))
     if err != nil{
         return nil,err
     }

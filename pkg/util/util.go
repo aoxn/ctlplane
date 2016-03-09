@@ -90,7 +90,7 @@ func Run(db *gorm.DB){
 			deleted = append(deleted,dit)
 		}
 	}
-	fmt.Printf("added   %+v\ndeleted %+v\n",added,deleted)
+	fmt.Printf("Run database Syncer => \n\tAdded:   %+v\n\tDeleted: %+v\n",added,deleted)
 	for _,it := range(deleted){
 		db.Unscoped().Delete(&it)
 	}
