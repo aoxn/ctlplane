@@ -16,6 +16,6 @@ type Tag struct{
 	gorm.Model
 	RepositoryID uint `sql:"index"`
 	Name string
-	Description string `sql:"type:varchar(255);unique_index"`
+	Description string `sql:"type:varchar(255)"`
 }
 
