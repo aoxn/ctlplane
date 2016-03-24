@@ -4,38 +4,32 @@
 <div class="main">
 
     <div class="container">
-        <h5 class="page-header">Image Tags Description>> <strong>[{{.repo.RepoName}}]</strong></h5>
+        <h5 class="page-header">Image标签>> <strong>{{if .has}}[{{.repo.RepoName}}]{{end}}</strong></h5>
     </div>
-    {{if not .has }}
+    {{if .has }}
     <div class="container">
-        <p><strong>{{.errorinfo}}</strong></p>
-    </div>
-    {{else}}
-    <div class="container">
+            <ul class="list-group hidden-xs col-sm-3 panel-info">
+                {{$repName:= .repo.RepoName}}
+                {{range $item := .repo.Tags}}
 
-        <div class="row">
-            <ul class="hidden-xs col-sm-3 ">
-                <div class="list-group">
-                    {{$repName:= .repo.RepoName}}
-                    {{range $item := .repo.Tags}}
-                    <a href="/detail?it={{$repName}}&tag={{$item.Name}}" class="list-group-item">
+                    <a class="list-group-item" href="/detail?it={{$repName}}&tag={{$item.Name}}" >
                         {{$item.Name}}
                     </a>
-                    {{end}}
-                </div>
+
+
+                {{end}}
             </ul>
 
-            <ul class="col-xs-12 col-sm-9">
-                <form role="form" id="descform" method="post" name="descform" action="/detail?it={{.repo.RepoName}}&tag={{.currtag.Name}}">
-                    <div class="panel panel-default">
+            <ul class="col-xs-12 col-sm-9 ">
+                <form role="form" class="col-xs-12 col-sm-10" id="descform" method="post" name="descform" action="/detail?it={{.repo.RepoName}}&tag={{.currtag.Name}}">
+                    <div class="panel panel-default panel-info">
                         <div class="panel panel-heading">
                             <div class="row ">
-                                <div class="col-xs-12 col-sm-7">Description <strong>[{{.currtag.Name}}]</strong></div>
-                                <ul class="hidden-xs col-sm-5 list-inline text-right ccby-op">
+                                <div class="col-xs-12 col-sm-10 ">标签描述 <strong>[{{.currtag.Name}}]</strong></div>
+                                <div class="hidden-xs col-sm-2 list-inline text-right" >
                                     <button id="edit" class="btn" name="edit">Edit</button>
-                                </ul>
+                                </div>
                             </div>
-
 
                         </div>
                         <div class="panel-body ">
@@ -45,8 +39,10 @@
                     </div>
                 </form>
             </ul>
-
-        </div>
+    </div>
+    {{else}}
+    <div class="container">
+        <p><strong>{{.errorinfo}}</strong></p>
     </div>
     {{end}}
 

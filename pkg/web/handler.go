@@ -40,6 +40,27 @@ func getPager(idx string) *page.Pager{
     return pg
 }
 
+
+func groupRepos(rs []api.Repository)map[string][]api.Repository{
+    se := make(map[string][]api.Repository)
+    for _,it := range(rs){
+        key,exist := se[it.Group]
+        if !exist{
+            key = []api.Repository{it}
+        }else{
+            key = append(key,it)
+        }
+        se[it.Group] = key
+    }
+    fmt.Printf("%+v\n",se)
+//    var result [][]api.Repository
+//    for it,_ := range(se){
+//        fmt.Printf("%+v\n",it)
+//        result = append(result,it)
+//    }
+    return se
+}
+
 func Index(c *gin.Context){
 //    fmt.Printf("%+v\n",c.Request)
 
@@ -76,6 +97,37 @@ func Index(c *gin.Context){
     return
 }
 
+func Index2(c *gin.Context){
+    //    fmt.Printf("%+v\n",c.Request)
+
+    var result []api.Repository
+
+    idx,_ := c.GetQuery("index")
+    pg:= getPager(idx)
+    sea,suc := c.GetQuery("search")
+    if suc{
+        pg.Search = sea
+        if err := db.Where("repo_name like ?",fmt.Sprintf("%%%s%%",sea)).
+        Find(&result).Error;err != nil{
+            errorPage(c,fmt.Sprintf("Get Repository Error,[%s]",err.Error()))
+            return
+        }
+    }else{
+        if err := db.
+        Find(&result).Error;err != nil{
+            errorPage(c,fmt.Sprintf("Get Repository Error,[%s]",err.Error()))
+            return
+        }
+    }
+    pg.Data = groupRepos(result)
+    c.HTML(http.StatusOK, "index",
+        gin.H{
+            "title":     "REPOSITORY",
+            "has":len(result)>0,
+            "page":pg,
+        })
+    return
+}
 
 func GetTag(c *gin.Context) {
     repoName,suc := c.GetQuery("it")
@@ -95,7 +147,7 @@ func GetTag(c *gin.Context) {
         return
     }
     fmt.Printf("TAGS: %+v \n", tag)
-    c.HTML(http.StatusOK, "tags",
+    c.HTML(http.StatusOK, "contags",
         gin.H{
             "title":     "REPOSITORY",
             "repo" : repo,
@@ -106,7 +158,7 @@ func GetTag(c *gin.Context) {
 }
 
 func errorPage(c *gin.Context,error string){
-    c.HTML(http.StatusOK, "tags",
+    c.HTML(http.StatusOK, "contags",
         gin.H{
             "title": "Error",
             "repo" : "",
@@ -122,9 +174,9 @@ func PutTag(c *gin.Context) {
         errorPage(c,"error parameter tag name needed by it=?")
         return
     }
-    txt,suc := c.GetPostForm("txtbody")
+    txt,suc := c.GetPostForm("txtbody-"+stag)
     if !suc {
-        errorPage(c,"error parameter txtbody name needed by it=?")
+        errorPage(c,fmt.Sprintf("error parameter txtbody name needed by it=%s",stag))
         return
     }
     repoName,suc := c.GetQuery("it")
@@ -148,7 +200,12 @@ func PutTag(c *gin.Context) {
         errorPage(c,fmt.Sprintf("error save Description by it=?[%s]",err.Error()))
         return
     }
-    c.HTML(http.StatusOK, "tags",
+    repo,err = getRepository(repoName)
+    if err != nil{
+        errorPage(c,fmt.Sprintf("error get Repository by it=?[%s]",err.Error()))
+        return
+    }
+    c.HTML(http.StatusOK, "contags",
         gin.H{
             "title":     "REPOSITORY",
             "repo" : repo,
@@ -157,9 +214,42 @@ func PutTag(c *gin.Context) {
         })
     return
 }
+func DeleteTag(c *gin.Context) {
+    stag,suc := c.GetQuery("tag")
+    if !suc{
+        errorPage(c,"error parameter tag name needed by it=?")
+        return
+    }
+    repoName,suc := c.GetQuery("it")
+    if !suc{
+        errorPage(c,fmt.Sprintf("error parameter repository name needed by it"))
+        return
+    }
+    repo,err := getRepository(repoName)
+    if err != nil{
+        errorPage(c,fmt.Sprintf("error get Repository by it=?[%s]",err.Error()))
+        return
+    }
+
+    tag := getSelectedTag(repo.Tags,stag)
+    if tag == nil{
+        errorPage(c,fmt.Sprintf("No curresponed Tag found by it=?[%s]",tag))
+        return
+    }
+    if err:=page.DeleteTag(repoName,tag.Digest); err!= nil{
+        errorPage(c,fmt.Sprintf("error delete Tag[%s] by it?[%s]",tag.Name,err.Error()))
+        return
+    }
+    if err := db.Delete(tag).Error; err !=nil{
+        errorPage(c,fmt.Sprintf("error delete Tag[%s] by it?[%s]",tag.Name,err.Error()))
+        return
+    }
+    GetTag(c)
+    return
+}
 
 func getRepository(repoName string) (*api.Repository,error){
-    tags := api.Tags{}
+    var tags []api.Tag
     repo := api.Repository{RepoName:repoName}
     if err := db.Where("repo_name = ?",repoName).First(&repo).Error;err!=nil{
         fmt.Errorf("Find repository [%s] Error,[%+v]",repoName,err)
@@ -172,7 +262,7 @@ func getRepository(repoName string) (*api.Repository,error){
     repo.Tags = tags
     return &repo,nil
 }
-func getSelectedTag(tags api.Tags,tag string) *api.Tag{
+func getSelectedTag(tags []api.Tag,tag string) *api.Tag{
     var ctag api.Tag
     if tag == ""{
         //return default first one

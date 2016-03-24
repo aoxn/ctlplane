@@ -35,7 +35,8 @@ func main() {
 
 	r.GET("/detail", web.GetTag)
 	r.POST("/detail", web.PutTag)
-	r.GET("/repository",web.Index)
+	r.GET("/repository",web.Index2)
+	r.GET("/tags/delete",web.DeleteTag)
 //	r.GET("/namespaces/:ns", listOthersInNamespace)
 
 

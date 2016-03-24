@@ -1,48 +1,53 @@
 {{define "index"}}
 {{template "header" .}}
-<h1 class="page-header"></h1>
+
 <div class="main">
-    {{if .has}}
-    {{range $item :=.page.Data}}
-    <div class="container panel panel-default panel-success">
-        <div class="row panel-body padded-right-middle btn-block">
-                <span class="col-xs-8 col-md-8 center-block">
-                    <span class="col-xs-1 col-md-1 center-block"><span class="glyphicon glyphicon-th-list"></span></span>
-                    <span class="col-xs-11 col-md-11 center-block"><span class="strong"><a href="/detail?it={{$item.RepoName}}">{{$item.RepoName}}</a></span></span>
-                </span>
-                <span class="col-xs-4 col-md-4 center-block">
-                    <span class="col-xs-4 col-md-5 center-block">520 <strong>STARS</strong></span>
-                    <span class="col-xs-4 col-md-5 center-block">500k <strong>PULL</strong></span>
-                    <span class="col-xs-4 col-md-2 center-block ">
-                        <a class="center-block" href="/detail?it={{$item.RepoName}}">Detail</a>
-                    </span>
-                </span>
+
+<div class="container">
+
+        <ol class="breadcrumb">
+        <li class="active"><a href="#">仓库列表</a></li>
+        </ol>
+    <div id="accord" class="panel-group">
+
+        {{if .has}}
+        {{range $key,$item :=.page.Data}}
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                Group <strong>[{{$key}}]</strong>
+                <a class="pull-right" data-toggle="collapse" data-parent="#accord" href="#accord-{{$key}}">Show <i class="glyphicon glyphicon-collapse-down"></i></a>
+            </div>
+            <div id="accord-{{$key}}" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <table class="table table-striped table-hover">
+                        <tbody>
+                        {{range $v := $item}}
+                        <tr>
+                            <td class="col-md-10"><a class="center-block" href="/detail?it={{$v.RepoName}}"><span class="glyphicon glyphicon-th-list"></span> {{$v.RepoName}}</a></td>
+                            <!-- <td>520 <strong>STARS</strong> </td>
+                            <td>500k <strong>PULL</strong></td> -->
+                            <td class="col-md-2"><a class="center-block" href="/detail?it={{$v.RepoName}}">Detail</a></td>
+                        </tr>
+                        {{end}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    </div>
-    {{$Last := $item}}
-    {{end}}
-    {{else}}
-    <div class="container panel panel-default panel-success">
-        <div class="row panel-body padded-right-middle btn-block">
-            No more results!
+        {{$Last := $item}}
+        {{end}}
+        {{else}}
+        <div class="container panel panel-default panel-success">
+            <div class="row panel-body padded-right-middle btn-block">
+                No more results!
+            </div>
         </div>
+        {{end}}
+
     </div>
-    {{end}}
-    <nav>
-        <ul class="pager">
-            <li>
-                <a href="/repository?index={{.page.Previous}}&search={{.page.Search}}">
-                    <span aria-hidden="true">&laquo;Prev</span>
-                </a>
-            </li>
-            <li> <a href="/repository?index={{.page.Index}}&search={{.page.Search}}">{{.page.Index}}</a></li>
-            <li>
-                <a href="/repository?index={{.page.Next}}&search={{.page.Search}}">
-                    <span aria-hidden="true">Next&raquo;</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+</div>
+
 
 </div>
 

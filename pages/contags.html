@@ -1,0 +1,144 @@
+{{define "contags"}}
+{{template "header" .}}
+
+<div class="main">
+<div class="container">
+        <ol class="breadcrumb">
+            <li ><a href="/repository">仓库列表</a></li>
+            <li class="active"><a href="#">标签列表</a></li>
+        </ol>
+
+    <div id="accord" class="panel-group">
+
+        {{if .has}}
+        {{$repName := .repo.RepoName}}
+        {{$currTag := .currtag}}
+        {{range $idx,$item := .repo.Tags}}
+
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                标签： <strong>[{{$item.Name}}]</strong>
+                <a class="pull-right" data-toggle="collapse" data-parent="#accord" href="#accord-{{$idx}}">描述 <i class="glyphicon glyphicon-collapse-down"></i></a>
+                <label class="pull-right">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                <a id="dmark-{{$idx}}" name="dmark-{{$idx}}" class="pull-right" href="/tags/delete?it={{$repName}}&tag={{$item.Name}}">删除</a>
+            </div>
+
+            <div id="accord-{{$idx}}" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <form role="form"  id="descform-{{$idx}}" method="post" name="descform-{{$idx}}" action="/detail?it={{$repName}}&tag={{$item.Name}}">
+                        <div class="row ">
+                            <div class="hidden-xs col-sm-12 list-inline text-right" >
+                                <button id="edittag-{{$idx}}" class="btn" name="edittag-{{$idx}}">
+                                    <span class="hidden">{{$idx}}</span>
+                                    <span class="hidden">{{$item.Name}}</span>
+                                    <span>Edit</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="page-header">
+                            <h6></h6>
+                        </div>
+                        <div class="popover-content">
+                            <span id="content-{{$idx}}" name="content-{{$idx}}">{{$item.Description}}</span>
+                            <textarea id="txtbody-{{$item.Name}}" name="txtbody-{{$item.Name}}" class="hidden center-block">{{$item.Description}}</textarea>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+        {{end}}
+        {{else}}
+        <div class="container">
+            <p><strong>{{.errorinfo}}</strong></p>
+        </div>
+        {{end}}
+
+        <div id="confirm" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">删除确认</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>是否确认删除标签？&hellip;</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button id="deleteconfirm" type="button" class="btn btn-primary">确定删除</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+    </div>
+
+</div>
+
+
+</div>
+<script src='https://cdn.tinymce.com/4/tinymce.min.js'></script>
+<script src="/js/jquery-1.11.3.min.js"></script>
+<script>
+    function edit(e) {
+        var idx = e.data.idx
+        $("#content-"+idx).hide()
+        var TAG = $("#edittag-"+idx).find("span")[2]
+        var txt = TAG.textContent
+        if (txt == "Edit"){
+            TAG.innerText = "Save"
+            tinymce.init({
+                selector: 'textarea',
+                height: 500,
+                plugins: [
+                    'advlist autolink lists link image charmap print preview anchor',
+                    'searchreplace visualblocks code fullscreen',
+                    'insertdatetime media table contextmenu paste code'
+                ],
+                toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+                content_css: [
+                    '//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
+                    '//www.tinymce.com/css/codepen.min.css'
+                ]
+            });
+            e.preventDefault()
+        }
+
+        if (txt == "Save"){
+            $("#descform-"+idx).submit()
+        }
+
+    }
+
+    $(document).ready(function(){
+
+        $.each($("span[id*=content]"),function(idx,s){
+            var span = $("#content-"+idx)
+            span.html(span.text())
+        })
+
+        $.each($("button[id*=edittag]"),function(idx,btn){
+            var b = $("#"+btn.id)
+            var x = b.find("span")
+            b.click({idx:x[0].textContent,tag:x[1].textContent}, edit)
+        })
+
+        $.each($("a[id*=dmark]"),function(idx,a){
+            var b = $("#"+a.id)
+            b.click(function(){
+                $('#confirm').modal('show')
+                $("#deleteconfirm").click( function() {
+                    //触发href连接
+                    window.location.href=b.attr("href")
+                });
+                return false
+            })
+        })
+
+
+    });
+
+</script>
+{{template "footer" .}}
+{{end}}
