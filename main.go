@@ -19,7 +19,7 @@ import (
 
 func main() {
 	defer glog.Flush()
-	dataPath := os.Getenv("DATAPATH")
+	dataPath := os.Getenv("DATA_PATH")
 	flag.Set("logtostderr", "true")
 	flag.Parse()
 
