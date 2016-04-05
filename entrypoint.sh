@@ -1,2 +1,4 @@
 #!/usr/bin/env bash
-exec /app/registry-console
+cd /app/
+exec ./registry-console
+

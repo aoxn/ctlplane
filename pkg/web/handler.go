@@ -7,22 +7,21 @@ import (
     "github.com/spacexnice/ctlplane/pkg/api"
     "github.com/spacexnice/ctlplane/pkg/page"
     "github.com/jinzhu/gorm"
-    "github.com/spacexnice/ctlplane/pkg/util"
 )
 
 var (
     db gorm.DB
 )
 
-func init(){
-    util.InitDB()
-    var err error
-    db, err = gorm.Open("sqlite3", util.DEFAULT_DB)
-    db.LogMode(true)
-    if err != nil {
-        panic(err)
-    }
-}
+//func init(){
+//    util.InitDB()
+//    var err error
+//    db, err = gorm.Open("sqlite3", util.DEFAULT_DB)
+//    db.LogMode(true)
+//    if err != nil {
+//        panic(err)
+//    }
+//}
 
 func getPager(idx string) *page.Pager{
     pg := &page.Pager{Size:page.PAGE_SIZE}

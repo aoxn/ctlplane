@@ -4,7 +4,7 @@ import (
 	"flag"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
-	"github.com/jinzhu/gorm"
+	//"github.com/jinzhu/gorm"
 //	"github.com/spacexnice/ctlplane/pkg/web"
 	"github.com/spacexnice/ctlplane/pkg/util"
 //	"github.com/spacexnice/ctlplane/pkg/api"
@@ -12,19 +12,21 @@ import (
 //	"github.com/spacexnice/ctlplane/pkg/page"
 //	"github.com/gin-gonic/gin"
 	"github.com/spacexnice/ctlplane/pkg/web"
+	"os"
 )
 
 
-var (
-	Db gorm.DB
-)
 
 func main() {
 	defer glog.Flush()
-
+	dataPath := os.Getenv("DATAPATH")
 	flag.Set("logtostderr", "true")
 	flag.Parse()
 
+	if dataPath != ""{
+		util.DEFAULT_DB = dataPath +"/gorm.db"
+	}
+	util.InitDB()
 	util.InitSync()
 //	web.GetRepository("bamboo/controller")
 	r := gin.Default()

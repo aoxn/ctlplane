@@ -1,0 +1,65 @@
+{
+  "kind": "Pod",
+  "apiVersion": "v1",
+  "metadata": {
+    "labels": {
+      "managed-by": "@CLUSTER_NAME@"
+    },
+    "annotations": {
+      "USER_DEFINED_1": "VALUE_1",
+      "USER_DEFINED_2": "VALUE_2"
+    }
+  },
+  "spec": {
+    "nodeSelector": {
+      "project": "test"
+    },
+    "containers": [
+      {
+        "name": "@CLUSTER_NAME@",
+        "image": "@IMAGE_REGISTRY@/@IMAGE_NAME@:@IMAGE_VERSION@",
+        "ports": [
+          {
+            "name": "ssh",
+            "containerPort": 22
+          },
+          {
+            "name": "app",
+            "containerPort": 8080
+          }
+        ],
+        "resources": {
+          "limits": {
+            "cpu": "1000",
+            "memory": "1Gi"
+          }
+        },
+        "volumeMounts": [
+          {
+            "name": "data-path",
+            "mountPath": "/data",
+            "readOnly": true
+          }
+        ],
+        "env": [
+          {
+            "name": "SSH_PUBLIC_KEY",
+            "value": "ssh-dss AAAAB3NzaC1kc3MAAACBANipmwNkPuTmRmERSl342qC6axEIgyuX/KR3OcWwyNGwTsxvVnfcwY8nlq9OvL9WiX+GCPArjTVb3WO/SWHF1vMi5cDXIxvNk4CHVgdDrlBuyCwCPOXgmtpcbLTQ8S8lr4EONw+KBuXgXSwTa9B4rYs0pTnDWDbWEFqNY0P1QL+bAAAAFQDqRPBdNNlCZdBBtqVQvAZqJGPlCQAAAIEAkh7/jammIB9IeMWDUUvS1l/iTl0re5RtgeYnizk/uL+F9ir2c6eQ4Ed+KuWgxtDHF5u8mTSDXHXL+F/tMIkz9DT2KHlugzUkv3pgFFn4ZzAsV1kfnRLyziKFsglKB5WNlLpJQeT5uvKDfPowParDPxnakzxF6kIcGQ9xdsN9CpgAAACAKvvcMJ32rDgh5XuY2xaaTlhqnoEo022IVVuLtm/CUWEB6PPWlOVl2UYFtZIIDkXp+ciY6Bv3I8/IQkzRVm6qiPuxTajocrQhBH9MfJWn0+z1sLvo+T0//PgFJCol1rE3y2gzQFFKyodmFqlhQkCckbPPEkIR118T9G6Mhs5nDa4= dw_xieyaoyao"
+          },
+          {
+            "name": "DATA_PATH",
+            "value": "/data/"
+          }
+        ]
+      }
+    ],
+    "volumes": [
+      {
+        "name": "data-path",
+        "hostPath": {
+          "path": "/data/registry_console"
+        }
+      }
+    ]
+  }
+}
