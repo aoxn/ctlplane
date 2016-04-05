@@ -10,7 +10,7 @@ import (
 )
 
 var (
-    db gorm.DB
+    Db *gorm.DB
 )
 
 //func init(){
@@ -71,7 +71,7 @@ func Index(c *gin.Context){
     sea,suc := c.GetQuery("search")
     if suc{
         pg.Search = sea
-        if err := db.Where("repo_name like ?",fmt.Sprintf("%%%s%%",sea)).
+        if err := Db.Where("repo_name like ?",fmt.Sprintf("%%%s%%",sea)).
                   Limit(pg.Size).
                   Offset(pg.Size*(pg.Index - 1)).
                   Find(&result).Error;err != nil{
@@ -79,7 +79,7 @@ func Index(c *gin.Context){
             return
         }
     }else{
-        if err := db.Limit(pg.Size).
+        if err := Db.Limit(pg.Size).
                   Offset(pg.Size*(pg.Index - 1)).
                   Find(&result).Error;err != nil{
             errorPage(c,fmt.Sprintf("Get Repository Error,[%s]",err.Error()))
@@ -106,13 +106,13 @@ func Index2(c *gin.Context){
     sea,suc := c.GetQuery("search")
     if suc{
         pg.Search = sea
-        if err := db.Where("repo_name like ?",fmt.Sprintf("%%%s%%",sea)).
+        if err := Db.Where("repo_name like ?",fmt.Sprintf("%%%s%%",sea)).
         Find(&result).Error;err != nil{
             errorPage(c,fmt.Sprintf("Get Repository Error,[%s]",err.Error()))
             return
         }
     }else{
-        if err := db.
+        if err := Db.
         Find(&result).Error;err != nil{
             errorPage(c,fmt.Sprintf("Get Repository Error,[%s]",err.Error()))
             return
@@ -195,7 +195,7 @@ func PutTag(c *gin.Context) {
         return
     }
     tag.Description = txt
-    if err := db.Save(tag).Error; err !=nil{
+    if err := Db.Save(tag).Error; err !=nil{
         errorPage(c,fmt.Sprintf("error save Description by it=?[%s]",err.Error()))
         return
     }
@@ -239,7 +239,7 @@ func DeleteTag(c *gin.Context) {
         errorPage(c,fmt.Sprintf("error delete Tag[%s] by it?[%s]",tag.Name,err.Error()))
         return
     }
-    if err := db.Delete(tag).Error; err !=nil{
+    if err := Db.Delete(tag).Error; err !=nil{
         errorPage(c,fmt.Sprintf("error delete Tag[%s] by it?[%s]",tag.Name,err.Error()))
         return
     }
@@ -250,11 +250,11 @@ func DeleteTag(c *gin.Context) {
 func getRepository(repoName string) (*api.Repository,error){
     var tags []api.Tag
     repo := api.Repository{RepoName:repoName}
-    if err := db.Where("repo_name = ?",repoName).First(&repo).Error;err!=nil{
+    if err := Db.Where("repo_name = ?",repoName).First(&repo).Error;err!=nil{
         fmt.Errorf("Find repository [%s] Error,[%+v]",repoName,err)
         return nil,err
     }
-    if err := db.Model(&repo).Related(&tags).Error ; err != nil{
+    if err := Db.Model(&repo).Related(&tags).Error ; err != nil{
         fmt.Errorf("Find Tags [%s] Error,[%+v]",repoName,err)
         return nil,err
     }

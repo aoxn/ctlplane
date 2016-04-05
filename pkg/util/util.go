@@ -15,6 +15,7 @@ import (
 
 	"time"
 	"strings"
+	"github.com/spacexnice/ctlplane/pkg/web"
 )
 
 var DEFAULT_DB = "./gorm.db"
@@ -22,18 +23,25 @@ var DEFAULT_DB = "./gorm.db"
 func InitDB() bool{
 	if Exist(DEFAULT_DB){
 		fmt.Println("DEFAULT_DB[./gorm.db] Loaded! ")
+		web.Db = open()
 		return true
 	}
+	if web.Db = open();web.Db==nil{
+		return false
+	}
+	web.Db.LogMode(true)
+	web.Db.CreateTable(&api.Repository{})
+	web.Db.CreateTable(&api.Tag{})
+	return true
+
+}
+func open() *gorm.DB{
 	db, err := gorm.Open("sqlite3", DEFAULT_DB)
 	if err != nil {
 		panic(err)
-		return false
+		return nil
 	}
-	db.LogMode(true)
-	db.CreateTable(&api.Repository{})
-	db.CreateTable(&api.Tag{})
-	return true
-
+	return &db
 }
 func InitSync(){
 	go func() {
@@ -106,7 +114,7 @@ func Run(db *gorm.DB){
 		}
 	}
 
-	fmt.Printf("DB DATA: => \n\tdbRep:   %+v\n\trep: %+v\n",dbRep,rep)
+	//fmt.Printf("DB DATA: => \n\tdbRep:   %+v\n\trep: %+v\n",dbRep,rep)
 }
 
 func updateTag(dbRep,regRep *api.Repository,db *gorm.DB){
@@ -120,7 +128,7 @@ func updateTag(dbRep,regRep *api.Repository,db *gorm.DB){
 			}
 		}
 		if !found{
-			fmt.Printf("DELETE UpdateTAG: %+v\n",dt)
+			//fmt.Printf("DELETE UpdateTAG: %+v\n",dt)
 			if err:=db.Unscoped().Delete(&dt).Error;err != nil{
 				fmt.Println("DELETE Tag ERROR: %s",err.Error())
 			}
@@ -136,7 +144,7 @@ func updateTag(dbRep,regRep *api.Repository,db *gorm.DB){
 		}
 		if !found{
 			dt.RepositoryID = dbRep.ID
-			fmt.Printf("ADDED UpdateTAG: %+v\n",dt)
+			//fmt.Printf("ADDED UpdateTAG: %+v\n",dt)
 			if err:=db.Create(&dt).Error ;err!=nil{
 				fmt.Println("Create Tag ERROR: %s",err)
 			}
