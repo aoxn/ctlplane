@@ -3,13 +3,13 @@
 package dbus
 
 import (
-	"os/user"
+    "os/user"
 )
 
 func lookupHomeDir() string {
-	u, err := user.Current()
-	if err != nil {
-		return "/"
-	}
-	return u.HomeDir
+    u, err := user.Current()
+    if err != nil {
+        return "/"
+    }
+    return u.HomeDir
 }

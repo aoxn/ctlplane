@@ -15,18 +15,18 @@
 package healthz
 
 import (
-	"net/http"
+    "net/http"
 
-	httpmux "github.com/google/cadvisor/http/mux"
+    httpmux "github.com/google/cadvisor/http/mux"
 )
 
 func handleHealthz(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("ok"))
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("ok"))
 }
 
 // Register simple HTTP /healthz handler to return "ok".
 func RegisterHandler(mux httpmux.Mux) error {
-	mux.HandleFunc("/healthz", handleHealthz)
-	return nil
+    mux.HandleFunc("/healthz", handleHealthz)
+    return nil
 }

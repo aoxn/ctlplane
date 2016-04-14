@@ -8,29 +8,29 @@
 package ratelimit
 
 import (
-	"math"
-	"strconv"
-	"sync"
-	"time"
+    "math"
+    "strconv"
+    "sync"
+    "time"
 )
 
 // Bucket represents a token bucket that fills at a predetermined rate.
 // Methods on Bucket may be called concurrently.
 type Bucket struct {
-	startTime    time.Time
-	capacity     int64
-	quantum      int64
-	fillInterval time.Duration
+    startTime    time.Time
+    capacity     int64
+    quantum      int64
+    fillInterval time.Duration
 
-	// The mutex guards the fields following it.
-	mu sync.Mutex
+    // The mutex guards the fields following it.
+    mu           sync.Mutex
 
-	// avail holds the number of available tokens
-	// in the bucket, as of availTick ticks from startTime.
-	// It will be negative when there are consumers
-	// waiting for tokens.
-	avail     int64
-	availTick int64
+    // avail holds the number of available tokens
+    // in the bucket, as of availTick ticks from startTime.
+    // It will be negative when there are consumers
+    // waiting for tokens.
+    avail        int64
+    availTick    int64
 }
 
 // NewBucket returns a new token bucket that fills at the
@@ -38,7 +38,7 @@ type Bucket struct {
 // maximum capacity. Both arguments must be
 // positive. The bucket is initially full.
 func NewBucket(fillInterval time.Duration, capacity int64) *Bucket {
-	return NewBucketWithQuantum(fillInterval, capacity, 1)
+    return NewBucketWithQuantum(fillInterval, capacity, 1)
 }
 
 // rateMargin specifes the allowed variance of actual
@@ -51,58 +51,58 @@ const rateMargin = 0.01
 // at high rates, the actual rate may be up to 1% different from the
 // specified rate.
 func NewBucketWithRate(rate float64, capacity int64) *Bucket {
-	for quantum := int64(1); quantum < 1<<50; quantum = nextQuantum(quantum) {
-		fillInterval := time.Duration(1e9 * float64(quantum) / rate)
-		if fillInterval <= 0 {
-			continue
-		}
-		tb := NewBucketWithQuantum(fillInterval, capacity, quantum)
-		if diff := math.Abs(tb.Rate() - rate); diff/rate <= rateMargin {
-			return tb
-		}
-	}
-	panic("cannot find suitable quantum for " + strconv.FormatFloat(rate, 'g', -1, 64))
+    for quantum := int64(1); quantum < 1 << 50; quantum = nextQuantum(quantum) {
+        fillInterval := time.Duration(1e9 * float64(quantum) / rate)
+        if fillInterval <= 0 {
+            continue
+        }
+        tb := NewBucketWithQuantum(fillInterval, capacity, quantum)
+        if diff := math.Abs(tb.Rate() - rate); diff / rate <= rateMargin {
+            return tb
+        }
+    }
+    panic("cannot find suitable quantum for " + strconv.FormatFloat(rate, 'g', -1, 64))
 }
 
 // nextQuantum returns the next quantum to try after q.
 // We grow the quantum exponentially, but slowly, so we
 // get a good fit in the lower numbers.
 func nextQuantum(q int64) int64 {
-	q1 := q * 11 / 10
-	if q1 == q {
-		q1++
-	}
-	return q1
+    q1 := q * 11 / 10
+    if q1 == q {
+        q1++
+    }
+    return q1
 }
 
 // NewBucketWithQuantum is similar to NewBucket, but allows
 // the specification of the quantum size - quantum tokens
 // are added every fillInterval.
 func NewBucketWithQuantum(fillInterval time.Duration, capacity, quantum int64) *Bucket {
-	if fillInterval <= 0 {
-		panic("token bucket fill interval is not > 0")
-	}
-	if capacity <= 0 {
-		panic("token bucket capacity is not > 0")
-	}
-	if quantum <= 0 {
-		panic("token bucket quantum is not > 0")
-	}
-	return &Bucket{
-		startTime:    time.Now(),
-		capacity:     capacity,
-		quantum:      quantum,
-		avail:        capacity,
-		fillInterval: fillInterval,
-	}
+    if fillInterval <= 0 {
+        panic("token bucket fill interval is not > 0")
+    }
+    if capacity <= 0 {
+        panic("token bucket capacity is not > 0")
+    }
+    if quantum <= 0 {
+        panic("token bucket quantum is not > 0")
+    }
+    return &Bucket{
+        startTime:    time.Now(),
+        capacity:     capacity,
+        quantum:      quantum,
+        avail:        capacity,
+        fillInterval: fillInterval,
+    }
 }
 
 // Wait takes count tokens from the bucket, waiting until they are
 // available.
 func (tb *Bucket) Wait(count int64) {
-	if d := tb.Take(count); d > 0 {
-		time.Sleep(d)
-	}
+    if d := tb.Take(count); d > 0 {
+        time.Sleep(d)
+    }
 }
 
 // WaitMaxDuration is like Wait except that it will
@@ -111,11 +111,11 @@ func (tb *Bucket) Wait(count int64) {
 // any tokens have been removed from the bucket
 // If no tokens have been removed, it returns immediately.
 func (tb *Bucket) WaitMaxDuration(count int64, maxWait time.Duration) bool {
-	d, ok := tb.TakeMaxDuration(count, maxWait)
-	if d > 0 {
-		time.Sleep(d)
-	}
-	return ok
+    d, ok := tb.TakeMaxDuration(count, maxWait)
+    if d > 0 {
+        time.Sleep(d)
+    }
+    return ok
 }
 
 const infinityDuration time.Duration = 0x7fffffffffffffff
@@ -127,8 +127,8 @@ const infinityDuration time.Duration = 0x7fffffffffffffff
 // Note that if the request is irrevocable - there is no way to return
 // tokens to the bucket once this method commits us to taking them.
 func (tb *Bucket) Take(count int64) time.Duration {
-	d, _ := tb.take(time.Now(), count, infinityDuration)
-	return d
+    d, _ := tb.take(time.Now(), count, infinityDuration)
+    return d
 }
 
 // TakeMaxDuration is like Take, except that
@@ -141,34 +141,34 @@ func (tb *Bucket) Take(count int64) time.Duration {
 // wait until the tokens are actually available, and reports
 // true.
 func (tb *Bucket) TakeMaxDuration(count int64, maxWait time.Duration) (time.Duration, bool) {
-	return tb.take(time.Now(), count, maxWait)
+    return tb.take(time.Now(), count, maxWait)
 }
 
 // TakeAvailable takes up to count immediately available tokens from the
 // bucket. It returns the number of tokens removed, or zero if there are
 // no available tokens. It does not block.
 func (tb *Bucket) TakeAvailable(count int64) int64 {
-	return tb.takeAvailable(time.Now(), count)
+    return tb.takeAvailable(time.Now(), count)
 }
 
 // takeAvailable is the internal version of TakeAvailable - it takes the
 // current time as an argument to enable easy testing.
 func (tb *Bucket) takeAvailable(now time.Time, count int64) int64 {
-	if count <= 0 {
-		return 0
-	}
-	tb.mu.Lock()
-	defer tb.mu.Unlock()
+    if count <= 0 {
+        return 0
+    }
+    tb.mu.Lock()
+    defer tb.mu.Unlock()
 
-	tb.adjust(now)
-	if tb.avail <= 0 {
-		return 0
-	}
-	if count > tb.avail {
-		count = tb.avail
-	}
-	tb.avail -= count
-	return count
+    tb.adjust(now)
+    if tb.avail <= 0 {
+        return 0
+    }
+    if count > tb.avail {
+        count = tb.avail
+    }
+    tb.avail -= count
+    return count
 }
 
 // Available returns the number of available tokens. It will be negative
@@ -178,68 +178,68 @@ func (tb *Bucket) takeAvailable(now time.Time, count int64) int64 {
 // tokens could have changed in the meantime. This method is intended
 // primarily for metrics reporting and debugging.
 func (tb *Bucket) Available() int64 {
-	return tb.available(time.Now())
+    return tb.available(time.Now())
 }
 
 // available is the internal version of available - it takes the current time as
 // an argument to enable easy testing.
 func (tb *Bucket) available(now time.Time) int64 {
-	tb.mu.Lock()
-	defer tb.mu.Unlock()
-	tb.adjust(now)
-	return tb.avail
+    tb.mu.Lock()
+    defer tb.mu.Unlock()
+    tb.adjust(now)
+    return tb.avail
 }
 
 // Capacity returns the capacity that the bucket was created with.
 func (tb *Bucket) Capacity() int64 {
-	return tb.capacity
+    return tb.capacity
 }
 
 // Rate returns the fill rate of the bucket, in tokens per second.
 func (tb *Bucket) Rate() float64 {
-	return 1e9 * float64(tb.quantum) / float64(tb.fillInterval)
+    return 1e9 * float64(tb.quantum) / float64(tb.fillInterval)
 }
 
 // take is the internal version of Take - it takes the current time as
 // an argument to enable easy testing.
 func (tb *Bucket) take(now time.Time, count int64, maxWait time.Duration) (time.Duration, bool) {
-	if count <= 0 {
-		return 0, true
-	}
-	tb.mu.Lock()
-	defer tb.mu.Unlock()
+    if count <= 0 {
+        return 0, true
+    }
+    tb.mu.Lock()
+    defer tb.mu.Unlock()
 
-	currentTick := tb.adjust(now)
-	avail := tb.avail - count
-	if avail >= 0 {
-		tb.avail = avail
-		return 0, true
-	}
-	// Round up the missing tokens to the nearest multiple
-	// of quantum - the tokens won't be available until
-	// that tick.
-	endTick := currentTick + (-avail+tb.quantum-1)/tb.quantum
-	endTime := tb.startTime.Add(time.Duration(endTick) * tb.fillInterval)
-	waitTime := endTime.Sub(now)
-	if waitTime > maxWait {
-		return 0, false
-	}
-	tb.avail = avail
-	return waitTime, true
+    currentTick := tb.adjust(now)
+    avail := tb.avail - count
+    if avail >= 0 {
+        tb.avail = avail
+        return 0, true
+    }
+    // Round up the missing tokens to the nearest multiple
+    // of quantum - the tokens won't be available until
+    // that tick.
+    endTick := currentTick + (-avail + tb.quantum - 1) / tb.quantum
+    endTime := tb.startTime.Add(time.Duration(endTick) * tb.fillInterval)
+    waitTime := endTime.Sub(now)
+    if waitTime > maxWait {
+        return 0, false
+    }
+    tb.avail = avail
+    return waitTime, true
 }
 
 // adjust adjusts the current bucket capacity based on the current time.
 // It returns the current tick.
 func (tb *Bucket) adjust(now time.Time) (currentTick int64) {
-	currentTick = int64(now.Sub(tb.startTime) / tb.fillInterval)
+    currentTick = int64(now.Sub(tb.startTime) / tb.fillInterval)
 
-	if tb.avail >= tb.capacity {
-		return
-	}
-	tb.avail += (currentTick - tb.availTick) * tb.quantum
-	if tb.avail > tb.capacity {
-		tb.avail = tb.capacity
-	}
-	tb.availTick = currentTick
-	return
+    if tb.avail >= tb.capacity {
+        return
+    }
+    tb.avail += (currentTick - tb.availTick) * tb.quantum
+    if tb.avail > tb.capacity {
+        tb.avail = tb.capacity
+    }
+    tb.availTick = currentTick
+    return
 }

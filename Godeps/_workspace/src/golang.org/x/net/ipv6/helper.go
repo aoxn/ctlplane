@@ -5,35 +5,35 @@
 package ipv6
 
 import (
-	"errors"
-	"net"
+    "errors"
+    "net"
 )
 
 var (
-	errMissingAddress  = errors.New("missing address")
-	errHeaderTooShort  = errors.New("header too short")
-	errInvalidConnType = errors.New("invalid conn type")
-	errOpNoSupport     = errors.New("operation not supported")
-	errNoSuchInterface = errors.New("no such interface")
+    errMissingAddress = errors.New("missing address")
+    errHeaderTooShort = errors.New("header too short")
+    errInvalidConnType = errors.New("invalid conn type")
+    errOpNoSupport = errors.New("operation not supported")
+    errNoSuchInterface = errors.New("no such interface")
 )
 
 func boolint(b bool) int {
-	if b {
-		return 1
-	}
-	return 0
+    if b {
+        return 1
+    }
+    return 0
 }
 
 func netAddrToIP16(a net.Addr) net.IP {
-	switch v := a.(type) {
-	case *net.UDPAddr:
-		if ip := v.IP.To16(); ip != nil && ip.To4() == nil {
-			return ip
-		}
-	case *net.IPAddr:
-		if ip := v.IP.To16(); ip != nil && ip.To4() == nil {
-			return ip
-		}
-	}
-	return nil
+    switch v := a.(type) {
+    case *net.UDPAddr:
+        if ip := v.IP.To16(); ip != nil && ip.To4() == nil {
+            return ip
+        }
+    case *net.IPAddr:
+        if ip := v.IP.To16(); ip != nil && ip.To4() == nil {
+            return ip
+        }
+    }
+    return nil
 }

@@ -3,18 +3,18 @@
 package apparmor
 
 import (
-	"errors"
+    "errors"
 )
 
 var ErrApparmorNotEnabled = errors.New("apparmor: config provided but apparmor not supported")
 
 func IsEnabled() bool {
-	return false
+    return false
 }
 
 func ApplyProfile(name string) error {
-	if name != "" {
-		return ErrApparmorNotEnabled
-	}
-	return nil
+    if name != "" {
+        return ErrApparmorNotEnabled
+    }
+    return nil
 }

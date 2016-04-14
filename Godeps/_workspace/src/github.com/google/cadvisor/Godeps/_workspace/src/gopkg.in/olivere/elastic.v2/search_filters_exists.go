@@ -8,34 +8,34 @@ package elastic
 // For details, see:
 // http://www.elasticsearch.org/guide/reference/query-dsl/exists-filter.html
 type ExistsFilter struct {
-	Filter
-	name       string
-	filterName string
+    Filter
+    name       string
+    filterName string
 }
 
 func NewExistsFilter(name string) ExistsFilter {
-	f := ExistsFilter{name: name}
-	return f
+    f := ExistsFilter{name: name}
+    return f
 }
 
 func (f ExistsFilter) FilterName(filterName string) ExistsFilter {
-	f.filterName = filterName
-	return f
+    f.filterName = filterName
+    return f
 }
 
 func (f ExistsFilter) Source() interface{} {
-	// {
-	//   "exists" : {
-	//     "field" : "..."
-	//   }
-	// }
+    // {
+    //   "exists" : {
+    //     "field" : "..."
+    //   }
+    // }
 
-	source := make(map[string]interface{})
-	params := make(map[string]interface{})
-	source["exists"] = params
-	params["field"] = f.name
-	if f.filterName != "" {
-		params["_name"] = f.filterName
-	}
-	return source
+    source := make(map[string]interface{})
+    params := make(map[string]interface{})
+    source["exists"] = params
+    params["field"] = f.name
+    if f.filterName != "" {
+        params["_name"] = f.filterName
+    }
+    return source
 }

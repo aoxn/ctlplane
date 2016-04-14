@@ -5,63 +5,63 @@
 package packet
 
 import (
-	"bytes"
-	"crypto"
-	"encoding/hex"
-	"io"
-	"io/ioutil"
-	"testing"
+    "bytes"
+    "crypto"
+    "encoding/hex"
+    "io"
+    "io/ioutil"
+    "testing"
 
-	"golang.org/x/crypto/openpgp/armor"
+    "golang.org/x/crypto/openpgp/armor"
 )
 
 func TestSignatureV3Read(t *testing.T) {
-	r := v3KeyReader(t)
-	Read(r)                // Skip public key
-	Read(r)                // Skip uid
-	packet, err := Read(r) // Signature
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	sig, ok := packet.(*SignatureV3)
-	if !ok || sig.SigType != SigTypeGenericCert || sig.PubKeyAlgo != PubKeyAlgoRSA || sig.Hash != crypto.MD5 {
-		t.Errorf("failed to parse, got: %#v", packet)
-	}
+    r := v3KeyReader(t)
+    Read(r)                // Skip public key
+    Read(r)                // Skip uid
+    packet, err := Read(r) // Signature
+    if err != nil {
+        t.Error(err)
+        return
+    }
+    sig, ok := packet.(*SignatureV3)
+    if !ok || sig.SigType != SigTypeGenericCert || sig.PubKeyAlgo != PubKeyAlgoRSA || sig.Hash != crypto.MD5 {
+        t.Errorf("failed to parse, got: %#v", packet)
+    }
 }
 
 func TestSignatureV3Reserialize(t *testing.T) {
-	r := v3KeyReader(t)
-	Read(r) // Skip public key
-	Read(r) // Skip uid
-	packet, err := Read(r)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	sig := packet.(*SignatureV3)
-	out := new(bytes.Buffer)
-	if err = sig.Serialize(out); err != nil {
-		t.Errorf("error reserializing: %s", err)
-		return
-	}
-	expected, err := ioutil.ReadAll(v3KeyReader(t))
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	expected = expected[4+141+4+39:] // See pgpdump offsets below, this is where the sig starts
-	if !bytes.Equal(expected, out.Bytes()) {
-		t.Errorf("output doesn't match input (got vs expected):\n%s\n%s", hex.Dump(out.Bytes()), hex.Dump(expected))
-	}
+    r := v3KeyReader(t)
+    Read(r) // Skip public key
+    Read(r) // Skip uid
+    packet, err := Read(r)
+    if err != nil {
+        t.Error(err)
+        return
+    }
+    sig := packet.(*SignatureV3)
+    out := new(bytes.Buffer)
+    if err = sig.Serialize(out); err != nil {
+        t.Errorf("error reserializing: %s", err)
+        return
+    }
+    expected, err := ioutil.ReadAll(v3KeyReader(t))
+    if err != nil {
+        t.Error(err)
+        return
+    }
+    expected = expected[4 + 141 + 4 + 39:] // See pgpdump offsets below, this is where the sig starts
+    if !bytes.Equal(expected, out.Bytes()) {
+        t.Errorf("output doesn't match input (got vs expected):\n%s\n%s", hex.Dump(out.Bytes()), hex.Dump(expected))
+    }
 }
 
 func v3KeyReader(t *testing.T) io.Reader {
-	armorBlock, err := armor.Decode(bytes.NewBufferString(keySigV3Armor))
-	if err != nil {
-		t.Fatalf("armor Decode failed: %v", err)
-	}
-	return armorBlock.Body
+    armorBlock, err := armor.Decode(bytes.NewBufferString(keySigV3Armor))
+    if err != nil {
+        t.Fatalf("armor Decode failed: %v", err)
+    }
+    return armorBlock.Body
 }
 
 // keySigV3Armor is some V3 public key I found in an SKS dump.

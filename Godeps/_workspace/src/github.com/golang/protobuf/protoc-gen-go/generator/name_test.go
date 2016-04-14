@@ -32,25 +32,25 @@
 package generator
 
 import (
-	"testing"
+    "testing"
 )
 
 func TestCamelCase(t *testing.T) {
-	tests := []struct {
-		in, want string
-	}{
-		{"one", "One"},
-		{"one_two", "OneTwo"},
-		{"_my_field_name_2", "XMyFieldName_2"},
-		{"Something_Capped", "Something_Capped"},
-		{"my_Name", "My_Name"},
-		{"OneTwo", "OneTwo"},
-		{"_", "X"},
-		{"_a_", "XA_"},
-	}
-	for _, tc := range tests {
-		if got := CamelCase(tc.in); got != tc.want {
-			t.Errorf("CamelCase(%q) = %q, want %q", tc.in, got, tc.want)
-		}
-	}
+    tests := []struct {
+        in, want string
+    }{
+        {"one", "One"},
+        {"one_two", "OneTwo"},
+        {"_my_field_name_2", "XMyFieldName_2"},
+        {"Something_Capped", "Something_Capped"},
+        {"my_Name", "My_Name"},
+        {"OneTwo", "OneTwo"},
+        {"_", "X"},
+        {"_a_", "XA_"},
+    }
+    for _, tc := range tests {
+        if got := CamelCase(tc.in); got != tc.want {
+            t.Errorf("CamelCase(%q) = %q, want %q", tc.in, got, tc.want)
+        }
+    }
 }

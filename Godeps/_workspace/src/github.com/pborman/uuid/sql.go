@@ -5,44 +5,44 @@
 package uuid
 
 import (
-	"errors"
-	"fmt"
+    "errors"
+    "fmt"
 )
 
 // Scan implements sql.Scanner so UUIDs can be read from databases transparently
 // Currently, database types that map to string and []byte are supported. Please
 // consult database-specific driver documentation for matching types.
 func (uuid *UUID) Scan(src interface{}) error {
-	switch src.(type) {
-	case string:
-		// see uuid.Parse for required string format
-		parsed := Parse(src.(string))
+    switch src.(type) {
+    case string:
+        // see uuid.Parse for required string format
+        parsed := Parse(src.(string))
 
-		if parsed == nil {
-			return errors.New("Scan: invalid UUID format")
-		}
+        if parsed == nil {
+            return errors.New("Scan: invalid UUID format")
+        }
 
-		*uuid = parsed
-	case []byte:
-		b := src.([]byte)
+        *uuid = parsed
+    case []byte:
+        b := src.([]byte)
 
-		// assumes a simple slice of bytes if 16 bytes
-		// otherwise attempts to parse
-		if len(b) == 16 {
-			*uuid = UUID(b)
-		} else {
-			u := Parse(string(b))
+        // assumes a simple slice of bytes if 16 bytes
+        // otherwise attempts to parse
+        if len(b) == 16 {
+            *uuid = UUID(b)
+        } else {
+            u := Parse(string(b))
 
-			if u == nil {
-				return errors.New("Scan: invalid UUID format")
-			}
+            if u == nil {
+                return errors.New("Scan: invalid UUID format")
+            }
 
-			*uuid = u
-		}
+            *uuid = u
+        }
 
-	default:
-		return fmt.Errorf("Scan: unable to scan type %T into UUID", src)
-	}
+    default:
+        return fmt.Errorf("Scan: unable to scan type %T into UUID", src)
+    }
 
-	return nil
+    return nil
 }

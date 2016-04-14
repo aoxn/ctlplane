@@ -5,5 +5,5 @@
 package elastic
 
 type Filter interface {
-	Source() interface{}
+    Source() interface{}
 }

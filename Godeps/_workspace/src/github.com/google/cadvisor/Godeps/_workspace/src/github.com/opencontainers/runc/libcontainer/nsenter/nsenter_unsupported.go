@@ -2,4 +2,3 @@
 
 package nsenter
 
-import "C"

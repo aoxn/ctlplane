@@ -7,40 +7,40 @@
 package ipv6
 
 import (
-	"net"
-	"reflect"
+    "net"
+    "reflect"
 )
 
 func (c *genericOpt) sysfd() (int, error) {
-	switch p := c.Conn.(type) {
-	case *net.TCPConn, *net.UDPConn, *net.IPConn:
-		return sysfd(p)
-	}
-	return 0, errInvalidConnType
+    switch p := c.Conn.(type) {
+    case *net.TCPConn, *net.UDPConn, *net.IPConn:
+        return sysfd(p)
+    }
+    return 0, errInvalidConnType
 }
 
 func (c *dgramOpt) sysfd() (int, error) {
-	switch p := c.PacketConn.(type) {
-	case *net.UDPConn, *net.IPConn:
-		return sysfd(p.(net.Conn))
-	}
-	return 0, errInvalidConnType
+    switch p := c.PacketConn.(type) {
+    case *net.UDPConn, *net.IPConn:
+        return sysfd(p.(net.Conn))
+    }
+    return 0, errInvalidConnType
 }
 
 func (c *payloadHandler) sysfd() (int, error) {
-	return sysfd(c.PacketConn.(net.Conn))
+    return sysfd(c.PacketConn.(net.Conn))
 }
 
 func sysfd(c net.Conn) (int, error) {
-	cv := reflect.ValueOf(c)
-	switch ce := cv.Elem(); ce.Kind() {
-	case reflect.Struct:
-		nfd := ce.FieldByName("conn").FieldByName("fd")
-		switch fe := nfd.Elem(); fe.Kind() {
-		case reflect.Struct:
-			fd := fe.FieldByName("sysfd")
-			return int(fd.Int()), nil
-		}
-	}
-	return 0, errInvalidConnType
+    cv := reflect.ValueOf(c)
+    switch ce := cv.Elem(); ce.Kind() {
+    case reflect.Struct:
+        nfd := ce.FieldByName("conn").FieldByName("fd")
+        switch fe := nfd.Elem(); fe.Kind() {
+        case reflect.Struct:
+            fd := fe.FieldByName("sysfd")
+            return int(fd.Int()), nil
+        }
+    }
+    return 0, errInvalidConnType
 }

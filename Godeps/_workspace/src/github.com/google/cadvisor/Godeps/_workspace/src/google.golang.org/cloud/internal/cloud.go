@@ -18,8 +18,8 @@
 package internal
 
 import (
-	"fmt"
-	"net/http"
+    "fmt"
+    "net/http"
 )
 
 const userAgent = "gcloud-golang/0.1"
@@ -28,35 +28,35 @@ const userAgent = "gcloud-golang/0.1"
 // Google Cloud client's user-agent to the original
 // request's user-agent header.
 type UATransport struct {
-	// Base represents the actual http.RoundTripper
-	// the requests will be delegated to.
-	Base http.RoundTripper
+    // Base represents the actual http.RoundTripper
+    // the requests will be delegated to.
+    Base http.RoundTripper
 }
 
 // RoundTrip appends a user-agent to the existing user-agent
 // header and delegates the request to the base http.RoundTripper.
 func (t *UATransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	req = cloneRequest(req)
-	ua := req.Header.Get("User-Agent")
-	if ua == "" {
-		ua = userAgent
-	} else {
-		ua = fmt.Sprintf("%s;%s", ua, userAgent)
-	}
-	req.Header.Set("User-Agent", ua)
-	return t.Base.RoundTrip(req)
+    req = cloneRequest(req)
+    ua := req.Header.Get("User-Agent")
+    if ua == "" {
+        ua = userAgent
+    } else {
+        ua = fmt.Sprintf("%s;%s", ua, userAgent)
+    }
+    req.Header.Set("User-Agent", ua)
+    return t.Base.RoundTrip(req)
 }
 
 // cloneRequest returns a clone of the provided *http.Request.
 // The clone is a shallow copy of the struct and its Header map.
 func cloneRequest(r *http.Request) *http.Request {
-	// shallow copy of the struct
-	r2 := new(http.Request)
-	*r2 = *r
-	// deep copy of the Header
-	r2.Header = make(http.Header)
-	for k, s := range r.Header {
-		r2.Header[k] = s
-	}
-	return r2
+    // shallow copy of the struct
+    r2 := new(http.Request)
+    *r2 = *r
+    // deep copy of the Header
+    r2.Header = make(http.Header)
+    for k, s := range r.Header {
+        r2.Header[k] = s
+    }
+    return r2
 }

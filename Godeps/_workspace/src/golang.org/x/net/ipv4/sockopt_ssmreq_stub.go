@@ -9,9 +9,9 @@ package ipv4
 import "net"
 
 func setsockoptGroupReq(fd, name int, ifi *net.Interface, grp net.IP) error {
-	return errOpNoSupport
+    return errOpNoSupport
 }
 
 func setsockoptGroupSourceReq(fd, name int, ifi *net.Interface, grp, src net.IP) error {
-	return errOpNoSupport
+    return errOpNoSupport
 }

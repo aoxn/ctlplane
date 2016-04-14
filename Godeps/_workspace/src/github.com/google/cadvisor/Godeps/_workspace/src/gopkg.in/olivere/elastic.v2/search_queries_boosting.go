@@ -9,81 +9,81 @@ package elastic
 // For more details, see:
 // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-boosting-query.html
 type BoostingQuery struct {
-	Query
-	positiveClause Query
-	negativeClause Query
-	negativeBoost  *float64
-	boost          *float64
+    Query
+    positiveClause Query
+    negativeClause Query
+    negativeBoost  *float64
+    boost          *float64
 }
 
 // Creates a new boosting query.
 func NewBoostingQuery() BoostingQuery {
-	return BoostingQuery{}
+    return BoostingQuery{}
 }
 
 func (q BoostingQuery) Positive(positive Query) BoostingQuery {
-	q.positiveClause = positive
-	return q
+    q.positiveClause = positive
+    return q
 }
 
 func (q BoostingQuery) Negative(negative Query) BoostingQuery {
-	q.negativeClause = negative
-	return q
+    q.negativeClause = negative
+    return q
 }
 
 func (q BoostingQuery) NegativeBoost(negativeBoost float64) BoostingQuery {
-	q.negativeBoost = &negativeBoost
-	return q
+    q.negativeBoost = &negativeBoost
+    return q
 }
 
 func (q BoostingQuery) Boost(boost float64) BoostingQuery {
-	q.boost = &boost
-	return q
+    q.boost = &boost
+    return q
 }
 
 // Creates the query source for the boosting query.
 func (q BoostingQuery) Source() interface{} {
-	// {
-	//     "boosting" : {
-	//         "positive" : {
-	//             "term" : {
-	//                 "field1" : "value1"
-	//             }
-	//         },
-	//         "negative" : {
-	//             "term" : {
-	//                 "field2" : "value2"
-	//             }
-	//         },
-	//         "negative_boost" : 0.2
-	//     }
-	// }
+    // {
+    //     "boosting" : {
+    //         "positive" : {
+    //             "term" : {
+    //                 "field1" : "value1"
+    //             }
+    //         },
+    //         "negative" : {
+    //             "term" : {
+    //                 "field2" : "value2"
+    //             }
+    //         },
+    //         "negative_boost" : 0.2
+    //     }
+    // }
 
-	query := make(map[string]interface{})
+    query := make(map[string]interface{})
 
-	boostingClause := make(map[string]interface{})
-	query["boosting"] = boostingClause
+    boostingClause := make(map[string]interface{})
+    query["boosting"] = boostingClause
 
-	// Negative and positive clause as well as negative boost
-	// are mandatory in the Java client.
+    // Negative and positive clause as well as negative boost
+    // are mandatory in the Java client.
 
-	// positive
-	if q.positiveClause != nil {
-		boostingClause["positive"] = q.positiveClause.Source()
-	}
+    // positive
+    if q.positiveClause != nil {
+        boostingClause["positive"] = q.positiveClause.Source()
+    }
 
-	// negative
-	if q.negativeClause != nil {
-		boostingClause["negative"] = q.negativeClause.Source()
-	}
+    // negative
+    if q.negativeClause != nil {
+        boostingClause["negative"] = q.negativeClause.Source()
+    }
 
-	if q.negativeBoost != nil {
-		boostingClause["negative_boost"] = *q.negativeBoost
-	}
+    if q.negativeBoost != nil {
+        boostingClause["negative_boost"] = *q.negativeBoost
+    }
 
-	if q.boost != nil {
-		boostingClause["boost"] = *q.boost
-	}
+    if q.boost != nil {
+        boostingClause["boost"] = *q.boost
+    }
 
-	return query
+    return query
 }

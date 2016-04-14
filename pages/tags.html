@@ -8,37 +8,39 @@
     </div>
     {{if .has }}
     <div class="container">
-            <ul class="list-group hidden-xs col-sm-3 panel-info">
-                {{$repName:= .repo.RepoName}}
-                {{range $item := .repo.Tags}}
+        <ul class="list-group hidden-xs col-sm-3 panel-info">
+            {{$repName:= .repo.RepoName}}
+            {{range $item := .repo.Tags}}
 
-                    <a class="list-group-item" href="/detail?it={{$repName}}&tag={{$item.Name}}" >
-                        {{$item.Name}}
-                    </a>
+            <a class="list-group-item" href="/detail?it={{$repName}}&tag={{$item.Name}}">
+                {{$item.Name}}
+            </a>
 
 
-                {{end}}
-            </ul>
+            {{end}}
+        </ul>
 
-            <ul class="col-xs-12 col-sm-9 ">
-                <form role="form" class="col-xs-12 col-sm-10" id="descform" method="post" name="descform" action="/detail?it={{.repo.RepoName}}&tag={{.currtag.Name}}">
-                    <div class="panel panel-default panel-info">
-                        <div class="panel panel-heading">
-                            <div class="row ">
-                                <div class="col-xs-12 col-sm-10 ">标签描述 <strong>[{{.currtag.Name}}]</strong></div>
-                                <div class="hidden-xs col-sm-2 list-inline text-right" >
-                                    <button id="edit" class="btn" name="edit">Edit</button>
-                                </div>
+        <ul class="col-xs-12 col-sm-9 ">
+            <form role="form" class="col-xs-12 col-sm-10" id="descform" method="post" name="descform"
+                  action="/detail?it={{.repo.RepoName}}&tag={{.currtag.Name}}">
+                <div class="panel panel-default panel-info">
+                    <div class="panel panel-heading">
+                        <div class="row ">
+                            <div class="col-xs-12 col-sm-10 ">标签描述 <strong>[{{.currtag.Name}}]</strong></div>
+                            <div class="hidden-xs col-sm-2 list-inline text-right">
+                                <button id="edit" class="btn" name="edit">Edit</button>
                             </div>
+                        </div>
 
-                        </div>
-                        <div class="panel-body ">
-                            <span id="content" name="content">{{.currtag.Description}}</span>
-                            <textarea id="txtbody" name="txtbody" class="hidden center-block">{{.currtag.Description}}</textarea>
-                        </div>
                     </div>
-                </form>
-            </ul>
+                    <div class="panel-body ">
+                        <span id="content" name="content">{{.currtag.Description}}</span>
+                        <textarea id="txtbody" name="txtbody"
+                                  class="hidden center-block">{{.currtag.Description}}</textarea>
+                    </div>
+                </div>
+            </form>
+        </ul>
     </div>
     {{else}}
     <div class="container">
@@ -53,7 +55,7 @@
     function edit(e) {
         $("#content").hide()
         var txt = $("#edit").text()
-        if (txt == "Edit"){
+        if (txt == "Edit") {
             $("#edit").text("Save")
             tinymce.init({
                 selector: 'textarea',
@@ -72,12 +74,12 @@
             e.preventDefault()
         }
 
-        if (txt == "Save"){
+        if (txt == "Save") {
             $("descform").submit()
         }
 
     }
-    $(document).ready(function(){
+    $(document).ready(function () {
         $("#edit").click(edit)
         $("#content").html($("#content").text())
     });

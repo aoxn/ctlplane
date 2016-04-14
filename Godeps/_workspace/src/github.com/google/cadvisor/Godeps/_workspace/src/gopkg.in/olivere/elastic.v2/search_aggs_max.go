@@ -11,99 +11,99 @@ package elastic
 // a provided script.
 // See: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-aggregations-metrics-max-aggregation.html
 type MaxAggregation struct {
-	field           string
-	script          string
-	scriptFile      string
-	lang            string
-	format          string
-	params          map[string]interface{}
-	subAggregations map[string]Aggregation
+    field           string
+    script          string
+    scriptFile      string
+    lang            string
+    format          string
+    params          map[string]interface{}
+    subAggregations map[string]Aggregation
 }
 
 func NewMaxAggregation() MaxAggregation {
-	a := MaxAggregation{
-		params:          make(map[string]interface{}),
-		subAggregations: make(map[string]Aggregation),
-	}
-	return a
+    a := MaxAggregation{
+        params:          make(map[string]interface{}),
+        subAggregations: make(map[string]Aggregation),
+    }
+    return a
 }
 
 func (a MaxAggregation) Field(field string) MaxAggregation {
-	a.field = field
-	return a
+    a.field = field
+    return a
 }
 
 func (a MaxAggregation) Script(script string) MaxAggregation {
-	a.script = script
-	return a
+    a.script = script
+    return a
 }
 
 func (a MaxAggregation) ScriptFile(scriptFile string) MaxAggregation {
-	a.scriptFile = scriptFile
-	return a
+    a.scriptFile = scriptFile
+    return a
 }
 
 func (a MaxAggregation) Lang(lang string) MaxAggregation {
-	a.lang = lang
-	return a
+    a.lang = lang
+    return a
 }
 
 func (a MaxAggregation) Format(format string) MaxAggregation {
-	a.format = format
-	return a
+    a.format = format
+    return a
 }
 
 func (a MaxAggregation) Param(name string, value interface{}) MaxAggregation {
-	a.params[name] = value
-	return a
+    a.params[name] = value
+    return a
 }
 
 func (a MaxAggregation) SubAggregation(name string, subAggregation Aggregation) MaxAggregation {
-	a.subAggregations[name] = subAggregation
-	return a
+    a.subAggregations[name] = subAggregation
+    return a
 }
 
 func (a MaxAggregation) Source() interface{} {
-	// Example:
-	//	{
-	//    "aggs" : {
-	//      "max_price" : { "max" : { "field" : "price" } }
-	//    }
-	//	}
-	// This method returns only the { "max" : { "field" : "price" } } part.
+    // Example:
+    //	{
+    //    "aggs" : {
+    //      "max_price" : { "max" : { "field" : "price" } }
+    //    }
+    //	}
+    // This method returns only the { "max" : { "field" : "price" } } part.
 
-	source := make(map[string]interface{})
-	opts := make(map[string]interface{})
-	source["max"] = opts
+    source := make(map[string]interface{})
+    opts := make(map[string]interface{})
+    source["max"] = opts
 
-	// ValuesSourceAggregationBuilder
-	if a.field != "" {
-		opts["field"] = a.field
-	}
-	if a.script != "" {
-		opts["script"] = a.script
-	}
-	if a.scriptFile != "" {
-		opts["script_file"] = a.scriptFile
-	}
-	if a.lang != "" {
-		opts["lang"] = a.lang
-	}
-	if a.format != "" {
-		opts["format"] = a.format
-	}
-	if len(a.params) > 0 {
-		opts["params"] = a.params
-	}
+    // ValuesSourceAggregationBuilder
+    if a.field != "" {
+        opts["field"] = a.field
+    }
+    if a.script != "" {
+        opts["script"] = a.script
+    }
+    if a.scriptFile != "" {
+        opts["script_file"] = a.scriptFile
+    }
+    if a.lang != "" {
+        opts["lang"] = a.lang
+    }
+    if a.format != "" {
+        opts["format"] = a.format
+    }
+    if len(a.params) > 0 {
+        opts["params"] = a.params
+    }
 
-	// AggregationBuilder (SubAggregations)
-	if len(a.subAggregations) > 0 {
-		aggsMap := make(map[string]interface{})
-		source["aggregations"] = aggsMap
-		for name, aggregate := range a.subAggregations {
-			aggsMap[name] = aggregate.Source()
-		}
-	}
+    // AggregationBuilder (SubAggregations)
+    if len(a.subAggregations) > 0 {
+        aggsMap := make(map[string]interface{})
+        source["aggregations"] = aggsMap
+        for name, aggregate := range a.subAggregations {
+            aggsMap[name] = aggregate.Source()
+        }
+    }
 
-	return source
+    return source
 }

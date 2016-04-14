@@ -29,75 +29,70 @@
 
 package pbutil
 
-import (
-	. "github.com/golang/protobuf/proto"
-	. "github.com/golang/protobuf/proto/testdata"
-)
-
 // FROM https://github.com/golang/protobuf/blob/master/proto/all_test.go.
 
 func initGoTestField() *GoTestField {
-	f := new(GoTestField)
-	f.Label = String("label")
-	f.Type = String("type")
-	return f
+    f := new(GoTestField)
+    f.Label = String("label")
+    f.Type = String("type")
+    return f
 }
 
 // These are all structurally equivalent but the tag numbers differ.
 // (It's remarkable that required, optional, and repeated all have
 // 8 letters.)
 func initGoTest_RequiredGroup() *GoTest_RequiredGroup {
-	return &GoTest_RequiredGroup{
-		RequiredField: String("required"),
-	}
+    return &GoTest_RequiredGroup{
+        RequiredField: String("required"),
+    }
 }
 
 func initGoTest_OptionalGroup() *GoTest_OptionalGroup {
-	return &GoTest_OptionalGroup{
-		RequiredField: String("optional"),
-	}
+    return &GoTest_OptionalGroup{
+        RequiredField: String("optional"),
+    }
 }
 
 func initGoTest_RepeatedGroup() *GoTest_RepeatedGroup {
-	return &GoTest_RepeatedGroup{
-		RequiredField: String("repeated"),
-	}
+    return &GoTest_RepeatedGroup{
+        RequiredField: String("repeated"),
+    }
 }
 
 func initGoTest(setdefaults bool) *GoTest {
-	pb := new(GoTest)
-	if setdefaults {
-		pb.F_BoolDefaulted = Bool(Default_GoTest_F_BoolDefaulted)
-		pb.F_Int32Defaulted = Int32(Default_GoTest_F_Int32Defaulted)
-		pb.F_Int64Defaulted = Int64(Default_GoTest_F_Int64Defaulted)
-		pb.F_Fixed32Defaulted = Uint32(Default_GoTest_F_Fixed32Defaulted)
-		pb.F_Fixed64Defaulted = Uint64(Default_GoTest_F_Fixed64Defaulted)
-		pb.F_Uint32Defaulted = Uint32(Default_GoTest_F_Uint32Defaulted)
-		pb.F_Uint64Defaulted = Uint64(Default_GoTest_F_Uint64Defaulted)
-		pb.F_FloatDefaulted = Float32(Default_GoTest_F_FloatDefaulted)
-		pb.F_DoubleDefaulted = Float64(Default_GoTest_F_DoubleDefaulted)
-		pb.F_StringDefaulted = String(Default_GoTest_F_StringDefaulted)
-		pb.F_BytesDefaulted = Default_GoTest_F_BytesDefaulted
-		pb.F_Sint32Defaulted = Int32(Default_GoTest_F_Sint32Defaulted)
-		pb.F_Sint64Defaulted = Int64(Default_GoTest_F_Sint64Defaulted)
-	}
+    pb := new(GoTest)
+    if setdefaults {
+        pb.F_BoolDefaulted = Bool(Default_GoTest_F_BoolDefaulted)
+        pb.F_Int32Defaulted = Int32(Default_GoTest_F_Int32Defaulted)
+        pb.F_Int64Defaulted = Int64(Default_GoTest_F_Int64Defaulted)
+        pb.F_Fixed32Defaulted = Uint32(Default_GoTest_F_Fixed32Defaulted)
+        pb.F_Fixed64Defaulted = Uint64(Default_GoTest_F_Fixed64Defaulted)
+        pb.F_Uint32Defaulted = Uint32(Default_GoTest_F_Uint32Defaulted)
+        pb.F_Uint64Defaulted = Uint64(Default_GoTest_F_Uint64Defaulted)
+        pb.F_FloatDefaulted = Float32(Default_GoTest_F_FloatDefaulted)
+        pb.F_DoubleDefaulted = Float64(Default_GoTest_F_DoubleDefaulted)
+        pb.F_StringDefaulted = String(Default_GoTest_F_StringDefaulted)
+        pb.F_BytesDefaulted = Default_GoTest_F_BytesDefaulted
+        pb.F_Sint32Defaulted = Int32(Default_GoTest_F_Sint32Defaulted)
+        pb.F_Sint64Defaulted = Int64(Default_GoTest_F_Sint64Defaulted)
+    }
 
-	pb.Kind = GoTest_TIME.Enum()
-	pb.RequiredField = initGoTestField()
-	pb.F_BoolRequired = Bool(true)
-	pb.F_Int32Required = Int32(3)
-	pb.F_Int64Required = Int64(6)
-	pb.F_Fixed32Required = Uint32(32)
-	pb.F_Fixed64Required = Uint64(64)
-	pb.F_Uint32Required = Uint32(3232)
-	pb.F_Uint64Required = Uint64(6464)
-	pb.F_FloatRequired = Float32(3232)
-	pb.F_DoubleRequired = Float64(6464)
-	pb.F_StringRequired = String("string")
-	pb.F_BytesRequired = []byte("bytes")
-	pb.F_Sint32Required = Int32(-32)
-	pb.F_Sint64Required = Int64(-64)
-	pb.Requiredgroup = initGoTest_RequiredGroup()
+    pb.Kind = GoTest_TIME.Enum()
+    pb.RequiredField = initGoTestField()
+    pb.F_BoolRequired = Bool(true)
+    pb.F_Int32Required = Int32(3)
+    pb.F_Int64Required = Int64(6)
+    pb.F_Fixed32Required = Uint32(32)
+    pb.F_Fixed64Required = Uint64(64)
+    pb.F_Uint32Required = Uint32(3232)
+    pb.F_Uint64Required = Uint64(6464)
+    pb.F_FloatRequired = Float32(3232)
+    pb.F_DoubleRequired = Float64(6464)
+    pb.F_StringRequired = String("string")
+    pb.F_BytesRequired = []byte("bytes")
+    pb.F_Sint32Required = Int32(-32)
+    pb.F_Sint64Required = Int64(-64)
+    pb.Requiredgroup = initGoTest_RequiredGroup()
 
-	return pb
+    return pb
 }

@@ -60,7 +60,7 @@
     function edit(e) {
         $("#content").hide()
         var txt = $("#edit").text()
-        if (txt == "Edit"){
+        if (txt == "Edit") {
             $("#edit").text("Save")
             tinymce.init({
                 selector: 'textarea',
@@ -79,12 +79,12 @@
             e.preventDefault()
         }
 
-        if (txt == "Save"){
+        if (txt == "Save") {
             $("descform").submit()
         }
 
     }
-    $(document).ready(function(){
+    $(document).ready(function () {
         $("#edit").click(edit)
         $("#content").html($("#content").text())
     });

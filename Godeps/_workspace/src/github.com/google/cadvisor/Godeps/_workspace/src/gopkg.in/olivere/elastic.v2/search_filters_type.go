@@ -10,24 +10,24 @@ package elastic
 // For details, see:
 // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-type-filter.html
 type TypeFilter struct {
-	Filter
-	typ string
+    Filter
+    typ string
 }
 
 func NewTypeFilter(typ string) TypeFilter {
-	f := TypeFilter{typ: typ}
-	return f
+    f := TypeFilter{typ: typ}
+    return f
 }
 
 func (f TypeFilter) Source() interface{} {
-	// {
-	//   "type" : {
-	//     "value" : "..."
-	//   }
-	// }
-	source := make(map[string]interface{})
-	params := make(map[string]interface{})
-	source["type"] = params
-	params["value"] = f.typ
-	return source
+    // {
+    //   "type" : {
+    //     "value" : "..."
+    //   }
+    // }
+    source := make(map[string]interface{})
+    params := make(map[string]interface{})
+    source["type"] = params
+    params["value"] = f.typ
+    return source
 }

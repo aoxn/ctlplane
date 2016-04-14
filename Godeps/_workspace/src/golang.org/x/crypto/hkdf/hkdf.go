@@ -13,63 +13,63 @@
 package hkdf // import "golang.org/x/crypto/hkdf"
 
 import (
-	"crypto/hmac"
-	"errors"
-	"hash"
-	"io"
+    "crypto/hmac"
+    "errors"
+    "hash"
+    "io"
 )
 
 type hkdf struct {
-	expander hash.Hash
-	size     int
+    expander hash.Hash
+    size     int
 
-	info    []byte
-	counter byte
+    info     []byte
+    counter  byte
 
-	prev  []byte
-	cache []byte
+    prev     []byte
+    cache    []byte
 }
 
 func (f *hkdf) Read(p []byte) (int, error) {
-	// Check whether enough data can be generated
-	need := len(p)
-	remains := len(f.cache) + int(255-f.counter+1)*f.size
-	if remains < need {
-		return 0, errors.New("hkdf: entropy limit reached")
-	}
-	// Read from the cache, if enough data is present
-	n := copy(p, f.cache)
-	p = p[n:]
+    // Check whether enough data can be generated
+    need := len(p)
+    remains := len(f.cache) + int(255 - f.counter + 1) * f.size
+    if remains < need {
+        return 0, errors.New("hkdf: entropy limit reached")
+    }
+    // Read from the cache, if enough data is present
+    n := copy(p, f.cache)
+    p = p[n:]
 
-	// Fill the buffer
-	for len(p) > 0 {
-		f.expander.Reset()
-		f.expander.Write(f.prev)
-		f.expander.Write(f.info)
-		f.expander.Write([]byte{f.counter})
-		f.prev = f.expander.Sum(f.prev[:0])
-		f.counter++
+    // Fill the buffer
+    for len(p) > 0 {
+        f.expander.Reset()
+        f.expander.Write(f.prev)
+        f.expander.Write(f.info)
+        f.expander.Write([]byte{f.counter})
+        f.prev = f.expander.Sum(f.prev[:0])
+        f.counter++
 
-		// Copy the new batch into p
-		f.cache = f.prev
-		n = copy(p, f.cache)
-		p = p[n:]
-	}
-	// Save leftovers for next run
-	f.cache = f.cache[n:]
+        // Copy the new batch into p
+        f.cache = f.prev
+        n = copy(p, f.cache)
+        p = p[n:]
+    }
+    // Save leftovers for next run
+    f.cache = f.cache[n:]
 
-	return need, nil
+    return need, nil
 }
 
 // New returns a new HKDF using the given hash, the secret keying material to expand
 // and optional salt and info fields.
 func New(hash func() hash.Hash, secret, salt, info []byte) io.Reader {
-	if salt == nil {
-		salt = make([]byte, hash().Size())
-	}
-	extractor := hmac.New(hash, salt)
-	extractor.Write(secret)
-	prk := extractor.Sum(nil)
+    if salt == nil {
+        salt = make([]byte, hash().Size())
+    }
+    extractor := hmac.New(hash, salt)
+    extractor.Write(secret)
+    prk := extractor.Sum(nil)
 
-	return &hkdf{hmac.New(hash, prk), extractor.Size(), info, 1, nil, nil}
+    return &hkdf{hmac.New(hash, prk), extractor.Size(), info, 1, nil, nil}
 }

@@ -15,16 +15,16 @@
 package main
 
 import (
-	"flag"
-	"net/http"
+    "flag"
+    "net/http"
 
-	"github.com/prometheus/client_golang/prometheus"
+    "github.com/prometheus/client_golang/prometheus"
 )
 
 var addr = flag.String("listen-address", ":8080", "The address to listen on for HTTP requests.")
 
 func main() {
-	flag.Parse()
-	http.Handle("/metrics", prometheus.Handler())
-	http.ListenAndServe(*addr, nil)
+    flag.Parse()
+    http.Handle("/metrics", prometheus.Handler())
+    http.ListenAndServe(*addr, nil)
 }

@@ -14,170 +14,170 @@
 package prometheus
 
 import (
-	"sync"
-	"testing"
+    "sync"
+    "testing"
 )
 
 func BenchmarkCounterWithLabelValues(b *testing.B) {
-	m := NewCounterVec(
-		CounterOpts{
-			Name: "benchmark_counter",
-			Help: "A counter to benchmark it.",
-		},
-		[]string{"one", "two", "three"},
-	)
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		m.WithLabelValues("eins", "zwei", "drei").Inc()
-	}
+    m := NewCounterVec(
+        CounterOpts{
+            Name: "benchmark_counter",
+            Help: "A counter to benchmark it.",
+        },
+        []string{"one", "two", "three"},
+    )
+    b.ReportAllocs()
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        m.WithLabelValues("eins", "zwei", "drei").Inc()
+    }
 }
 
 func BenchmarkCounterWithLabelValuesConcurrent(b *testing.B) {
-	m := NewCounterVec(
-		CounterOpts{
-			Name: "benchmark_counter",
-			Help: "A counter to benchmark it.",
-		},
-		[]string{"one", "two", "three"},
-	)
-	b.ReportAllocs()
-	b.ResetTimer()
-	wg := sync.WaitGroup{}
-	for i := 0; i < 10; i++ {
-		wg.Add(1)
-		go func() {
-			for j := 0; j < b.N/10; j++ {
-				m.WithLabelValues("eins", "zwei", "drei").Inc()
-			}
-			wg.Done()
-		}()
-	}
-	wg.Wait()
+    m := NewCounterVec(
+        CounterOpts{
+            Name: "benchmark_counter",
+            Help: "A counter to benchmark it.",
+        },
+        []string{"one", "two", "three"},
+    )
+    b.ReportAllocs()
+    b.ResetTimer()
+    wg := sync.WaitGroup{}
+    for i := 0; i < 10; i++ {
+        wg.Add(1)
+        go func() {
+            for j := 0; j < b.N / 10; j++ {
+                m.WithLabelValues("eins", "zwei", "drei").Inc()
+            }
+            wg.Done()
+        }()
+    }
+    wg.Wait()
 }
 
 func BenchmarkCounterWithMappedLabels(b *testing.B) {
-	m := NewCounterVec(
-		CounterOpts{
-			Name: "benchmark_counter",
-			Help: "A counter to benchmark it.",
-		},
-		[]string{"one", "two", "three"},
-	)
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		m.With(Labels{"two": "zwei", "one": "eins", "three": "drei"}).Inc()
-	}
+    m := NewCounterVec(
+        CounterOpts{
+            Name: "benchmark_counter",
+            Help: "A counter to benchmark it.",
+        },
+        []string{"one", "two", "three"},
+    )
+    b.ReportAllocs()
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        m.With(Labels{"two": "zwei", "one": "eins", "three": "drei"}).Inc()
+    }
 }
 
 func BenchmarkCounterWithPreparedMappedLabels(b *testing.B) {
-	m := NewCounterVec(
-		CounterOpts{
-			Name: "benchmark_counter",
-			Help: "A counter to benchmark it.",
-		},
-		[]string{"one", "two", "three"},
-	)
-	b.ReportAllocs()
-	b.ResetTimer()
-	labels := Labels{"two": "zwei", "one": "eins", "three": "drei"}
-	for i := 0; i < b.N; i++ {
-		m.With(labels).Inc()
-	}
+    m := NewCounterVec(
+        CounterOpts{
+            Name: "benchmark_counter",
+            Help: "A counter to benchmark it.",
+        },
+        []string{"one", "two", "three"},
+    )
+    b.ReportAllocs()
+    b.ResetTimer()
+    labels := Labels{"two": "zwei", "one": "eins", "three": "drei"}
+    for i := 0; i < b.N; i++ {
+        m.With(labels).Inc()
+    }
 }
 
 func BenchmarkCounterNoLabels(b *testing.B) {
-	m := NewCounter(CounterOpts{
-		Name: "benchmark_counter",
-		Help: "A counter to benchmark it.",
-	})
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		m.Inc()
-	}
+    m := NewCounter(CounterOpts{
+        Name: "benchmark_counter",
+        Help: "A counter to benchmark it.",
+    })
+    b.ReportAllocs()
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        m.Inc()
+    }
 }
 
 func BenchmarkGaugeWithLabelValues(b *testing.B) {
-	m := NewGaugeVec(
-		GaugeOpts{
-			Name: "benchmark_gauge",
-			Help: "A gauge to benchmark it.",
-		},
-		[]string{"one", "two", "three"},
-	)
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		m.WithLabelValues("eins", "zwei", "drei").Set(3.1415)
-	}
+    m := NewGaugeVec(
+        GaugeOpts{
+            Name: "benchmark_gauge",
+            Help: "A gauge to benchmark it.",
+        },
+        []string{"one", "two", "three"},
+    )
+    b.ReportAllocs()
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        m.WithLabelValues("eins", "zwei", "drei").Set(3.1415)
+    }
 }
 
 func BenchmarkGaugeNoLabels(b *testing.B) {
-	m := NewGauge(GaugeOpts{
-		Name: "benchmark_gauge",
-		Help: "A gauge to benchmark it.",
-	})
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		m.Set(3.1415)
-	}
+    m := NewGauge(GaugeOpts{
+        Name: "benchmark_gauge",
+        Help: "A gauge to benchmark it.",
+    })
+    b.ReportAllocs()
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        m.Set(3.1415)
+    }
 }
 
 func BenchmarkSummaryWithLabelValues(b *testing.B) {
-	m := NewSummaryVec(
-		SummaryOpts{
-			Name: "benchmark_summary",
-			Help: "A summary to benchmark it.",
-		},
-		[]string{"one", "two", "three"},
-	)
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		m.WithLabelValues("eins", "zwei", "drei").Observe(3.1415)
-	}
+    m := NewSummaryVec(
+        SummaryOpts{
+            Name: "benchmark_summary",
+            Help: "A summary to benchmark it.",
+        },
+        []string{"one", "two", "three"},
+    )
+    b.ReportAllocs()
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        m.WithLabelValues("eins", "zwei", "drei").Observe(3.1415)
+    }
 }
 
 func BenchmarkSummaryNoLabels(b *testing.B) {
-	m := NewSummary(SummaryOpts{
-		Name: "benchmark_summary",
-		Help: "A summary to benchmark it.",
-	},
-	)
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		m.Observe(3.1415)
-	}
+    m := NewSummary(SummaryOpts{
+        Name: "benchmark_summary",
+        Help: "A summary to benchmark it.",
+    },
+    )
+    b.ReportAllocs()
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        m.Observe(3.1415)
+    }
 }
 
 func BenchmarkHistogramWithLabelValues(b *testing.B) {
-	m := NewHistogramVec(
-		HistogramOpts{
-			Name: "benchmark_histogram",
-			Help: "A histogram to benchmark it.",
-		},
-		[]string{"one", "two", "three"},
-	)
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		m.WithLabelValues("eins", "zwei", "drei").Observe(3.1415)
-	}
+    m := NewHistogramVec(
+        HistogramOpts{
+            Name: "benchmark_histogram",
+            Help: "A histogram to benchmark it.",
+        },
+        []string{"one", "two", "three"},
+    )
+    b.ReportAllocs()
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        m.WithLabelValues("eins", "zwei", "drei").Observe(3.1415)
+    }
 }
 
 func BenchmarkHistogramNoLabels(b *testing.B) {
-	m := NewHistogram(HistogramOpts{
-		Name: "benchmark_histogram",
-		Help: "A histogram to benchmark it.",
-	},
-	)
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		m.Observe(3.1415)
-	}
+    m := NewHistogram(HistogramOpts{
+        Name: "benchmark_histogram",
+        Help: "A histogram to benchmark it.",
+    },
+    )
+    b.ReportAllocs()
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        m.Observe(3.1415)
+    }
 }

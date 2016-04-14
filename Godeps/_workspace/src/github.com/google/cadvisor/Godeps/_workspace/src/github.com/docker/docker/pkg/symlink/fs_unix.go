@@ -3,9 +3,9 @@
 package symlink
 
 import (
-	"path/filepath"
+    "path/filepath"
 )
 
 func evalSymlinks(path string) (string, error) {
-	return filepath.EvalSymlinks(path)
+    return filepath.EvalSymlinks(path)
 }

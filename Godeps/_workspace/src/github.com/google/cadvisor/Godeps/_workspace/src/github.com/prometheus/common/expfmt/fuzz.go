@@ -25,12 +25,12 @@ import "bytes"
 //
 // Further input samples should go in the folder fuzz/corpus.
 func Fuzz(in []byte) int {
-	parser := TextParser{}
-	_, err := parser.TextToMetricFamilies(bytes.NewReader(in))
+    parser := TextParser{}
+    _, err := parser.TextToMetricFamilies(bytes.NewReader(in))
 
-	if err != nil {
-		return 0
-	}
+    if err != nil {
+        return 0
+    }
 
-	return 1
+    return 1
 }

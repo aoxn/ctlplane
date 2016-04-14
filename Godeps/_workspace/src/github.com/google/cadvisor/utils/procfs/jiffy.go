@@ -23,11 +23,11 @@ import "time"
 var userHz uint64
 
 func init() {
-	userHzLong := C.sysconf(C._SC_CLK_TCK)
-	userHz = uint64(userHzLong)
+    userHzLong := C.sysconf(C._SC_CLK_TCK)
+    userHz = uint64(userHzLong)
 }
 
 func JiffiesToDuration(jiffies uint64) time.Duration {
-	d := jiffies * 1000000000 / userHz
-	return time.Duration(d)
+    d := jiffies * 1000000000 / userHz
+    return time.Duration(d)
 }

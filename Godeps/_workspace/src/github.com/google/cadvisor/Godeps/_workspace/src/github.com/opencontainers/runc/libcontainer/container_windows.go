@@ -2,9 +2,9 @@ package libcontainer
 
 // State represents a running container's state
 type State struct {
-	BaseState
+    BaseState
 
-	// Platform specific fields below here
+    // Platform specific fields below here
 }
 
 // A libcontainer container object.
@@ -13,8 +13,7 @@ type State struct {
 // be destroyed by a separate process, any function may return that the container
 // was not found.
 type Container interface {
-	BaseContainer
+    BaseContainer
 
-	// Methods below here are platform specific
-
+    // Methods below here are platform specific
 }

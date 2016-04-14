@@ -9,5 +9,5 @@ package http2
 import "net/http"
 
 func configureTransport(t1 *http.Transport) (*Transport, error) {
-	return nil, errTransportVersion
+    return nil, errTransportVersion
 }

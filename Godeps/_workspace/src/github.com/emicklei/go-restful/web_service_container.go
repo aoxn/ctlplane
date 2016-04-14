@@ -5,15 +5,15 @@ package restful
 // that can be found in the LICENSE file.
 
 import (
-	"net/http"
+    "net/http"
 )
 
 // DefaultContainer is a restful.Container that uses http.DefaultServeMux
 var DefaultContainer *Container
 
 func init() {
-	DefaultContainer = NewContainer()
-	DefaultContainer.ServeMux = http.DefaultServeMux
+    DefaultContainer = NewContainer()
+    DefaultContainer.ServeMux = http.DefaultServeMux
 }
 
 // If set the true then panics will not be caught to return HTTP 500.
@@ -24,16 +24,16 @@ var DoNotRecover = false
 
 // Add registers a new WebService add it to the DefaultContainer.
 func Add(service *WebService) {
-	DefaultContainer.Add(service)
+    DefaultContainer.Add(service)
 }
 
 // Filter appends a container FilterFunction from the DefaultContainer.
 // These are called before dispatching a http.Request to a WebService.
 func Filter(filter FilterFunction) {
-	DefaultContainer.Filter(filter)
+    DefaultContainer.Filter(filter)
 }
 
 // RegisteredWebServices returns the collections of WebServices from the DefaultContainer
 func RegisteredWebServices() []*WebService {
-	return DefaultContainer.RegisteredWebServices()
+    return DefaultContainer.RegisteredWebServices()
 }

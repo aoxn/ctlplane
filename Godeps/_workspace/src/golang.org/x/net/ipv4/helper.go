@@ -5,38 +5,38 @@
 package ipv4
 
 import (
-	"errors"
-	"net"
+    "errors"
+    "net"
 )
 
 var (
-	errMissingAddress           = errors.New("missing address")
-	errMissingHeader            = errors.New("missing header")
-	errHeaderTooShort           = errors.New("header too short")
-	errBufferTooShort           = errors.New("buffer too short")
-	errInvalidConnType          = errors.New("invalid conn type")
-	errOpNoSupport              = errors.New("operation not supported")
-	errNoSuchInterface          = errors.New("no such interface")
-	errNoSuchMulticastInterface = errors.New("no such multicast interface")
+    errMissingAddress = errors.New("missing address")
+    errMissingHeader = errors.New("missing header")
+    errHeaderTooShort = errors.New("header too short")
+    errBufferTooShort = errors.New("buffer too short")
+    errInvalidConnType = errors.New("invalid conn type")
+    errOpNoSupport = errors.New("operation not supported")
+    errNoSuchInterface = errors.New("no such interface")
+    errNoSuchMulticastInterface = errors.New("no such multicast interface")
 )
 
 func boolint(b bool) int {
-	if b {
-		return 1
-	}
-	return 0
+    if b {
+        return 1
+    }
+    return 0
 }
 
 func netAddrToIP4(a net.Addr) net.IP {
-	switch v := a.(type) {
-	case *net.UDPAddr:
-		if ip := v.IP.To4(); ip != nil {
-			return ip
-		}
-	case *net.IPAddr:
-		if ip := v.IP.To4(); ip != nil {
-			return ip
-		}
-	}
-	return nil
+    switch v := a.(type) {
+    case *net.UDPAddr:
+        if ip := v.IP.To4(); ip != nil {
+            return ip
+        }
+    case *net.IPAddr:
+        if ip := v.IP.To4(); ip != nil {
+            return ip
+        }
+    }
+    return nil
 }

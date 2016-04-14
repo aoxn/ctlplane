@@ -3,9 +3,9 @@
 package system
 
 import (
-	"syscall"
+    "syscall"
 )
 
 func Umask(newmask int) (oldmask int, err error) {
-	return syscall.Umask(newmask), nil
+    return syscall.Umask(newmask), nil
 }

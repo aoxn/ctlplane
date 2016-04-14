@@ -7,44 +7,44 @@ package ssh
 // Key exchange tests.
 
 import (
-	"crypto/rand"
-	"reflect"
-	"testing"
+    "crypto/rand"
+    "reflect"
+    "testing"
 )
 
 func TestKexes(t *testing.T) {
-	type kexResultErr struct {
-		result *kexResult
-		err    error
-	}
+    type kexResultErr struct {
+        result *kexResult
+        err    error
+    }
 
-	for name, kex := range kexAlgoMap {
-		a, b := memPipe()
+    for name, kex := range kexAlgoMap {
+        a, b := memPipe()
 
-		s := make(chan kexResultErr, 1)
-		c := make(chan kexResultErr, 1)
-		var magics handshakeMagics
-		go func() {
-			r, e := kex.Client(a, rand.Reader, &magics)
-			a.Close()
-			c <- kexResultErr{r, e}
-		}()
-		go func() {
-			r, e := kex.Server(b, rand.Reader, &magics, testSigners["ecdsa"])
-			b.Close()
-			s <- kexResultErr{r, e}
-		}()
+        s := make(chan kexResultErr, 1)
+        c := make(chan kexResultErr, 1)
+        var magics handshakeMagics
+        go func() {
+            r, e := kex.Client(a, rand.Reader, &magics)
+            a.Close()
+            c <- kexResultErr{r, e}
+        }()
+        go func() {
+            r, e := kex.Server(b, rand.Reader, &magics, testSigners["ecdsa"])
+            b.Close()
+            s <- kexResultErr{r, e}
+        }()
 
-		clientRes := <-c
-		serverRes := <-s
-		if clientRes.err != nil {
-			t.Errorf("client: %v", clientRes.err)
-		}
-		if serverRes.err != nil {
-			t.Errorf("server: %v", serverRes.err)
-		}
-		if !reflect.DeepEqual(clientRes.result, serverRes.result) {
-			t.Errorf("kex %q: mismatch %#v, %#v", name, clientRes.result, serverRes.result)
-		}
-	}
+        clientRes := <-c
+        serverRes := <-s
+        if clientRes.err != nil {
+            t.Errorf("client: %v", clientRes.err)
+        }
+        if serverRes.err != nil {
+            t.Errorf("server: %v", serverRes.err)
+        }
+        if !reflect.DeepEqual(clientRes.result, serverRes.result) {
+            t.Errorf("kex %q: mismatch %#v, %#v", name, clientRes.result, serverRes.result)
+        }
+    }
 }

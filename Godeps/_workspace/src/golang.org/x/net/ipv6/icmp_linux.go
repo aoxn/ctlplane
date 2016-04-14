@@ -5,23 +5,23 @@
 package ipv6
 
 func (f *sysICMPv6Filter) accept(typ ICMPType) {
-	f.Data[typ>>5] &^= 1 << (uint32(typ) & 31)
+    f.Data[typ >> 5] &^= 1 << (uint32(typ) & 31)
 }
 
 func (f *sysICMPv6Filter) block(typ ICMPType) {
-	f.Data[typ>>5] |= 1 << (uint32(typ) & 31)
+    f.Data[typ >> 5] |= 1 << (uint32(typ) & 31)
 }
 
 func (f *sysICMPv6Filter) setAll(block bool) {
-	for i := range f.Data {
-		if block {
-			f.Data[i] = 1<<32 - 1
-		} else {
-			f.Data[i] = 0
-		}
-	}
+    for i := range f.Data {
+        if block {
+            f.Data[i] = 1 << 32 - 1
+        } else {
+            f.Data[i] = 0
+        }
+    }
 }
 
 func (f *sysICMPv6Filter) willBlock(typ ICMPType) bool {
-	return f.Data[typ>>5]&(1<<(uint32(typ)&31)) != 0
+    return f.Data[typ >> 5] & (1 << (uint32(typ) & 31)) != 0
 }

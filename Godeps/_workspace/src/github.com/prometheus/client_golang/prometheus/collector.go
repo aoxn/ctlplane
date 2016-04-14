@@ -25,51 +25,51 @@ package prometheus
 // of multiple instances of the same Metric but with different label values)
 // like GaugeVec or SummaryVec, and the ExpvarCollector.
 type Collector interface {
-	// Describe sends the super-set of all possible descriptors of metrics
-	// collected by this Collector to the provided channel and returns once
-	// the last descriptor has been sent. The sent descriptors fulfill the
-	// consistency and uniqueness requirements described in the Desc
-	// documentation. (It is valid if one and the same Collector sends
-	// duplicate descriptors. Those duplicates are simply ignored. However,
-	// two different Collectors must not send duplicate descriptors.) This
-	// method idempotently sends the same descriptors throughout the
-	// lifetime of the Collector. If a Collector encounters an error while
-	// executing this method, it must send an invalid descriptor (created
-	// with NewInvalidDesc) to signal the error to the registry.
-	Describe(chan<- *Desc)
-	// Collect is called by Prometheus when collecting metrics. The
-	// implementation sends each collected metric via the provided channel
-	// and returns once the last metric has been sent. The descriptor of
-	// each sent metric is one of those returned by Describe. Returned
-	// metrics that share the same descriptor must differ in their variable
-	// label values. This method may be called concurrently and must
-	// therefore be implemented in a concurrency safe way. Blocking occurs
-	// at the expense of total performance of rendering all registered
-	// metrics. Ideally, Collector implementations support concurrent
-	// readers.
-	Collect(chan<- Metric)
+    // Describe sends the super-set of all possible descriptors of metrics
+    // collected by this Collector to the provided channel and returns once
+    // the last descriptor has been sent. The sent descriptors fulfill the
+    // consistency and uniqueness requirements described in the Desc
+    // documentation. (It is valid if one and the same Collector sends
+    // duplicate descriptors. Those duplicates are simply ignored. However,
+    // two different Collectors must not send duplicate descriptors.) This
+    // method idempotently sends the same descriptors throughout the
+    // lifetime of the Collector. If a Collector encounters an error while
+    // executing this method, it must send an invalid descriptor (created
+    // with NewInvalidDesc) to signal the error to the registry.
+    Describe(chan <- *Desc)
+    // Collect is called by Prometheus when collecting metrics. The
+    // implementation sends each collected metric via the provided channel
+    // and returns once the last metric has been sent. The descriptor of
+    // each sent metric is one of those returned by Describe. Returned
+    // metrics that share the same descriptor must differ in their variable
+    // label values. This method may be called concurrently and must
+    // therefore be implemented in a concurrency safe way. Blocking occurs
+    // at the expense of total performance of rendering all registered
+    // metrics. Ideally, Collector implementations support concurrent
+    // readers.
+    Collect(chan <- Metric)
 }
 
 // SelfCollector implements Collector for a single Metric so that that the
 // Metric collects itself. Add it as an anonymous field to a struct that
 // implements Metric, and call Init with the Metric itself as an argument.
 type SelfCollector struct {
-	self Metric
+    self Metric
 }
 
 // Init provides the SelfCollector with a reference to the metric it is supposed
 // to collect. It is usually called within the factory function to create a
 // metric. See example.
 func (c *SelfCollector) Init(self Metric) {
-	c.self = self
+    c.self = self
 }
 
 // Describe implements Collector.
-func (c *SelfCollector) Describe(ch chan<- *Desc) {
-	ch <- c.self.Desc()
+func (c *SelfCollector) Describe(ch chan <- *Desc) {
+    ch <- c.self.Desc()
 }
 
 // Collect implements Collector.
-func (c *SelfCollector) Collect(ch chan<- Metric) {
-	ch <- c.self
+func (c *SelfCollector) Collect(ch chan <- Metric) {
+    ch <- c.self
 }

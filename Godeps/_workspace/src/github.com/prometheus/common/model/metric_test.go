@@ -16,106 +16,106 @@ package model
 import "testing"
 
 func testMetric(t testing.TB) {
-	var scenarios = []struct {
-		input           LabelSet
-		fingerprint     Fingerprint
-		fastFingerprint Fingerprint
-	}{
-		{
-			input:           LabelSet{},
-			fingerprint:     14695981039346656037,
-			fastFingerprint: 14695981039346656037,
-		},
-		{
-			input: LabelSet{
-				"first_name":   "electro",
-				"occupation":   "robot",
-				"manufacturer": "westinghouse",
-			},
-			fingerprint:     5911716720268894962,
-			fastFingerprint: 11310079640881077873,
-		},
-		{
-			input: LabelSet{
-				"x": "y",
-			},
-			fingerprint:     8241431561484471700,
-			fastFingerprint: 13948396922932177635,
-		},
-		{
-			input: LabelSet{
-				"a": "bb",
-				"b": "c",
-			},
-			fingerprint:     3016285359649981711,
-			fastFingerprint: 3198632812309449502,
-		},
-		{
-			input: LabelSet{
-				"a":  "b",
-				"bb": "c",
-			},
-			fingerprint:     7122421792099404749,
-			fastFingerprint: 5774953389407657638,
-		},
-	}
+    var scenarios = []struct {
+        input           LabelSet
+        fingerprint     Fingerprint
+        fastFingerprint Fingerprint
+    }{
+        {
+            input:           LabelSet{},
+            fingerprint:     14695981039346656037,
+            fastFingerprint: 14695981039346656037,
+        },
+        {
+            input: LabelSet{
+                "first_name":   "electro",
+                "occupation":   "robot",
+                "manufacturer": "westinghouse",
+            },
+            fingerprint:     5911716720268894962,
+            fastFingerprint: 11310079640881077873,
+        },
+        {
+            input: LabelSet{
+                "x": "y",
+            },
+            fingerprint:     8241431561484471700,
+            fastFingerprint: 13948396922932177635,
+        },
+        {
+            input: LabelSet{
+                "a": "bb",
+                "b": "c",
+            },
+            fingerprint:     3016285359649981711,
+            fastFingerprint: 3198632812309449502,
+        },
+        {
+            input: LabelSet{
+                "a":  "b",
+                "bb": "c",
+            },
+            fingerprint:     7122421792099404749,
+            fastFingerprint: 5774953389407657638,
+        },
+    }
 
-	for i, scenario := range scenarios {
-		input := Metric(scenario.input)
+    for i, scenario := range scenarios {
+        input := Metric(scenario.input)
 
-		if scenario.fingerprint != input.Fingerprint() {
-			t.Errorf("%d. expected %d, got %d", i, scenario.fingerprint, input.Fingerprint())
-		}
-		if scenario.fastFingerprint != input.FastFingerprint() {
-			t.Errorf("%d. expected %d, got %d", i, scenario.fastFingerprint, input.FastFingerprint())
-		}
-	}
+        if scenario.fingerprint != input.Fingerprint() {
+            t.Errorf("%d. expected %d, got %d", i, scenario.fingerprint, input.Fingerprint())
+        }
+        if scenario.fastFingerprint != input.FastFingerprint() {
+            t.Errorf("%d. expected %d, got %d", i, scenario.fastFingerprint, input.FastFingerprint())
+        }
+    }
 }
 
 func TestMetric(t *testing.T) {
-	testMetric(t)
+    testMetric(t)
 }
 
 func BenchmarkMetric(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		testMetric(b)
-	}
+    for i := 0; i < b.N; i++ {
+        testMetric(b)
+    }
 }
 
 func TestMetricNameIsValid(t *testing.T) {
-	var scenarios = []struct {
-		mn    LabelValue
-		valid bool
-	}{
-		{
-			mn:    "Avalid_23name",
-			valid: true,
-		},
-		{
-			mn:    "_Avalid_23name",
-			valid: true,
-		},
-		{
-			mn:    "1valid_23name",
-			valid: false,
-		},
-		{
-			mn:    "avalid_23name",
-			valid: true,
-		},
-		{
-			mn:    "Ava:lid_23name",
-			valid: true,
-		},
-		{
-			mn:    "a lid_23name",
-			valid: false,
-		},
-	}
+    var scenarios = []struct {
+        mn    LabelValue
+        valid bool
+    }{
+        {
+            mn:    "Avalid_23name",
+            valid: true,
+        },
+        {
+            mn:    "_Avalid_23name",
+            valid: true,
+        },
+        {
+            mn:    "1valid_23name",
+            valid: false,
+        },
+        {
+            mn:    "avalid_23name",
+            valid: true,
+        },
+        {
+            mn:    "Ava:lid_23name",
+            valid: true,
+        },
+        {
+            mn:    "a lid_23name",
+            valid: false,
+        },
+    }
 
-	for _, s := range scenarios {
-		if IsValidMetricName(s.mn) != s.valid {
-			t.Errorf("Expected %v for %q", s.valid, s.mn)
-		}
-	}
+    for _, s := range scenarios {
+        if IsValidMetricName(s.mn) != s.valid {
+            t.Errorf("Expected %v for %q", s.valid, s.mn)
+        }
+    }
 }

@@ -7,16 +7,16 @@
 package nettest
 
 import (
-	"fmt"
-	"os"
-	"runtime"
+    "fmt"
+    "os"
+    "runtime"
 )
 
 // SupportsRawIPSocket reports whether the platform supports raw IP
 // sockets.
 func SupportsRawIPSocket() (string, bool) {
-	if os.Getuid() != 0 {
-		return fmt.Sprintf("must be root on %s", runtime.GOOS), false
-	}
-	return "", true
+    if os.Getuid() != 0 {
+        return fmt.Sprintf("must be root on %s", runtime.GOOS), false
+    }
+    return "", true
 }

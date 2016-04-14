@@ -10,49 +10,49 @@ package elastic
 // to a specific set of documents.
 // See: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-aggregations-bucket-filter-aggregation.html
 type FilterAggregation struct {
-	filter          Filter
-	subAggregations map[string]Aggregation
+    filter          Filter
+    subAggregations map[string]Aggregation
 }
 
 func NewFilterAggregation() FilterAggregation {
-	a := FilterAggregation{
-		subAggregations: make(map[string]Aggregation),
-	}
-	return a
+    a := FilterAggregation{
+        subAggregations: make(map[string]Aggregation),
+    }
+    return a
 }
 
 func (a FilterAggregation) SubAggregation(name string, subAggregation Aggregation) FilterAggregation {
-	a.subAggregations[name] = subAggregation
-	return a
+    a.subAggregations[name] = subAggregation
+    return a
 }
 
 func (a FilterAggregation) Filter(filter Filter) FilterAggregation {
-	a.filter = filter
-	return a
+    a.filter = filter
+    return a
 }
 
 func (a FilterAggregation) Source() interface{} {
-	// Example:
-	//	{
-	//    "aggs" : {
-	//         "in_stock_products" : {
-	//             "filter" : { "range" : { "stock" : { "gt" : 0 } } }
-	//         }
-	//    }
-	//	}
-	// This method returns only the { "filter" : {} } part.
+    // Example:
+    //	{
+    //    "aggs" : {
+    //         "in_stock_products" : {
+    //             "filter" : { "range" : { "stock" : { "gt" : 0 } } }
+    //         }
+    //    }
+    //	}
+    // This method returns only the { "filter" : {} } part.
 
-	source := make(map[string]interface{})
-	source["filter"] = a.filter.Source()
+    source := make(map[string]interface{})
+    source["filter"] = a.filter.Source()
 
-	// AggregationBuilder (SubAggregations)
-	if len(a.subAggregations) > 0 {
-		aggsMap := make(map[string]interface{})
-		source["aggregations"] = aggsMap
-		for name, aggregate := range a.subAggregations {
-			aggsMap[name] = aggregate.Source()
-		}
-	}
+    // AggregationBuilder (SubAggregations)
+    if len(a.subAggregations) > 0 {
+        aggsMap := make(map[string]interface{})
+        source["aggregations"] = aggsMap
+        for name, aggregate := range a.subAggregations {
+            aggsMap[name] = aggregate.Source()
+        }
+    }
 
-	return source
+    return source
 }

@@ -15,104 +15,104 @@
 package summary
 
 import (
-	"reflect"
-	"testing"
+    "reflect"
+    "testing"
 
-	info "github.com/google/cadvisor/info/v2"
+    info "github.com/google/cadvisor/info/v2"
 )
 
 func createSample(i uint64) info.Usage {
-	usage := info.Usage{}
-	usage.PercentComplete = 100
-	usage.Cpu = info.Percentiles{
-		Present: true,
-		Mean:    i * 50,
-		Max:     i * 100,
-		Ninety:  i * 90,
-	}
-	usage.Memory = info.Percentiles{
-		Present: true,
-		Mean:    i * 50 * 1024,
-		Max:     i * 100 * 1024,
-		Ninety:  i * 90 * 1024,
-	}
-	return usage
+    usage := info.Usage{}
+    usage.PercentComplete = 100
+    usage.Cpu = info.Percentiles{
+        Present: true,
+        Mean:    i * 50,
+        Max:     i * 100,
+        Ninety:  i * 90,
+    }
+    usage.Memory = info.Percentiles{
+        Present: true,
+        Mean:    i * 50 * 1024,
+        Max:     i * 100 * 1024,
+        Ninety:  i * 90 * 1024,
+    }
+    return usage
 }
 
 func expectSize(t *testing.T, b *SamplesBuffer, expectedSize int) {
-	if b.Size() != expectedSize {
-		t.Errorf("Expected size %d, got %d", expectedSize, b.Size())
-	}
+    if b.Size() != expectedSize {
+        t.Errorf("Expected size %d, got %d", expectedSize, b.Size())
+    }
 }
 
 func expectElements(t *testing.T, b *SamplesBuffer, expected []info.Usage) {
 
-	out := b.RecentStats(b.Size())
-	if len(out) != len(expected) {
-		t.Errorf("Expected %d elements, got %d", len(expected), len(out))
-	}
-	for i, el := range out {
-		if !reflect.DeepEqual(*el, expected[i]) {
-			t.Errorf("Expected elements %v, got %v", expected[i], *el)
-		}
-	}
+    out := b.RecentStats(b.Size())
+    if len(out) != len(expected) {
+        t.Errorf("Expected %d elements, got %d", len(expected), len(out))
+    }
+    for i, el := range out {
+        if !reflect.DeepEqual(*el, expected[i]) {
+            t.Errorf("Expected elements %v, got %v", expected[i], *el)
+        }
+    }
 }
 
 func TestEmpty(t *testing.T) {
-	b := NewSamplesBuffer(5)
-	expectSize(t, b, 0)
-	expectElements(t, b, []info.Usage{})
+    b := NewSamplesBuffer(5)
+    expectSize(t, b, 0)
+    expectElements(t, b, []info.Usage{})
 }
 
 func TestAddSingleSample(t *testing.T) {
-	b := NewSamplesBuffer(5)
+    b := NewSamplesBuffer(5)
 
-	sample := createSample(1)
-	b.Add(sample)
-	expectSize(t, b, 1)
-	expectElements(t, b, []info.Usage{sample})
+    sample := createSample(1)
+    b.Add(sample)
+    expectSize(t, b, 1)
+    expectElements(t, b, []info.Usage{sample})
 }
 
 func TestFullBuffer(t *testing.T) {
-	maxSize := 5
-	b := NewSamplesBuffer(maxSize)
-	samples := []info.Usage{}
-	for i := 0; i < maxSize; i++ {
-		sample := createSample(uint64(i))
-		samples = append(samples, sample)
-		b.Add(sample)
-	}
-	expectSize(t, b, maxSize)
-	expectElements(t, b, samples)
+    maxSize := 5
+    b := NewSamplesBuffer(maxSize)
+    samples := []info.Usage{}
+    for i := 0; i < maxSize; i++ {
+        sample := createSample(uint64(i))
+        samples = append(samples, sample)
+        b.Add(sample)
+    }
+    expectSize(t, b, maxSize)
+    expectElements(t, b, samples)
 }
 
 func TestOverflow(t *testing.T) {
-	maxSize := 5
-	overflow := 2
-	b := NewSamplesBuffer(maxSize)
-	samples := []info.Usage{}
-	for i := 0; i < maxSize+overflow; i++ {
-		sample := createSample(uint64(i))
-		if i >= overflow {
-			samples = append(samples, sample)
-		}
-		b.Add(sample)
-	}
-	expectSize(t, b, maxSize)
-	expectElements(t, b, samples)
+    maxSize := 5
+    overflow := 2
+    b := NewSamplesBuffer(maxSize)
+    samples := []info.Usage{}
+    for i := 0; i < maxSize + overflow; i++ {
+        sample := createSample(uint64(i))
+        if i >= overflow {
+            samples = append(samples, sample)
+        }
+        b.Add(sample)
+    }
+    expectSize(t, b, maxSize)
+    expectElements(t, b, samples)
 }
 
 func TestReplaceAll(t *testing.T) {
-	maxSize := 5
-	b := NewSamplesBuffer(maxSize)
-	samples := []info.Usage{}
-	for i := 0; i < maxSize*2; i++ {
-		sample := createSample(uint64(i))
-		if i >= maxSize {
-			samples = append(samples, sample)
-		}
-		b.Add(sample)
-	}
-	expectSize(t, b, maxSize)
-	expectElements(t, b, samples)
+    maxSize := 5
+    b := NewSamplesBuffer(maxSize)
+    samples := []info.Usage{}
+    for i := 0; i < maxSize * 2; i++ {
+        sample := createSample(uint64(i))
+        if i >= maxSize {
+            samples = append(samples, sample)
+        }
+        b.Add(sample)
+    }
+    expectSize(t, b, maxSize)
+    expectElements(t, b, samples)
 }

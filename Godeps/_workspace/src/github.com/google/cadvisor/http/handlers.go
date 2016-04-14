@@ -15,96 +15,96 @@
 package http
 
 import (
-	"fmt"
-	"net/http"
+    "fmt"
+    "net/http"
 
-	"github.com/google/cadvisor/api"
-	"github.com/google/cadvisor/healthz"
-	httpmux "github.com/google/cadvisor/http/mux"
-	"github.com/google/cadvisor/manager"
-	"github.com/google/cadvisor/metrics"
-	"github.com/google/cadvisor/pages"
-	"github.com/google/cadvisor/pages/static"
-	"github.com/google/cadvisor/validate"
+    "github.com/google/cadvisor/api"
+    "github.com/google/cadvisor/healthz"
+    httpmux "github.com/google/cadvisor/http/mux"
+    "github.com/google/cadvisor/manager"
+    "github.com/google/cadvisor/metrics"
+    "github.com/google/cadvisor/pages"
+    "github.com/google/cadvisor/pages/static"
+    "github.com/google/cadvisor/validate"
 
-	auth "github.com/abbot/go-http-auth"
-	"github.com/golang/glog"
-	"github.com/prometheus/client_golang/prometheus"
+    auth "github.com/abbot/go-http-auth"
+    "github.com/golang/glog"
+    "github.com/prometheus/client_golang/prometheus"
 )
 
 func RegisterHandlers(mux httpmux.Mux, containerManager manager.Manager, httpAuthFile, httpAuthRealm, httpDigestFile, httpDigestRealm string) error {
-	// Basic health handler.
-	if err := healthz.RegisterHandler(mux); err != nil {
-		return fmt.Errorf("failed to register healthz handler: %s", err)
-	}
+    // Basic health handler.
+    if err := healthz.RegisterHandler(mux); err != nil {
+        return fmt.Errorf("failed to register healthz handler: %s", err)
+    }
 
-	// Validation/Debug handler.
-	mux.HandleFunc(validate.ValidatePage, func(w http.ResponseWriter, r *http.Request) {
-		err := validate.HandleRequest(w, containerManager)
-		if err != nil {
-			fmt.Fprintf(w, "%s", err)
-		}
-	})
+    // Validation/Debug handler.
+    mux.HandleFunc(validate.ValidatePage, func(w http.ResponseWriter, r *http.Request) {
+        err := validate.HandleRequest(w, containerManager)
+        if err != nil {
+            fmt.Fprintf(w, "%s", err)
+        }
+    })
 
-	// Register API handler.
-	if err := api.RegisterHandlers(mux, containerManager); err != nil {
-		return fmt.Errorf("failed to register API handlers: %s", err)
-	}
+    // Register API handler.
+    if err := api.RegisterHandlers(mux, containerManager); err != nil {
+        return fmt.Errorf("failed to register API handlers: %s", err)
+    }
 
-	// Redirect / to containers page.
-	mux.Handle("/", http.RedirectHandler(pages.ContainersPage, http.StatusTemporaryRedirect))
+    // Redirect / to containers page.
+    mux.Handle("/", http.RedirectHandler(pages.ContainersPage, http.StatusTemporaryRedirect))
 
-	var authenticated bool = false
+    var authenticated bool = false
 
-	// Setup the authenticator object
-	if httpAuthFile != "" {
-		glog.Infof("Using auth file %s", httpAuthFile)
-		secrets := auth.HtpasswdFileProvider(httpAuthFile)
-		authenticator := auth.NewBasicAuthenticator(httpAuthRealm, secrets)
-		mux.HandleFunc(static.StaticResource, authenticator.Wrap(staticHandler))
-		if err := pages.RegisterHandlersBasic(mux, containerManager, authenticator); err != nil {
-			return fmt.Errorf("failed to register pages auth handlers: %s", err)
-		}
-		authenticated = true
-	}
-	if httpAuthFile == "" && httpDigestFile != "" {
-		glog.Infof("Using digest file %s", httpDigestFile)
-		secrets := auth.HtdigestFileProvider(httpDigestFile)
-		authenticator := auth.NewDigestAuthenticator(httpDigestRealm, secrets)
-		mux.HandleFunc(static.StaticResource, authenticator.Wrap(staticHandler))
-		if err := pages.RegisterHandlersDigest(mux, containerManager, authenticator); err != nil {
-			return fmt.Errorf("failed to register pages digest handlers: %s", err)
-		}
-		authenticated = true
-	}
+    // Setup the authenticator object
+    if httpAuthFile != "" {
+        glog.Infof("Using auth file %s", httpAuthFile)
+        secrets := auth.HtpasswdFileProvider(httpAuthFile)
+        authenticator := auth.NewBasicAuthenticator(httpAuthRealm, secrets)
+        mux.HandleFunc(static.StaticResource, authenticator.Wrap(staticHandler))
+        if err := pages.RegisterHandlersBasic(mux, containerManager, authenticator); err != nil {
+            return fmt.Errorf("failed to register pages auth handlers: %s", err)
+        }
+        authenticated = true
+    }
+    if httpAuthFile == "" && httpDigestFile != "" {
+        glog.Infof("Using digest file %s", httpDigestFile)
+        secrets := auth.HtdigestFileProvider(httpDigestFile)
+        authenticator := auth.NewDigestAuthenticator(httpDigestRealm, secrets)
+        mux.HandleFunc(static.StaticResource, authenticator.Wrap(staticHandler))
+        if err := pages.RegisterHandlersDigest(mux, containerManager, authenticator); err != nil {
+            return fmt.Errorf("failed to register pages digest handlers: %s", err)
+        }
+        authenticated = true
+    }
 
-	// Change handler based on authenticator initalization
-	if !authenticated {
-		mux.HandleFunc(static.StaticResource, staticHandlerNoAuth)
-		if err := pages.RegisterHandlersBasic(mux, containerManager, nil); err != nil {
-			return fmt.Errorf("failed to register pages handlers: %s", err)
-		}
-	}
+    // Change handler based on authenticator initalization
+    if !authenticated {
+        mux.HandleFunc(static.StaticResource, staticHandlerNoAuth)
+        if err := pages.RegisterHandlersBasic(mux, containerManager, nil); err != nil {
+            return fmt.Errorf("failed to register pages handlers: %s", err)
+        }
+    }
 
-	return nil
+    return nil
 }
 
 func RegisterPrometheusHandler(mux httpmux.Mux, containerManager manager.Manager, prometheusEndpoint string, containerNameToLabelsFunc metrics.ContainerNameToLabelsFunc) {
-	collector := metrics.NewPrometheusCollector(containerManager, containerNameToLabelsFunc)
-	prometheus.MustRegister(collector)
-	mux.Handle(prometheusEndpoint, prometheus.Handler())
+    collector := metrics.NewPrometheusCollector(containerManager, containerNameToLabelsFunc)
+    prometheus.MustRegister(collector)
+    mux.Handle(prometheusEndpoint, prometheus.Handler())
 }
 
 func staticHandlerNoAuth(w http.ResponseWriter, r *http.Request) {
-	err := static.HandleRequest(w, r.URL)
-	if err != nil {
-		fmt.Fprintf(w, "%s", err)
-	}
+    err := static.HandleRequest(w, r.URL)
+    if err != nil {
+        fmt.Fprintf(w, "%s", err)
+    }
 }
 
 func staticHandler(w http.ResponseWriter, r *auth.AuthenticatedRequest) {
-	err := static.HandleRequest(w, r.URL)
-	if err != nil {
-		fmt.Fprintf(w, "%s", err)
-	}
+    err := static.HandleRequest(w, r.URL)
+    if err != nil {
+        fmt.Fprintf(w, "%s", err)
+    }
 }

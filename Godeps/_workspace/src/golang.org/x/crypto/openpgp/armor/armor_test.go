@@ -5,69 +5,69 @@
 package armor
 
 import (
-	"bytes"
-	"hash/adler32"
-	"io/ioutil"
-	"testing"
+    "bytes"
+    "hash/adler32"
+    "io/ioutil"
+    "testing"
 )
 
 func TestDecodeEncode(t *testing.T) {
-	buf := bytes.NewBuffer([]byte(armorExample1))
-	result, err := Decode(buf)
-	if err != nil {
-		t.Error(err)
-	}
-	expectedType := "PGP SIGNATURE"
-	if result.Type != expectedType {
-		t.Errorf("result.Type: got:%s want:%s", result.Type, expectedType)
-	}
-	if len(result.Header) != 1 {
-		t.Errorf("len(result.Header): got:%d want:1", len(result.Header))
-	}
-	v, ok := result.Header["Version"]
-	if !ok || v != "GnuPG v1.4.10 (GNU/Linux)" {
-		t.Errorf("result.Header: got:%#v", result.Header)
-	}
+    buf := bytes.NewBuffer([]byte(armorExample1))
+    result, err := Decode(buf)
+    if err != nil {
+        t.Error(err)
+    }
+    expectedType := "PGP SIGNATURE"
+    if result.Type != expectedType {
+        t.Errorf("result.Type: got:%s want:%s", result.Type, expectedType)
+    }
+    if len(result.Header) != 1 {
+        t.Errorf("len(result.Header): got:%d want:1", len(result.Header))
+    }
+    v, ok := result.Header["Version"]
+    if !ok || v != "GnuPG v1.4.10 (GNU/Linux)" {
+        t.Errorf("result.Header: got:%#v", result.Header)
+    }
 
-	contents, err := ioutil.ReadAll(result.Body)
-	if err != nil {
-		t.Error(err)
-	}
+    contents, err := ioutil.ReadAll(result.Body)
+    if err != nil {
+        t.Error(err)
+    }
 
-	if adler32.Checksum(contents) != 0x27b144be {
-		t.Errorf("contents: got: %x", contents)
-	}
+    if adler32.Checksum(contents) != 0x27b144be {
+        t.Errorf("contents: got: %x", contents)
+    }
 
-	buf = bytes.NewBuffer(nil)
-	w, err := Encode(buf, result.Type, result.Header)
-	if err != nil {
-		t.Error(err)
-	}
-	_, err = w.Write(contents)
-	if err != nil {
-		t.Error(err)
-	}
-	w.Close()
+    buf = bytes.NewBuffer(nil)
+    w, err := Encode(buf, result.Type, result.Header)
+    if err != nil {
+        t.Error(err)
+    }
+    _, err = w.Write(contents)
+    if err != nil {
+        t.Error(err)
+    }
+    w.Close()
 
-	if !bytes.Equal(buf.Bytes(), []byte(armorExample1)) {
-		t.Errorf("got: %s\nwant: %s", string(buf.Bytes()), armorExample1)
-	}
+    if !bytes.Equal(buf.Bytes(), []byte(armorExample1)) {
+        t.Errorf("got: %s\nwant: %s", string(buf.Bytes()), armorExample1)
+    }
 }
 
 func TestLongHeader(t *testing.T) {
-	buf := bytes.NewBuffer([]byte(armorLongLine))
-	result, err := Decode(buf)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	value, ok := result.Header["Version"]
-	if !ok {
-		t.Errorf("missing Version header")
-	}
-	if value != longValueExpected {
-		t.Errorf("got: %s want: %s", value, longValueExpected)
-	}
+    buf := bytes.NewBuffer([]byte(armorLongLine))
+    result, err := Decode(buf)
+    if err != nil {
+        t.Error(err)
+        return
+    }
+    value, ok := result.Header["Version"]
+    if !ok {
+        t.Errorf("missing Version header")
+    }
+    if value != longValueExpected {
+        t.Errorf("got: %s want: %s", value, longValueExpected)
+    }
 }
 
 const armorExample1 = `-----BEGIN PGP SIGNATURE-----

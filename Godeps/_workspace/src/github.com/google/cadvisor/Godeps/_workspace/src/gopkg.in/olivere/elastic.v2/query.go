@@ -10,5 +10,5 @@ package elastic
 // object. Returning a map[string]interface{}
 // will do.
 type Query interface {
-	Source() interface{}
+    Source() interface{}
 }

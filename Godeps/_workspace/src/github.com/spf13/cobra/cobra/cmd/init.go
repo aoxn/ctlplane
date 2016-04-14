@@ -14,24 +14,24 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-	"strings"
+    "fmt"
+    "os"
+    "strings"
 
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+    "github.com/spf13/cobra"
+    "github.com/spf13/viper"
 )
 
 func init() {
-	RootCmd.AddCommand(initCmd)
+    RootCmd.AddCommand(initCmd)
 }
 
 // initialize Command
 var initCmd = &cobra.Command{
-	Use:     "init [name]",
-	Aliases: []string{"initialize", "initialise", "create"},
-	Short:   "Initialize a Cobra Application",
-	Long: `Initialize (cobra init) will create a new application, with a license
+    Use:     "init [name]",
+    Aliases: []string{"initialize", "initialise", "create"},
+    Short:   "Initialize a Cobra Application",
+    Long: `Initialize (cobra init) will create a new application, with a license
 and the appropriate structure for a Cobra-based CLI application.
 
   * If a name is provided, it will be created in the current directory;
@@ -43,71 +43,73 @@ and the appropriate structure for a Cobra-based CLI application.
 
 Init will not use an existing directory with contents.`,
 
-	Run: func(cmd *cobra.Command, args []string) {
-		switch len(args) {
-		case 0:
-			inputPath = ""
+    Run: func(cmd *cobra.Command, args []string) {
+        switch len(args) {
+        case 0:
+            inputPath = ""
 
-		case 1:
-			inputPath = args[0]
+        case 1:
+            inputPath = args[0]
 
-		default:
-			er("init doesn't support more than 1 parameter")
-		}
-		guessProjectPath()
-		initializePath(projectPath)
-	},
+        default:
+            er("init doesn't support more than 1 parameter")
+        }
+        guessProjectPath()
+        initializePath(projectPath)
+    },
 }
 
 func initializePath(path string) {
-	b, err := exists(path)
-	if err != nil {
-		er(err)
-	}
+    b, err := exists(path)
+    if err != nil {
+        er(err)
+    }
 
-	if !b { // If path doesn't yet exist, create it
-		err := os.MkdirAll(path, os.ModePerm)
-		if err != nil {
-			er(err)
-		}
-	} else { // If path exists and is not empty don't use it
-		empty, err := exists(path)
-		if err != nil {
-			er(err)
-		}
-		if !empty {
-			er("Cobra will not create a new project in a non empty directory")
-		}
-	}
-	// We have a directory and it's empty.. Time to initialize it.
+    if !b {
+        // If path doesn't yet exist, create it
+        err := os.MkdirAll(path, os.ModePerm)
+        if err != nil {
+            er(err)
+        }
+    } else {
+        // If path exists and is not empty don't use it
+        empty, err := exists(path)
+        if err != nil {
+            er(err)
+        }
+        if !empty {
+            er("Cobra will not create a new project in a non empty directory")
+        }
+    }
+    // We have a directory and it's empty.. Time to initialize it.
 
-	createLicenseFile()
-	createMainFile()
-	createRootCmdFile()
+    createLicenseFile()
+    createMainFile()
+    createRootCmdFile()
 }
 
 func createLicenseFile() {
-	lic := getLicense()
+    lic := getLicense()
 
-	template := lic.Text
+    template := lic.Text
 
-	var data map[string]interface{}
-	data = make(map[string]interface{})
+    var data map[string]interface{}
+    data = make(map[string]interface{})
 
-	// Try to remove the email address, if any
-	data["copyright"] = strings.Split(copyrightLine(), " <")[0]
+    // Try to remove the email address, if any
+    data["copyright"] = strings.Split(copyrightLine(), " <")[0]
 
-	err := writeTemplateToFile(ProjectPath(), "LICENSE", template, data)
-	_ = err
-	// if err != nil {
-	// 	er(err)
-	// }
+    err := writeTemplateToFile(ProjectPath(), "LICENSE", template, data)
+    _ = err
+    // if err != nil {
+    // 	er(err)
+    // }
 }
 
 func createMainFile() {
-	lic := getLicense()
+    lic := getLicense()
 
-	template := `{{ comment .copyright }}
+    template := `{{ comment .copyright }}
 {{ comment .license }}
 
 package main
@@ -118,24 +120,24 @@ func main() {
 	cmd.Execute()
 }
 `
-	var data map[string]interface{}
-	data = make(map[string]interface{})
+    var data map[string]interface{}
+    data = make(map[string]interface{})
 
-	data["copyright"] = copyrightLine()
-	data["license"] = lic.Header
-	data["importpath"] = guessImportPath() + "/" + guessCmdDir()
+    data["copyright"] = copyrightLine()
+    data["license"] = lic.Header
+    data["importpath"] = guessImportPath() + "/" + guessCmdDir()
 
-	err := writeTemplateToFile(ProjectPath(), "main.go", template, data)
-	_ = err
-	// if err != nil {
-	// 	er(err)
-	// }
+    err := writeTemplateToFile(ProjectPath(), "main.go", template, data)
+    _ = err
+    // if err != nil {
+    // 	er(err)
+    // }
 }
 
 func createRootCmdFile() {
-	lic := getLicense()
+    lic := getLicense()
 
-	template := `{{ comment .copyright }}
+    template := `{{ comment .copyright }}
 {{ comment .license }}
 
 package cmd
@@ -206,21 +208,21 @@ func initConfig() {
 }
 {{ end }}`
 
-	var data map[string]interface{}
-	data = make(map[string]interface{})
+    var data map[string]interface{}
+    data = make(map[string]interface{})
 
-	data["copyright"] = copyrightLine()
-	data["license"] = lic.Header
-	data["appName"] = projectName()
-	data["viper"] = viper.GetBool("useViper")
+    data["copyright"] = copyrightLine()
+    data["license"] = lic.Header
+    data["appName"] = projectName()
+    data["viper"] = viper.GetBool("useViper")
 
-	err := writeTemplateToFile(ProjectPath()+string(os.PathSeparator)+guessCmdDir(), "root.go", template, data)
-	if err != nil {
-		er(err)
-	}
+    err := writeTemplateToFile(ProjectPath() + string(os.PathSeparator) + guessCmdDir(), "root.go", template, data)
+    if err != nil {
+        er(err)
+    }
 
-	fmt.Println("Your Cobra application is ready at")
-	fmt.Println(ProjectPath())
-	fmt.Println("Give it a try by going there and running `go run main.go`")
-	fmt.Println("Add commands to it by running `cobra add [cmdname]`")
+    fmt.Println("Your Cobra application is ready at")
+    fmt.Println(ProjectPath())
+    fmt.Println("Give it a try by going there and running `go run main.go`")
+    fmt.Println("Add commands to it by running `cobra add [cmdname]`")
 }

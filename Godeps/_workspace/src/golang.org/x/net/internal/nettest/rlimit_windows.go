@@ -4,4 +4,6 @@
 
 package nettest
 
-func maxOpenFiles() int { return 4 * defaultMaxOpenFiles /* actually it's 16581375 */ }
+func maxOpenFiles() int {
+    return 4 * defaultMaxOpenFiles /* actually it's 16581375 */
+}

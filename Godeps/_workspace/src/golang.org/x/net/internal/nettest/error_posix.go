@@ -7,25 +7,25 @@
 package nettest
 
 import (
-	"os"
-	"syscall"
+    "os"
+    "syscall"
 )
 
 func protocolNotSupported(err error) bool {
-	switch err := err.(type) {
-	case syscall.Errno:
-		switch err {
-		case syscall.EPROTONOSUPPORT, syscall.ENOPROTOOPT:
-			return true
-		}
-	case *os.SyscallError:
-		switch err := err.Err.(type) {
-		case syscall.Errno:
-			switch err {
-			case syscall.EPROTONOSUPPORT, syscall.ENOPROTOOPT:
-				return true
-			}
-		}
-	}
-	return false
+    switch err := err.(type) {
+    case syscall.Errno:
+        switch err {
+        case syscall.EPROTONOSUPPORT, syscall.ENOPROTOOPT:
+            return true
+        }
+    case *os.SyscallError:
+        switch err := err.Err.(type) {
+        case syscall.Errno:
+            switch err {
+            case syscall.EPROTONOSUPPORT, syscall.ENOPROTOOPT:
+                return true
+            }
+        }
+    }
+    return false
 }

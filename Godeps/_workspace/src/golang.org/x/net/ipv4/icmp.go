@@ -10,16 +10,16 @@ import "golang.org/x/net/internal/iana"
 type ICMPType int
 
 func (typ ICMPType) String() string {
-	s, ok := icmpTypes[typ]
-	if !ok {
-		return "<nil>"
-	}
-	return s
+    s, ok := icmpTypes[typ]
+    if !ok {
+        return "<nil>"
+    }
+    return s
 }
 
 // Protocol returns the ICMPv4 protocol number.
 func (typ ICMPType) Protocol() int {
-	return iana.ProtocolICMP
+    return iana.ProtocolICMP
 }
 
 // An ICMPFilter represents an ICMP message filter for incoming
@@ -31,27 +31,27 @@ func (typ ICMPType) Protocol() int {
 // A router means a node that forwards IP packets not explicitly
 // addressed to itself, and a host means a node that is not a router.
 type ICMPFilter struct {
-	sysICMPFilter
+    sysICMPFilter
 }
 
 // Accept accepts incoming ICMP packets including the type field value
 // typ.
 func (f *ICMPFilter) Accept(typ ICMPType) {
-	f.accept(typ)
+    f.accept(typ)
 }
 
 // Block blocks incoming ICMP packets including the type field value
 // typ.
 func (f *ICMPFilter) Block(typ ICMPType) {
-	f.block(typ)
+    f.block(typ)
 }
 
 // SetAll sets the filter action to the filter.
 func (f *ICMPFilter) SetAll(block bool) {
-	f.setAll(block)
+    f.setAll(block)
 }
 
 // WillBlock reports whether the ICMP type will be blocked.
 func (f *ICMPFilter) WillBlock(typ ICMPType) bool {
-	return f.willBlock(typ)
+    return f.willBlock(typ)
 }

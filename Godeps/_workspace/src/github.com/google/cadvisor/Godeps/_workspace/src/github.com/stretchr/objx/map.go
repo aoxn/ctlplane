@@ -1,20 +1,20 @@
 package objx
 
 import (
-	"encoding/base64"
-	"encoding/json"
-	"errors"
-	"io/ioutil"
-	"net/url"
-	"strings"
+    "encoding/base64"
+    "encoding/json"
+    "errors"
+    "io/ioutil"
+    "net/url"
+    "strings"
 )
 
 // MSIConvertable is an interface that defines methods for converting your
 // custom types to a map[string]interface{} representation.
 type MSIConvertable interface {
-	// MSI gets a map[string]interface{} (msi) representing the
-	// object.
-	MSI() map[string]interface{}
+    // MSI gets a map[string]interface{} (msi) representing the
+    // object.
+    MSI() map[string]interface{}
 }
 
 // Map provides extended functionality for working with
@@ -23,7 +23,7 @@ type Map map[string]interface{}
 
 // Value returns the internal value instance
 func (m Map) Value() *Value {
-	return &Value{data: m}
+    return &Value{data: m}
 }
 
 // Nil represents a nil Map.
@@ -33,14 +33,14 @@ var Nil Map = New(nil)
 // If the data argument is not a map[string]interface, New attempts to call the
 // MSI() method on the MSIConvertable interface to create one.
 func New(data interface{}) Map {
-	if _, ok := data.(map[string]interface{}); !ok {
-		if converter, ok := data.(MSIConvertable); ok {
-			data = converter.MSI()
-		} else {
-			return nil
-		}
-	}
-	return Map(data.(map[string]interface{}))
+    if _, ok := data.(map[string]interface{}); !ok {
+        if converter, ok := data.(MSIConvertable); ok {
+            data = converter.MSI()
+        } else {
+            return nil
+        }
+    }
+    return Map(data.(map[string]interface{}))
 }
 
 // MSI creates a map[string]interface{} and puts it inside a new Map.
@@ -61,29 +61,29 @@ func New(data interface{}) Map {
 //     m := objx.New(map[string]interface{}{"name": "Mat", "age": 29, "subobj": map[string]interface{}{"active": true}})
 func MSI(keyAndValuePairs ...interface{}) Map {
 
-	newMap := make(map[string]interface{})
-	keyAndValuePairsLen := len(keyAndValuePairs)
+    newMap := make(map[string]interface{})
+    keyAndValuePairsLen := len(keyAndValuePairs)
 
-	if keyAndValuePairsLen%2 != 0 {
-		panic("objx: MSI must have an even number of arguments following the 'key, value' pattern.")
-	}
+    if keyAndValuePairsLen % 2 != 0 {
+        panic("objx: MSI must have an even number of arguments following the 'key, value' pattern.")
+    }
 
-	for i := 0; i < keyAndValuePairsLen; i = i + 2 {
+    for i := 0; i < keyAndValuePairsLen; i = i + 2 {
 
-		key := keyAndValuePairs[i]
-		value := keyAndValuePairs[i+1]
+        key := keyAndValuePairs[i]
+        value := keyAndValuePairs[i + 1]
 
-		// make sure the key is a string
-		keyString, keyStringOK := key.(string)
-		if !keyStringOK {
-			panic("objx: MSI must follow 'string, interface{}' pattern.  " + keyString + " is not a valid key.")
-		}
+        // make sure the key is a string
+        keyString, keyStringOK := key.(string)
+        if !keyStringOK {
+            panic("objx: MSI must follow 'string, interface{}' pattern.  " + keyString + " is not a valid key.")
+        }
 
-		newMap[keyString] = value
+        newMap[keyString] = value
 
-	}
+    }
 
-	return New(newMap)
+    return New(newMap)
 }
 
 // ****** Conversion Constructors
@@ -93,13 +93,13 @@ func MSI(keyAndValuePairs ...interface{}) Map {
 //
 // Panics if the JSON is invalid.
 func MustFromJSON(jsonString string) Map {
-	o, err := FromJSON(jsonString)
+    o, err := FromJSON(jsonString)
 
-	if err != nil {
-		panic("objx: MustFromJSON failed with error: " + err.Error())
-	}
+    if err != nil {
+        panic("objx: MustFromJSON failed with error: " + err.Error())
+    }
 
-	return o
+    return o
 }
 
 // FromJSON creates a new Map containing the data specified in the
@@ -108,14 +108,14 @@ func MustFromJSON(jsonString string) Map {
 // Returns an error if the JSON is invalid.
 func FromJSON(jsonString string) (Map, error) {
 
-	var data interface{}
-	err := json.Unmarshal([]byte(jsonString), &data)
+    var data interface{}
+    err := json.Unmarshal([]byte(jsonString), &data)
 
-	if err != nil {
-		return Nil, err
-	}
+    if err != nil {
+        return Nil, err
+    }
 
-	return New(data), nil
+    return New(data), nil
 
 }
 
@@ -125,14 +125,14 @@ func FromJSON(jsonString string) (Map, error) {
 // The string is an encoded JSON string returned by Base64
 func FromBase64(base64String string) (Map, error) {
 
-	decoder := base64.NewDecoder(base64.StdEncoding, strings.NewReader(base64String))
+    decoder := base64.NewDecoder(base64.StdEncoding, strings.NewReader(base64String))
 
-	decoded, err := ioutil.ReadAll(decoder)
-	if err != nil {
-		return nil, err
-	}
+    decoded, err := ioutil.ReadAll(decoder)
+    if err != nil {
+        return nil, err
+    }
 
-	return FromJSON(string(decoded))
+    return FromJSON(string(decoded))
 }
 
 // MustFromBase64 creates a new Obj containing the data specified
@@ -141,13 +141,13 @@ func FromBase64(base64String string) (Map, error) {
 // The string is an encoded JSON string returned by Base64
 func MustFromBase64(base64String string) Map {
 
-	result, err := FromBase64(base64String)
+    result, err := FromBase64(base64String)
 
-	if err != nil {
-		panic("objx: MustFromBase64 failed with error: " + err.Error())
-	}
+    if err != nil {
+        panic("objx: MustFromBase64 failed with error: " + err.Error())
+    }
 
-	return result
+    return result
 }
 
 // FromSignedBase64 creates a new Obj containing the data specified
@@ -155,17 +155,17 @@ func MustFromBase64(base64String string) Map {
 //
 // The string is an encoded JSON string returned by SignedBase64
 func FromSignedBase64(base64String, key string) (Map, error) {
-	parts := strings.Split(base64String, SignatureSeparator)
-	if len(parts) != 2 {
-		return nil, errors.New("objx: Signed base64 string is malformed.")
-	}
+    parts := strings.Split(base64String, SignatureSeparator)
+    if len(parts) != 2 {
+        return nil, errors.New("objx: Signed base64 string is malformed.")
+    }
 
-	sig := HashWithKey(parts[0], key)
-	if parts[1] != sig {
-		return nil, errors.New("objx: Signature for base64 data does not match.")
-	}
+    sig := HashWithKey(parts[0], key)
+    if parts[1] != sig {
+        return nil, errors.New("objx: Signature for base64 data does not match.")
+    }
 
-	return FromBase64(parts[0])
+    return FromBase64(parts[0])
 }
 
 // MustFromSignedBase64 creates a new Obj containing the data specified
@@ -174,13 +174,13 @@ func FromSignedBase64(base64String, key string) (Map, error) {
 // The string is an encoded JSON string returned by Base64
 func MustFromSignedBase64(base64String, key string) Map {
 
-	result, err := FromSignedBase64(base64String, key)
+    result, err := FromSignedBase64(base64String, key)
 
-	if err != nil {
-		panic("objx: MustFromSignedBase64 failed with error: " + err.Error())
-	}
+    if err != nil {
+        panic("objx: MustFromSignedBase64 failed with error: " + err.Error())
+    }
 
-	return result
+    return result
 }
 
 // FromURLQuery generates a new Obj by parsing the specified
@@ -189,18 +189,18 @@ func MustFromSignedBase64(base64String, key string) Map {
 // For queries with multiple values, the first value is selected.
 func FromURLQuery(query string) (Map, error) {
 
-	vals, err := url.ParseQuery(query)
+    vals, err := url.ParseQuery(query)
 
-	if err != nil {
-		return nil, err
-	}
+    if err != nil {
+        return nil, err
+    }
 
-	m := make(map[string]interface{})
-	for k, vals := range vals {
-		m[k] = vals[0]
-	}
+    m := make(map[string]interface{})
+    for k, vals := range vals {
+        m[k] = vals[0]
+    }
 
-	return New(m), nil
+    return New(m), nil
 }
 
 // MustFromURLQuery generates a new Obj by parsing the specified
@@ -211,12 +211,12 @@ func FromURLQuery(query string) (Map, error) {
 // Panics if it encounters an error
 func MustFromURLQuery(query string) Map {
 
-	o, err := FromURLQuery(query)
+    o, err := FromURLQuery(query)
 
-	if err != nil {
-		panic("objx: MustFromURLQuery failed with error: " + err.Error())
-	}
+    if err != nil {
+        panic("objx: MustFromURLQuery failed with error: " + err.Error())
+    }
 
-	return o
+    return o
 
 }

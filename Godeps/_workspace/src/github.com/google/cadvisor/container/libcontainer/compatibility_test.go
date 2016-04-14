@@ -15,42 +15,42 @@
 package libcontainer
 
 import (
-	"path/filepath"
-	"testing"
+    "path/filepath"
+    "testing"
 )
 
 func TestReadConfig(t *testing.T) {
-	var (
-		testdata    string = "testdata"
-		containerID string = "1"
-	)
-	// Test with using the new config of docker v1.9.0
-	dockerRoot := filepath.Join(testdata, "docker-v1.9.1")
-	dockerRun := filepath.Join(testdata, "docker-v1.9.1")
-	config, err := ReadConfig(dockerRoot, dockerRun, containerID)
-	if err != nil {
-		t.Error(err)
-	}
-	if config.Hostname != containerID {
-		t.Errorf("Expected container hostname is %s, but got %s", containerID, config.Hostname)
-	}
+    var (
+        testdata string = "testdata"
+        containerID string = "1"
+    )
+    // Test with using the new config of docker v1.9.0
+    dockerRoot := filepath.Join(testdata, "docker-v1.9.1")
+    dockerRun := filepath.Join(testdata, "docker-v1.9.1")
+    config, err := ReadConfig(dockerRoot, dockerRun, containerID)
+    if err != nil {
+        t.Error(err)
+    }
+    if config.Hostname != containerID {
+        t.Errorf("Expected container hostname is %s, but got %s", containerID, config.Hostname)
+    }
 
-	// Test with using the pre config of docker v1.8.3
-	dockerRoot = filepath.Join(testdata, "docker-v1.8.3")
-	dockerRun = filepath.Join(testdata, "docker-v1.8.3")
-	config, err = ReadConfig(dockerRoot, dockerRun, containerID)
-	if err != nil {
-		t.Error(err)
-	}
-	if config.Hostname != containerID {
-		t.Errorf("Expected container hostname is %s, but got %s", containerID, config.Hostname)
-	}
+    // Test with using the pre config of docker v1.8.3
+    dockerRoot = filepath.Join(testdata, "docker-v1.8.3")
+    dockerRun = filepath.Join(testdata, "docker-v1.8.3")
+    config, err = ReadConfig(dockerRoot, dockerRun, containerID)
+    if err != nil {
+        t.Error(err)
+    }
+    if config.Hostname != containerID {
+        t.Errorf("Expected container hostname is %s, but got %s", containerID, config.Hostname)
+    }
 
-	// Test with using non-existed old config, return an error
-	dockerRoot = filepath.Join(testdata, "docker-v1.8.0")
-	dockerRun = filepath.Join(testdata, "docker-v1.8.0")
-	config, err = ReadConfig(dockerRoot, dockerRun, containerID)
-	if err == nil {
-		t.Error("Expected an error, but got nil")
-	}
+    // Test with using non-existed old config, return an error
+    dockerRoot = filepath.Join(testdata, "docker-v1.8.0")
+    dockerRun = filepath.Join(testdata, "docker-v1.8.0")
+    config, err = ReadConfig(dockerRoot, dockerRun, containerID)
+    if err == nil {
+        t.Error("Expected an error, but got nil")
+    }
 }

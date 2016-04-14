@@ -25,31 +25,31 @@ var Licenses map[string]License
 // the header to be used with each file on the file's creating, and the text
 // of the license
 type License struct {
-	Name            string   // The type of license in use
-	PossibleMatches []string // Similar names to guess
-	Text            string   // License text data
-	Header          string   // License header for source files
+    Name            string   // The type of license in use
+    PossibleMatches []string // Similar names to guess
+    Text            string   // License text data
+    Header          string   // License header for source files
 }
 
 // given a license name (in), try to match the license indicated
 func matchLicense(in string) string {
-	for key, lic := range Licenses {
-		for _, match := range lic.PossibleMatches {
-			if strings.EqualFold(in, match) {
-				return key
-			}
-		}
-	}
-	return ""
+    for key, lic := range Licenses {
+        for _, match := range lic.PossibleMatches {
+            if strings.EqualFold(in, match) {
+                return key
+            }
+        }
+    }
+    return ""
 }
 
 func init() {
-	Licenses = make(map[string]License)
+    Licenses = make(map[string]License)
 
-	Licenses["apache"] = License{
-		Name:            "Apache 2.0",
-		PossibleMatches: []string{"apache", "apache20", "apache 2.0", "apache2.0", "apache-2.0"},
-		Header: `
+    Licenses["apache"] = License{
+        Name:            "Apache 2.0",
+        PossibleMatches: []string{"apache", "apache20", "apache 2.0", "apache2.0", "apache-2.0"},
+        Header: `
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -61,7 +61,7 @@ func init() {
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.`,
-		Text: `
+        Text: `
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -264,12 +264,12 @@ func init() {
    See the License for the specific language governing permissions and
    limitations under the License.
 `,
-	}
+    }
 
-	Licenses["mit"] = License{
-		Name:            "Mit",
-		PossibleMatches: []string{"mit"},
-		Header: `
+    Licenses["mit"] = License{
+        Name:            "Mit",
+        PossibleMatches: []string{"mit"},
+        Header: `
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -287,7 +287,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.`,
-		Text: `The MIT License (MIT)
+        Text: `The MIT License (MIT)
 
 {{ .copyright }}
 
@@ -309,12 +309,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 `,
-	}
+    }
 
-	Licenses["bsd"] = License{
-		Name:            "NewBSD",
-		PossibleMatches: []string{"bsd", "newbsd", "3 clause bsd"},
-		Header: `
+    Licenses["bsd"] = License{
+        Name:            "NewBSD",
+        PossibleMatches: []string{"bsd", "newbsd", "3 clause bsd"},
+        Header: `
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -342,7 +342,7 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.`,
-		Text: `{{ .copyright }}
+        Text: `{{ .copyright }}
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -370,12 +370,12 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `,
-	}
+    }
 
-	Licenses["freebsd"] = License{
-		Name:            "Simplified BSD License",
-		PossibleMatches: []string{"freebsd", "simpbsd", "simple bsd", "2 clause bsd"},
-		Header: `
+    Licenses["freebsd"] = License{
+        Name:            "Simplified BSD License",
+        PossibleMatches: []string{"freebsd", "simpbsd", "simple bsd", "2 clause bsd"},
+        Header: `
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -399,7 +399,7 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.`,
-		Text: `{{ .copyright }}
+        Text: `{{ .copyright }}
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -423,12 +423,12 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `,
-	}
+    }
 
-	Licenses["gpl3"] = License{
-		Name:            "GNU General Public License 3.0",
-		PossibleMatches: []string{"gpl3", "gpl", "gnu gpl3", "gnu gpl"},
-		Header: `{{ .copyright }}
+    Licenses["gpl3"] = License{
+        Name:            "GNU General Public License 3.0",
+        PossibleMatches: []string{"gpl3", "gpl", "gnu gpl3", "gnu gpl"},
+        Header: `{{ .copyright }}
 
  This file is part of {{ .appName }}.
 
@@ -445,7 +445,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  You should have received a copy of the GNU Lesser General Public License
  along with {{ .appName }}. If not, see <http://www.gnu.org/licenses/>.
 	   `,
-		Text: `                    GNU GENERAL PUBLIC LICENSE
+        Text: `                    GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
  Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
@@ -1120,14 +1120,14 @@ the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 `,
-	}
+    }
 
-	// Licenses["apache20"] = License{
-	// 	Name:            "Apache 2.0",
-	// 	PossibleMatches: []string{"apache", "apache20", ""},
-	//   Header: `
-	//   `,
-	// 	Text: `
-	//   `,
-	// }
+    // Licenses["apache20"] = License{
+    // 	Name:            "Apache 2.0",
+    // 	PossibleMatches: []string{"apache", "apache20", ""},
+    //   Header: `
+    //   `,
+    // 	Text: `
+    //   `,
+    // }
 }

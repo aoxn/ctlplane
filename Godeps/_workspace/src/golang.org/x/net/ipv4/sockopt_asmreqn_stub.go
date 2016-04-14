@@ -9,9 +9,9 @@ package ipv4
 import "net"
 
 func getsockoptIPMreqn(fd, name int) (*net.Interface, error) {
-	return nil, errOpNoSupport
+    return nil, errOpNoSupport
 }
 
 func setsockoptIPMreqn(fd, name int, ifi *net.Interface, grp net.IP) error {
-	return errOpNoSupport
+    return errOpNoSupport
 }

@@ -5,45 +5,45 @@
 package packet
 
 import (
-	"bytes"
-	"encoding/base64"
-	"image/color"
-	"image/jpeg"
-	"testing"
+    "bytes"
+    "encoding/base64"
+    "image/color"
+    "image/jpeg"
+    "testing"
 )
 
 func TestParseUserAttribute(t *testing.T) {
-	r := base64.NewDecoder(base64.StdEncoding, bytes.NewBufferString(userAttributePacket))
-	for i := 0; i < 2; i++ {
-		p, err := Read(r)
-		if err != nil {
-			t.Fatal(err)
-		}
-		uat := p.(*UserAttribute)
-		imgs := uat.ImageData()
-		if len(imgs) != 1 {
-			t.Errorf("Unexpected number of images in user attribute packet: %d", len(imgs))
-		}
-		if len(imgs[0]) != 3395 {
-			t.Errorf("Unexpected JPEG image size: %d", len(imgs[0]))
-		}
-		img, err := jpeg.Decode(bytes.NewBuffer(imgs[0]))
-		if err != nil {
-			t.Errorf("Error decoding JPEG image: %v", err)
-		}
-		// A pixel in my right eye.
-		pixel := color.NRGBAModel.Convert(img.At(56, 36))
-		ref := color.NRGBA{R: 157, G: 128, B: 124, A: 255}
-		if pixel != ref {
-			t.Errorf("Unexpected pixel color: %v", pixel)
-		}
-		w := bytes.NewBuffer(nil)
-		err = uat.Serialize(w)
-		if err != nil {
-			t.Errorf("Error writing user attribute: %v", err)
-		}
-		r = bytes.NewBuffer(w.Bytes())
-	}
+    r := base64.NewDecoder(base64.StdEncoding, bytes.NewBufferString(userAttributePacket))
+    for i := 0; i < 2; i++ {
+        p, err := Read(r)
+        if err != nil {
+            t.Fatal(err)
+        }
+        uat := p.(*UserAttribute)
+        imgs := uat.ImageData()
+        if len(imgs) != 1 {
+            t.Errorf("Unexpected number of images in user attribute packet: %d", len(imgs))
+        }
+        if len(imgs[0]) != 3395 {
+            t.Errorf("Unexpected JPEG image size: %d", len(imgs[0]))
+        }
+        img, err := jpeg.Decode(bytes.NewBuffer(imgs[0]))
+        if err != nil {
+            t.Errorf("Error decoding JPEG image: %v", err)
+        }
+        // A pixel in my right eye.
+        pixel := color.NRGBAModel.Convert(img.At(56, 36))
+        ref := color.NRGBA{R: 157, G: 128, B: 124, A: 255}
+        if pixel != ref {
+            t.Errorf("Unexpected pixel color: %v", pixel)
+        }
+        w := bytes.NewBuffer(nil)
+        err = uat.Serialize(w)
+        if err != nil {
+            t.Errorf("Error writing user attribute: %v", err)
+        }
+        r = bytes.NewBuffer(w.Bytes())
+    }
 }
 
 const userAttributePacket = `

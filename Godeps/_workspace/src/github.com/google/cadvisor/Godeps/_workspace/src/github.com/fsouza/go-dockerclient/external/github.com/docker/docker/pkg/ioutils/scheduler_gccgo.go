@@ -3,11 +3,11 @@
 package ioutils
 
 import (
-	"runtime"
+    "runtime"
 )
 
 func callSchedulerIfNecessary() {
-	//allow or force Go scheduler to switch context, without explicitly
-	//forcing this will make it hang when using gccgo implementation
-	runtime.Gosched()
+    //allow or force Go scheduler to switch context, without explicitly
+    //forcing this will make it hang when using gccgo implementation
+    runtime.Gosched()
 }

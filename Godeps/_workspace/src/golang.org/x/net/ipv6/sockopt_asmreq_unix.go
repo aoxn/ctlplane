@@ -7,16 +7,16 @@
 package ipv6
 
 import (
-	"net"
-	"os"
-	"unsafe"
+    "net"
+    "os"
+    "unsafe"
 )
 
 func setsockoptIPMreq(fd int, opt *sockOpt, ifi *net.Interface, grp net.IP) error {
-	var mreq sysIPv6Mreq
-	copy(mreq.Multiaddr[:], grp)
-	if ifi != nil {
-		mreq.setIfindex(ifi.Index)
-	}
-	return os.NewSyscallError("setsockopt", setsockopt(fd, opt.level, opt.name, unsafe.Pointer(&mreq), sysSizeofIPv6Mreq))
+    var mreq sysIPv6Mreq
+    copy(mreq.Multiaddr[:], grp)
+    if ifi != nil {
+        mreq.setIfindex(ifi.Index)
+    }
+    return os.NewSyscallError("setsockopt", setsockopt(fd, opt.level, opt.name, unsafe.Pointer(&mreq), sysSizeofIPv6Mreq))
 }

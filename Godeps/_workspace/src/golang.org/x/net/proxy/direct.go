@@ -5,7 +5,7 @@
 package proxy
 
 import (
-	"net"
+    "net"
 )
 
 type direct struct{}
@@ -14,5 +14,5 @@ type direct struct{}
 var Direct = direct{}
 
 func (direct) Dial(network, addr string) (net.Conn, error) {
-	return net.Dial(network, addr)
+    return net.Dial(network, addr)
 }

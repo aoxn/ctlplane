@@ -10,6 +10,6 @@ package elastic
 // object. Returning a map[string]interface{}
 // will do.
 type Suggester interface {
-	Name() string
-	Source(includeName bool) interface{}
+    Name() string
+    Source(includeName bool) interface{}
 }

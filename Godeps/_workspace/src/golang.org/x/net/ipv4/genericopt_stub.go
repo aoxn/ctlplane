@@ -8,22 +8,22 @@ package ipv4
 
 // TOS returns the type-of-service field value for outgoing packets.
 func (c *genericOpt) TOS() (int, error) {
-	return 0, errOpNoSupport
+    return 0, errOpNoSupport
 }
 
 // SetTOS sets the type-of-service field value for future outgoing
 // packets.
 func (c *genericOpt) SetTOS(tos int) error {
-	return errOpNoSupport
+    return errOpNoSupport
 }
 
 // TTL returns the time-to-live field value for outgoing packets.
 func (c *genericOpt) TTL() (int, error) {
-	return 0, errOpNoSupport
+    return 0, errOpNoSupport
 }
 
 // SetTTL sets the time-to-live field value for future outgoing
 // packets.
 func (c *genericOpt) SetTTL(ttl int) error {
-	return errOpNoSupport
+    return errOpNoSupport
 }

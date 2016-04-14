@@ -14,75 +14,75 @@
 package prometheus
 
 import (
-	"testing"
+    "testing"
 )
 
 func TestDelete(t *testing.T) {
-	desc := NewDesc("test", "helpless", []string{"l1", "l2"}, nil)
-	vec := MetricVec{
-		children: map[uint64]Metric{},
-		desc:     desc,
-		newMetric: func(lvs ...string) Metric {
-			return newValue(desc, UntypedValue, 0, lvs...)
-		},
-	}
+    desc := NewDesc("test", "helpless", []string{"l1", "l2"}, nil)
+    vec := MetricVec{
+        children: map[uint64]Metric{},
+        desc:     desc,
+        newMetric: func(lvs ...string) Metric {
+            return newValue(desc, UntypedValue, 0, lvs...)
+        },
+    }
 
-	if got, want := vec.Delete(Labels{"l1": "v1", "l2": "v2"}), false; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
+    if got, want := vec.Delete(Labels{"l1": "v1", "l2": "v2"}), false; got != want {
+        t.Errorf("got %v, want %v", got, want)
+    }
 
-	vec.With(Labels{"l1": "v1", "l2": "v2"}).(Untyped).Set(42)
-	if got, want := vec.Delete(Labels{"l1": "v1", "l2": "v2"}), true; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
-	if got, want := vec.Delete(Labels{"l1": "v1", "l2": "v2"}), false; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
+    vec.With(Labels{"l1": "v1", "l2": "v2"}).(Untyped).Set(42)
+    if got, want := vec.Delete(Labels{"l1": "v1", "l2": "v2"}), true; got != want {
+        t.Errorf("got %v, want %v", got, want)
+    }
+    if got, want := vec.Delete(Labels{"l1": "v1", "l2": "v2"}), false; got != want {
+        t.Errorf("got %v, want %v", got, want)
+    }
 
-	vec.With(Labels{"l1": "v1", "l2": "v2"}).(Untyped).Set(42)
-	if got, want := vec.Delete(Labels{"l2": "v2", "l1": "v1"}), true; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
-	if got, want := vec.Delete(Labels{"l2": "v2", "l1": "v1"}), false; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
+    vec.With(Labels{"l1": "v1", "l2": "v2"}).(Untyped).Set(42)
+    if got, want := vec.Delete(Labels{"l2": "v2", "l1": "v1"}), true; got != want {
+        t.Errorf("got %v, want %v", got, want)
+    }
+    if got, want := vec.Delete(Labels{"l2": "v2", "l1": "v1"}), false; got != want {
+        t.Errorf("got %v, want %v", got, want)
+    }
 
-	vec.With(Labels{"l1": "v1", "l2": "v2"}).(Untyped).Set(42)
-	if got, want := vec.Delete(Labels{"l2": "v1", "l1": "v2"}), false; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
-	if got, want := vec.Delete(Labels{"l1": "v1"}), false; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
+    vec.With(Labels{"l1": "v1", "l2": "v2"}).(Untyped).Set(42)
+    if got, want := vec.Delete(Labels{"l2": "v1", "l1": "v2"}), false; got != want {
+        t.Errorf("got %v, want %v", got, want)
+    }
+    if got, want := vec.Delete(Labels{"l1": "v1"}), false; got != want {
+        t.Errorf("got %v, want %v", got, want)
+    }
 }
 
 func TestDeleteLabelValues(t *testing.T) {
-	desc := NewDesc("test", "helpless", []string{"l1", "l2"}, nil)
-	vec := MetricVec{
-		children: map[uint64]Metric{},
-		desc:     desc,
-		newMetric: func(lvs ...string) Metric {
-			return newValue(desc, UntypedValue, 0, lvs...)
-		},
-	}
+    desc := NewDesc("test", "helpless", []string{"l1", "l2"}, nil)
+    vec := MetricVec{
+        children: map[uint64]Metric{},
+        desc:     desc,
+        newMetric: func(lvs ...string) Metric {
+            return newValue(desc, UntypedValue, 0, lvs...)
+        },
+    }
 
-	if got, want := vec.DeleteLabelValues("v1", "v2"), false; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
+    if got, want := vec.DeleteLabelValues("v1", "v2"), false; got != want {
+        t.Errorf("got %v, want %v", got, want)
+    }
 
-	vec.With(Labels{"l1": "v1", "l2": "v2"}).(Untyped).Set(42)
-	if got, want := vec.DeleteLabelValues("v1", "v2"), true; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
-	if got, want := vec.DeleteLabelValues("v1", "v2"), false; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
+    vec.With(Labels{"l1": "v1", "l2": "v2"}).(Untyped).Set(42)
+    if got, want := vec.DeleteLabelValues("v1", "v2"), true; got != want {
+        t.Errorf("got %v, want %v", got, want)
+    }
+    if got, want := vec.DeleteLabelValues("v1", "v2"), false; got != want {
+        t.Errorf("got %v, want %v", got, want)
+    }
 
-	vec.With(Labels{"l1": "v1", "l2": "v2"}).(Untyped).Set(42)
-	if got, want := vec.DeleteLabelValues("v2", "v1"), false; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
-	if got, want := vec.DeleteLabelValues("v1"), false; got != want {
-		t.Errorf("got %v, want %v", got, want)
-	}
+    vec.With(Labels{"l1": "v1", "l2": "v2"}).(Untyped).Set(42)
+    if got, want := vec.DeleteLabelValues("v2", "v1"), false; got != want {
+        t.Errorf("got %v, want %v", got, want)
+    }
+    if got, want := vec.DeleteLabelValues("v1"), false; got != want {
+        t.Errorf("got %v, want %v", got, want)
+    }
 }

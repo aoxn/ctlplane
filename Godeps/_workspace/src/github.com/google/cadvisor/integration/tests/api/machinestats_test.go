@@ -15,40 +15,40 @@
 package api
 
 import (
-	"testing"
-	"time"
+    "testing"
+    "time"
 
-	"github.com/google/cadvisor/integration/framework"
-	"github.com/stretchr/testify/assert"
+    "github.com/google/cadvisor/integration/framework"
+    "github.com/stretchr/testify/assert"
 )
 
 func TestMachineStatsIsReturned(t *testing.T) {
-	fm := framework.New(t)
-	defer fm.Cleanup()
+    fm := framework.New(t)
+    defer fm.Cleanup()
 
-	machineStats, err := fm.Cadvisor().ClientV2().MachineStats()
-	if err != nil {
-		t.Fatal(err)
-	}
+    machineStats, err := fm.Cadvisor().ClientV2().MachineStats()
+    if err != nil {
+        t.Fatal(err)
+    }
 
-	as := assert.New(t)
-	for _, stat := range machineStats {
-		as.NotEqual(stat.Timestamp, time.Time{})
-		as.True(stat.Cpu.Usage.Total > 0)
-		as.True(len(stat.Cpu.Usage.PerCpu) > 0)
-		if stat.CpuInst != nil {
-			as.True(stat.CpuInst.Usage.Total > 0)
-		}
-		as.True(stat.Memory.Usage > 0)
-		for _, nStat := range stat.Network.Interfaces {
-			as.NotEqual(nStat.Name, "")
-			as.NotEqual(nStat.RxBytes, 0)
-		}
-		for _, fsStat := range stat.Filesystem {
-			as.NotEqual(fsStat.Device, "")
-			as.NotNil(fsStat.Capacity)
-			as.NotNil(fsStat.Usage)
-			as.NotNil(fsStat.ReadsCompleted)
-		}
-	}
+    as := assert.New(t)
+    for _, stat := range machineStats {
+        as.NotEqual(stat.Timestamp, time.Time{})
+        as.True(stat.Cpu.Usage.Total > 0)
+        as.True(len(stat.Cpu.Usage.PerCpu) > 0)
+        if stat.CpuInst != nil {
+            as.True(stat.CpuInst.Usage.Total > 0)
+        }
+        as.True(stat.Memory.Usage > 0)
+        for _, nStat := range stat.Network.Interfaces {
+            as.NotEqual(nStat.Name, "")
+            as.NotEqual(nStat.RxBytes, 0)
+        }
+        for _, fsStat := range stat.Filesystem {
+            as.NotEqual(fsStat.Device, "")
+            as.NotNil(fsStat.Capacity)
+            as.NotNil(fsStat.Usage)
+            as.NotNil(fsStat.ReadsCompleted)
+        }
+    }
 }

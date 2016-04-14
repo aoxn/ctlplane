@@ -17,196 +17,196 @@
 package manager
 
 import (
-	"reflect"
-	"strings"
-	"testing"
-	"time"
+    "reflect"
+    "strings"
+    "testing"
+    "time"
 
-	"github.com/google/cadvisor/cache/memory"
-	"github.com/google/cadvisor/collector"
-	"github.com/google/cadvisor/container"
-	"github.com/google/cadvisor/container/docker"
-	info "github.com/google/cadvisor/info/v1"
-	itest "github.com/google/cadvisor/info/v1/test"
-	"github.com/google/cadvisor/utils/sysfs/fakesysfs"
+    "github.com/google/cadvisor/cache/memory"
+    "github.com/google/cadvisor/collector"
+    "github.com/google/cadvisor/container"
+    "github.com/google/cadvisor/container/docker"
+    info "github.com/google/cadvisor/info/v1"
+    itest "github.com/google/cadvisor/info/v1/test"
+    "github.com/google/cadvisor/utils/sysfs/fakesysfs"
 )
 
 // TODO(vmarmol): Refactor these tests.
 
 func createManagerAndAddContainers(
-	memoryCache *memory.InMemoryCache,
-	sysfs *fakesysfs.FakeSysFs,
-	containers []string,
-	f func(*container.MockContainerHandler),
-	t *testing.T,
+memoryCache *memory.InMemoryCache,
+sysfs *fakesysfs.FakeSysFs,
+containers []string,
+f func(*container.MockContainerHandler),
+t *testing.T,
 ) *manager {
-	container.ClearContainerHandlerFactories()
-	mif := &manager{
-		containers:   make(map[namespacedContainerName]*containerData),
-		quitChannels: make([]chan error, 0, 2),
-		memoryCache:  memoryCache,
-	}
-	for _, name := range containers {
-		mockHandler := container.NewMockContainerHandler(name)
-		spec := itest.GenerateRandomContainerSpec(4)
-		mockHandler.On("GetSpec").Return(
-			spec,
-			nil,
-		).Once()
-		cont, err := newContainerData(name, memoryCache, mockHandler, nil, false, &collector.GenericCollectorManager{}, 60*time.Second, true)
-		if err != nil {
-			t.Fatal(err)
-		}
-		mif.containers[namespacedContainerName{
-			Name: name,
-		}] = cont
-		// Add Docker containers under their namespace.
-		if strings.HasPrefix(name, "/docker") {
-			mif.containers[namespacedContainerName{
-				Namespace: docker.DockerNamespace,
-				Name:      strings.TrimPrefix(name, "/docker/"),
-			}] = cont
-		}
-		f(mockHandler)
-	}
-	return mif
+    container.ClearContainerHandlerFactories()
+    mif := &manager{
+        containers:   make(map[namespacedContainerName]*containerData),
+        quitChannels: make([]chan error, 0, 2),
+        memoryCache:  memoryCache,
+    }
+    for _, name := range containers {
+        mockHandler := container.NewMockContainerHandler(name)
+        spec := itest.GenerateRandomContainerSpec(4)
+        mockHandler.On("GetSpec").Return(
+            spec,
+            nil,
+        ).Once()
+        cont, err := newContainerData(name, memoryCache, mockHandler, nil, false, &collector.GenericCollectorManager{}, 60 * time.Second, true)
+        if err != nil {
+            t.Fatal(err)
+        }
+        mif.containers[namespacedContainerName{
+            Name: name,
+        }] = cont
+        // Add Docker containers under their namespace.
+        if strings.HasPrefix(name, "/docker") {
+            mif.containers[namespacedContainerName{
+                Namespace: docker.DockerNamespace,
+                Name:      strings.TrimPrefix(name, "/docker/"),
+            }] = cont
+        }
+        f(mockHandler)
+    }
+    return mif
 }
 
 // Expect a manager with the specified containers and query. Returns the manager, map of ContainerInfo objects,
 // and map of MockContainerHandler objects.}
 func expectManagerWithContainers(containers []string, query *info.ContainerInfoRequest, t *testing.T) (*manager, map[string]*info.ContainerInfo, map[string]*container.MockContainerHandler) {
-	infosMap := make(map[string]*info.ContainerInfo, len(containers))
-	handlerMap := make(map[string]*container.MockContainerHandler, len(containers))
+    infosMap := make(map[string]*info.ContainerInfo, len(containers))
+    handlerMap := make(map[string]*container.MockContainerHandler, len(containers))
 
-	for _, container := range containers {
-		infosMap[container] = itest.GenerateRandomContainerInfo(container, 4, query, 1*time.Second)
-	}
+    for _, container := range containers {
+        infosMap[container] = itest.GenerateRandomContainerInfo(container, 4, query, 1 * time.Second)
+    }
 
-	memoryCache := memory.New(time.Duration(query.NumStats)*time.Second, nil)
-	sysfs := &fakesysfs.FakeSysFs{}
-	m := createManagerAndAddContainers(
-		memoryCache,
-		sysfs,
-		containers,
-		func(h *container.MockContainerHandler) {
-			cinfo := infosMap[h.Name]
-			ref, err := h.ContainerReference()
-			if err != nil {
-				t.Error(err)
-			}
-			for _, stat := range cinfo.Stats {
-				err = memoryCache.AddStats(ref, stat)
-				if err != nil {
-					t.Error(err)
-				}
-			}
-			spec := cinfo.Spec
+    memoryCache := memory.New(time.Duration(query.NumStats) * time.Second, nil)
+    sysfs := &fakesysfs.FakeSysFs{}
+    m := createManagerAndAddContainers(
+        memoryCache,
+        sysfs,
+        containers,
+        func(h *container.MockContainerHandler) {
+            cinfo := infosMap[h.Name]
+            ref, err := h.ContainerReference()
+            if err != nil {
+                t.Error(err)
+            }
+            for _, stat := range cinfo.Stats {
+                err = memoryCache.AddStats(ref, stat)
+                if err != nil {
+                    t.Error(err)
+                }
+            }
+            spec := cinfo.Spec
 
-			h.On("ListContainers", container.ListSelf).Return(
-				[]info.ContainerReference(nil),
-				nil,
-			)
-			h.On("GetSpec").Return(
-				spec,
-				nil,
-			)
-			handlerMap[h.Name] = h
-		},
-		t,
-	)
+            h.On("ListContainers", container.ListSelf).Return(
+                []info.ContainerReference(nil),
+                nil,
+            )
+            h.On("GetSpec").Return(
+                spec,
+                nil,
+            )
+            handlerMap[h.Name] = h
+        },
+        t,
+    )
 
-	return m, infosMap, handlerMap
+    return m, infosMap, handlerMap
 }
 
 func TestGetContainerInfo(t *testing.T) {
-	containers := []string{
-		"/c1",
-		"/c2",
-	}
+    containers := []string{
+        "/c1",
+        "/c2",
+    }
 
-	query := &info.ContainerInfoRequest{
-		NumStats: 256,
-	}
+    query := &info.ContainerInfoRequest{
+        NumStats: 256,
+    }
 
-	m, infosMap, handlerMap := expectManagerWithContainers(containers, query, t)
+    m, infosMap, handlerMap := expectManagerWithContainers(containers, query, t)
 
-	returnedInfos := make(map[string]*info.ContainerInfo, len(containers))
+    returnedInfos := make(map[string]*info.ContainerInfo, len(containers))
 
-	for _, container := range containers {
-		cinfo, err := m.GetContainerInfo(container, query)
-		if err != nil {
-			t.Fatalf("Unable to get info for container %v: %v", container, err)
-		}
-		returnedInfos[container] = cinfo
-	}
+    for _, container := range containers {
+        cinfo, err := m.GetContainerInfo(container, query)
+        if err != nil {
+            t.Fatalf("Unable to get info for container %v: %v", container, err)
+        }
+        returnedInfos[container] = cinfo
+    }
 
-	for container, handler := range handlerMap {
-		handler.AssertExpectations(t)
-		returned := returnedInfos[container]
-		expected := infosMap[container]
-		if !reflect.DeepEqual(returned, expected) {
-			t.Errorf("returned unexpected info for container %v; returned %+v; expected %+v", container, returned, expected)
-		}
-	}
+    for container, handler := range handlerMap {
+        handler.AssertExpectations(t)
+        returned := returnedInfos[container]
+        expected := infosMap[container]
+        if !reflect.DeepEqual(returned, expected) {
+            t.Errorf("returned unexpected info for container %v; returned %+v; expected %+v", container, returned, expected)
+        }
+    }
 
 }
 
 func TestSubcontainersInfo(t *testing.T) {
-	containers := []string{
-		"/c1",
-		"/c2",
-	}
+    containers := []string{
+        "/c1",
+        "/c2",
+    }
 
-	query := &info.ContainerInfoRequest{
-		NumStats: 64,
-	}
+    query := &info.ContainerInfoRequest{
+        NumStats: 64,
+    }
 
-	m, _, _ := expectManagerWithContainers(containers, query, t)
+    m, _, _ := expectManagerWithContainers(containers, query, t)
 
-	result, err := m.SubcontainersInfo("/", query)
-	if err != nil {
-		t.Fatalf("expected to succeed: %s", err)
-	}
-	if len(result) != len(containers) {
-		t.Errorf("expected to received containers: %v, but received: %v", containers, result)
-	}
-	for _, res := range result {
-		found := false
-		for _, name := range containers {
-			if res.Name == name {
-				found = true
-				break
-			}
-		}
-		if !found {
-			t.Errorf("unexpected container %q in result, expected one of %v", res.Name, containers)
-		}
-	}
+    result, err := m.SubcontainersInfo("/", query)
+    if err != nil {
+        t.Fatalf("expected to succeed: %s", err)
+    }
+    if len(result) != len(containers) {
+        t.Errorf("expected to received containers: %v, but received: %v", containers, result)
+    }
+    for _, res := range result {
+        found := false
+        for _, name := range containers {
+            if res.Name == name {
+                found = true
+                break
+            }
+        }
+        if !found {
+            t.Errorf("unexpected container %q in result, expected one of %v", res.Name, containers)
+        }
+    }
 }
 
 func TestDockerContainersInfo(t *testing.T) {
-	containers := []string{
-		"/docker/c1",
-	}
+    containers := []string{
+        "/docker/c1",
+    }
 
-	query := &info.ContainerInfoRequest{
-		NumStats: 2,
-	}
+    query := &info.ContainerInfoRequest{
+        NumStats: 2,
+    }
 
-	m, _, _ := expectManagerWithContainers(containers, query, t)
+    m, _, _ := expectManagerWithContainers(containers, query, t)
 
-	result, err := m.DockerContainer("c1", query)
-	if err != nil {
-		t.Fatalf("expected to succeed: %s", err)
-	}
-	if result.Name != containers[0] {
-		t.Errorf("Unexpected container %q in result. Expected container %q", result.Name, containers[0])
-	}
+    result, err := m.DockerContainer("c1", query)
+    if err != nil {
+        t.Fatalf("expected to succeed: %s", err)
+    }
+    if result.Name != containers[0] {
+        t.Errorf("Unexpected container %q in result. Expected container %q", result.Name, containers[0])
+    }
 }
 
 func TestNewNilManager(t *testing.T) {
-	_, err := New(nil, nil, 60*time.Second, true)
-	if err == nil {
-		t.Fatalf("Expected nil manager to return error")
-	}
+    _, err := New(nil, nil, 60 * time.Second, true)
+    if err == nil {
+        t.Fatalf("Expected nil manager to return error")
+    }
 }

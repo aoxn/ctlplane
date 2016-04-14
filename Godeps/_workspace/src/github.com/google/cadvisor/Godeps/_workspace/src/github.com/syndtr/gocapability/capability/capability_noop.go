@@ -11,9 +11,9 @@ package capability
 import "errors"
 
 func newPid(pid int) (Capabilities, error) {
-	return nil, errors.New("not supported")
+    return nil, errors.New("not supported")
 }
 
 func newFile(path string) (Capabilities, error) {
-	return nil, errors.New("not supported")
+    return nil, errors.New("not supported")
 }

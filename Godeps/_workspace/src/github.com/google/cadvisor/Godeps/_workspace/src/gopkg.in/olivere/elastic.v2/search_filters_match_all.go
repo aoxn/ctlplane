@@ -8,18 +8,18 @@ package elastic
 // For details, see:
 // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-match-all-filter.html
 type MatchAllFilter struct {
-	Filter
+    Filter
 }
 
 func NewMatchAllFilter() MatchAllFilter {
-	return MatchAllFilter{}
+    return MatchAllFilter{}
 }
 
 func (f MatchAllFilter) Source() interface{} {
-	// {
-	//   "match_all" : {}
-	// }
-	source := make(map[string]interface{})
-	source["match_all"] = make(map[string]interface{})
-	return source
+    // {
+    //   "match_all" : {}
+    // }
+    source := make(map[string]interface{})
+    source["match_all"] = make(map[string]interface{})
+    return source
 }

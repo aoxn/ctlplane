@@ -15,86 +15,86 @@ package elastic
 // For more details, see
 // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html.
 type WildcardQuery struct {
-	Query
+    Query
 
-	name      string
-	wildcard  string
-	boost     float32
-	rewrite   string
-	queryName string
+    name      string
+    wildcard  string
+    boost     float32
+    rewrite   string
+    queryName string
 }
 
 // NewWildcardQuery creates a new wildcard query.
 func NewWildcardQuery(name, wildcard string) WildcardQuery {
-	q := WildcardQuery{
-		name:     name,
-		wildcard: wildcard,
-		boost:    -1.0,
-	}
-	return q
+    q := WildcardQuery{
+        name:     name,
+        wildcard: wildcard,
+        boost:    -1.0,
+    }
+    return q
 }
 
 // Name is the name of the field name.
 func (q WildcardQuery) Name(name string) WildcardQuery {
-	q.name = name
-	return q
+    q.name = name
+    return q
 }
 
 // Wildcard is the wildcard to be used in the query, e.g. ki*y??.
 func (q WildcardQuery) Wildcard(wildcard string) WildcardQuery {
-	q.wildcard = wildcard
-	return q
+    q.wildcard = wildcard
+    return q
 }
 
 // Boost sets the boost for this query.
 func (q WildcardQuery) Boost(boost float32) WildcardQuery {
-	q.boost = boost
-	return q
+    q.boost = boost
+    return q
 }
 
 // Rewrite controls the rewriting.
 // See http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-multi-term-rewrite.html
 // for details.
 func (q WildcardQuery) Rewrite(rewrite string) WildcardQuery {
-	q.rewrite = rewrite
-	return q
+    q.rewrite = rewrite
+    return q
 }
 
 // QueryName sets the name of this query.
 func (q WildcardQuery) QueryName(queryName string) WildcardQuery {
-	q.queryName = queryName
-	return q
+    q.queryName = queryName
+    return q
 }
 
 // Source returns the JSON serializable body of this query.
 func (q WildcardQuery) Source() interface{} {
-	// {
-	//	"wildcard" : {
-	//		"user" : {
-	//      "wildcard" : "ki*y",
-	//      "boost" : 1.0
-	//    }
-	// }
+    // {
+    //	"wildcard" : {
+    //		"user" : {
+    //      "wildcard" : "ki*y",
+    //      "boost" : 1.0
+    //    }
+    // }
 
-	source := make(map[string]interface{})
+    source := make(map[string]interface{})
 
-	query := make(map[string]interface{})
-	source["wildcard"] = query
+    query := make(map[string]interface{})
+    source["wildcard"] = query
 
-	wq := make(map[string]interface{})
-	query[q.name] = wq
+    wq := make(map[string]interface{})
+    query[q.name] = wq
 
-	wq["wildcard"] = q.wildcard
+    wq["wildcard"] = q.wildcard
 
-	if q.boost != -1.0 {
-		wq["boost"] = q.boost
-	}
-	if q.rewrite != "" {
-		wq["rewrite"] = q.rewrite
-	}
-	if q.queryName != "" {
-		wq["_name"] = q.queryName
-	}
+    if q.boost != -1.0 {
+        wq["boost"] = q.boost
+    }
+    if q.rewrite != "" {
+        wq["rewrite"] = q.rewrite
+    }
+    if q.queryName != "" {
+        wq["_name"] = q.queryName
+    }
 
-	return source
+    return source
 }

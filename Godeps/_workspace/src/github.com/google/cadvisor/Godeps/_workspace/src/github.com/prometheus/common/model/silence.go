@@ -14,47 +14,47 @@
 package model
 
 import (
-	"encoding/json"
-	"fmt"
-	"regexp"
-	"time"
+    "encoding/json"
+    "fmt"
+    "regexp"
+    "time"
 )
 
 // Matcher describes a matches the value of a given label.
 type Matcher struct {
-	Name    LabelName `json:"name"`
-	Value   string    `json:"value"`
-	IsRegex bool      `json:"isRegex"`
+    Name    LabelName `json:"name"`
+    Value   string    `json:"value"`
+    IsRegex bool      `json:"isRegex"`
 }
 
 func (m *Matcher) UnmarshalJSON(b []byte) error {
-	type plain Matcher
-	if err := json.Unmarshal(b, (*plain)(m)); err != nil {
-		return err
-	}
+    type plain Matcher
+    if err := json.Unmarshal(b, (*plain)(m)); err != nil {
+        return err
+    }
 
-	if len(m.Name) == 0 {
-		return fmt.Errorf("label name in matcher must not be empty")
-	}
-	if m.IsRegex {
-		if _, err := regexp.Compile(m.Value); err != nil {
-			return err
-		}
-	}
-	return nil
+    if len(m.Name) == 0 {
+        return fmt.Errorf("label name in matcher must not be empty")
+    }
+    if m.IsRegex {
+        if _, err := regexp.Compile(m.Value); err != nil {
+            return err
+        }
+    }
+    return nil
 }
 
 // Silence defines the representation of a silence definiton
 // in the Prometheus eco-system.
 type Silence struct {
-	ID uint64 `json:"id,omitempty"`
+    ID        uint64 `json:"id,omitempty"`
 
-	Matchers []*Matcher `json:"matchers"`
+    Matchers  []*Matcher `json:"matchers"`
 
-	StartsAt time.Time `json:"startsAt"`
-	EndsAt   time.Time `json:"endsAt"`
+    StartsAt  time.Time `json:"startsAt"`
+    EndsAt    time.Time `json:"endsAt"`
 
-	CreatedAt time.Time `json:"createdAt,omitempty"`
-	CreatedBy string    `json:"createdBy"`
-	Comment   string    `json:"comment,omitempty"`
+    CreatedAt time.Time `json:"createdAt,omitempty"`
+    CreatedBy string    `json:"createdBy"`
+    Comment   string    `json:"comment,omitempty"`
 }

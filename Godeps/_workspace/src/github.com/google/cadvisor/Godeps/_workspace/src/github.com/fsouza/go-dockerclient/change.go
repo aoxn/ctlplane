@@ -11,33 +11,33 @@ import "fmt"
 type ChangeType int
 
 const (
-	// ChangeModify is the ChangeType for container modifications
-	ChangeModify ChangeType = iota
+// ChangeModify is the ChangeType for container modifications
+    ChangeModify ChangeType = iota
 
-	// ChangeAdd is the ChangeType for additions to a container
-	ChangeAdd
+// ChangeAdd is the ChangeType for additions to a container
+    ChangeAdd
 
-	// ChangeDelete is the ChangeType for deletions from a container
-	ChangeDelete
+// ChangeDelete is the ChangeType for deletions from a container
+    ChangeDelete
 )
 
 // Change represents a change in a container.
 //
 // See https://goo.gl/9GsTIF for more details.
 type Change struct {
-	Path string
-	Kind ChangeType
+    Path string
+    Kind ChangeType
 }
 
 func (change *Change) String() string {
-	var kind string
-	switch change.Kind {
-	case ChangeModify:
-		kind = "C"
-	case ChangeAdd:
-		kind = "A"
-	case ChangeDelete:
-		kind = "D"
-	}
-	return fmt.Sprintf("%s %s", kind, change.Path)
+    var kind string
+    switch change.Kind {
+    case ChangeModify:
+        kind = "C"
+    case ChangeAdd:
+        kind = "A"
+    case ChangeDelete:
+        kind = "D"
+    }
+    return fmt.Sprintf("%s %s", kind, change.Path)
 }

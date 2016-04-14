@@ -9,68 +9,68 @@ package elastic
 // For details, see:
 // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-or-filter.html
 type OrFilter struct {
-	filters    []Filter
-	cache      *bool
-	cacheKey   string
-	filterName string
+    filters    []Filter
+    cache      *bool
+    cacheKey   string
+    filterName string
 }
 
 func NewOrFilter(filters ...Filter) OrFilter {
-	f := OrFilter{
-		filters: make([]Filter, 0),
-	}
-	if len(filters) > 0 {
-		f.filters = append(f.filters, filters...)
-	}
-	return f
+    f := OrFilter{
+        filters: make([]Filter, 0),
+    }
+    if len(filters) > 0 {
+        f.filters = append(f.filters, filters...)
+    }
+    return f
 }
 
 func (f OrFilter) Add(filter Filter) OrFilter {
-	f.filters = append(f.filters, filter)
-	return f
+    f.filters = append(f.filters, filter)
+    return f
 }
 
 func (f OrFilter) Cache(cache bool) OrFilter {
-	f.cache = &cache
-	return f
+    f.cache = &cache
+    return f
 }
 
 func (f OrFilter) CacheKey(cacheKey string) OrFilter {
-	f.cacheKey = cacheKey
-	return f
+    f.cacheKey = cacheKey
+    return f
 }
 
 func (f OrFilter) FilterName(filterName string) OrFilter {
-	f.filterName = filterName
-	return f
+    f.filterName = filterName
+    return f
 }
 
 func (f OrFilter) Source() interface{} {
-	// {
-	//   "or" : [
-	//      ... filters ...
-	//   ]
-	// }
+    // {
+    //   "or" : [
+    //      ... filters ...
+    //   ]
+    // }
 
-	source := make(map[string]interface{})
+    source := make(map[string]interface{})
 
-	params := make(map[string]interface{})
-	source["or"] = params
+    params := make(map[string]interface{})
+    source["or"] = params
 
-	filters := make([]interface{}, len(f.filters))
-	params["filters"] = filters
-	for i, filter := range f.filters {
-		filters[i] = filter.Source()
-	}
+    filters := make([]interface{}, len(f.filters))
+    params["filters"] = filters
+    for i, filter := range f.filters {
+        filters[i] = filter.Source()
+    }
 
-	if f.cache != nil {
-		params["_cache"] = *f.cache
-	}
-	if f.cacheKey != "" {
-		params["_cache_key"] = f.cacheKey
-	}
-	if f.filterName != "" {
-		params["_name"] = f.filterName
-	}
-	return source
+    if f.cache != nil {
+        params["_cache"] = *f.cache
+    }
+    if f.cacheKey != "" {
+        params["_cache_key"] = f.cacheKey
+    }
+    if f.filterName != "" {
+        params["_name"] = f.filterName
+    }
+    return source
 }

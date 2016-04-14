@@ -5,15 +5,15 @@
 package packet
 
 import (
-	"golang.org/x/crypto/openpgp/errors"
-	"io"
+    "golang.org/x/crypto/openpgp/errors"
+    "io"
 )
 
 // Reader reads packets from an io.Reader and allows packets to be 'unread' so
 // that they result from the next call to Next.
 type Reader struct {
-	q       []Packet
-	readers []io.Reader
+    q       []Packet
+    readers []io.Reader
 }
 
 // New io.Readers are pushed when a compressed or encrypted packet is processed
@@ -27,27 +27,27 @@ const maxReaders = 32
 // Next returns the most recently unread Packet, or reads another packet from
 // the top-most io.Reader. Unknown packet types are skipped.
 func (r *Reader) Next() (p Packet, err error) {
-	if len(r.q) > 0 {
-		p = r.q[len(r.q)-1]
-		r.q = r.q[:len(r.q)-1]
-		return
-	}
+    if len(r.q) > 0 {
+        p = r.q[len(r.q) - 1]
+        r.q = r.q[:len(r.q) - 1]
+        return
+    }
 
-	for len(r.readers) > 0 {
-		p, err = Read(r.readers[len(r.readers)-1])
-		if err == nil {
-			return
-		}
-		if err == io.EOF {
-			r.readers = r.readers[:len(r.readers)-1]
-			continue
-		}
-		if _, ok := err.(errors.UnknownPacketTypeError); !ok {
-			return nil, err
-		}
-	}
+    for len(r.readers) > 0 {
+        p, err = Read(r.readers[len(r.readers) - 1])
+        if err == nil {
+            return
+        }
+        if err == io.EOF {
+            r.readers = r.readers[:len(r.readers) - 1]
+            continue
+        }
+        if _, ok := err.(errors.UnknownPacketTypeError); !ok {
+            return nil, err
+        }
+    }
 
-	return nil, io.EOF
+    return nil, io.EOF
 }
 
 // Push causes the Reader to start reading from a new io.Reader. When an EOF
@@ -56,21 +56,21 @@ func (r *Reader) Next() (p Packet, err error) {
 // if pushing the reader would exceed the maximum recursion level, otherwise it
 // returns nil.
 func (r *Reader) Push(reader io.Reader) (err error) {
-	if len(r.readers) >= maxReaders {
-		return errors.StructuralError("too many layers of packets")
-	}
-	r.readers = append(r.readers, reader)
-	return nil
+    if len(r.readers) >= maxReaders {
+        return errors.StructuralError("too many layers of packets")
+    }
+    r.readers = append(r.readers, reader)
+    return nil
 }
 
 // Unread causes the given Packet to be returned from the next call to Next.
 func (r *Reader) Unread(p Packet) {
-	r.q = append(r.q, p)
+    r.q = append(r.q, p)
 }
 
 func NewReader(r io.Reader) *Reader {
-	return &Reader{
-		q:       nil,
-		readers: []io.Reader{r},
-	}
+    return &Reader{
+        q:       nil,
+        readers: []io.Reader{r},
+    }
 }

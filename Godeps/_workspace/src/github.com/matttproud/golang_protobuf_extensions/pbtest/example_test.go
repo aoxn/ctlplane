@@ -15,37 +15,39 @@
 package pbtest
 
 import (
-	"testing"
-	"testing/quick"
+    "testing"
+    "testing/quick"
 
-	"github.com/golang/protobuf/proto"
+    "github.com/golang/protobuf/proto"
 )
 
 func Example() {
-	// You would place this in a top-level function, like TestDatastore(t *testing.T).
-	var (
-		datastore Datastore
-		t         *testing.T
-	)
-	if err := quick.Check(func(rec *CustomerRecord) bool {
-		// testing/quick generated rec using quick.Value.  We want to ensure that
-		// semi-internal struct fields are recursively reset to a known value.
-		SanitizeGenerated(rec)
-		// Ensure that any record can be stored, no matter what!
-		if err := datastore.Store(rec); err != nil {
-			return false
-		}
-		return true
-	}, nil); err != nil {
-		t.Fatal(err)
-	}
+    // You would place this in a top-level function, like TestDatastore(t *testing.T).
+    var (
+        datastore Datastore
+        t         *testing.T
+    )
+    if err := quick.Check(func(rec *CustomerRecord) bool {
+        // testing/quick generated rec using quick.Value.  We want to ensure that
+        // semi-internal struct fields are recursively reset to a known value.
+        SanitizeGenerated(rec)
+        // Ensure that any record can be stored, no matter what!
+        if err := datastore.Store(rec); err != nil {
+            return false
+        }
+        return true
+    }, nil); err != nil {
+        t.Fatal(err)
+    }
 }
 
 // Datastore models some system under test.
 type Datastore struct{}
 
 // Store stores a customer record.
-func (Datastore) Store(*CustomerRecord) error { return nil }
+func (Datastore) Store(*CustomerRecord) error {
+    return nil
+}
 
 // Types below are generated from protoc --go_out=. example.proto, where
 // example.proto contains
@@ -56,9 +58,13 @@ func (Datastore) Store(*CustomerRecord) error { return nil }
 // """
 
 type CustomerRecord struct {
-	XXX_unrecognized []byte `json:"-"`
+    XXX_unrecognized []byte `json:"-"`
 }
 
-func (m *CustomerRecord) Reset()         { *m = CustomerRecord{} }
-func (m *CustomerRecord) String() string { return proto.CompactTextString(m) }
-func (*CustomerRecord) ProtoMessage()    {}
+func (m *CustomerRecord) Reset() {
+    *m = CustomerRecord{}
+}
+func (m *CustomerRecord) String() string {
+    return proto.CompactTextString(m)
+}
+func (*CustomerRecord) ProtoMessage() {}

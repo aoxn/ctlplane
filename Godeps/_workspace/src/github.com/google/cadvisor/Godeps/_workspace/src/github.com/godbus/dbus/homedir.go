@@ -1,28 +1,28 @@
 package dbus
 
 import (
-	"os"
-	"sync"
+    "os"
+    "sync"
 )
 
 var (
-	homeDir     string
-	homeDirLock sync.Mutex
+    homeDir string
+    homeDirLock sync.Mutex
 )
 
 func getHomeDir() string {
-	homeDirLock.Lock()
-	defer homeDirLock.Unlock()
+    homeDirLock.Lock()
+    defer homeDirLock.Unlock()
 
-	if homeDir != "" {
-		return homeDir
-	}
+    if homeDir != "" {
+        return homeDir
+    }
 
-	homeDir = os.Getenv("HOME")
-	if homeDir != "" {
-		return homeDir
-	}
+    homeDir = os.Getenv("HOME")
+    if homeDir != "" {
+        return homeDir
+    }
 
-	homeDir = lookupHomeDir()
-	return homeDir
+    homeDir = lookupHomeDir()
+    return homeDir
 }

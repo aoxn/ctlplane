@@ -16,20 +16,20 @@ package prometheus
 import "testing"
 
 func TestBuildFQName(t *testing.T) {
-	scenarios := []struct{ namespace, subsystem, name, result string }{
-		{"a", "b", "c", "a_b_c"},
-		{"", "b", "c", "b_c"},
-		{"a", "", "c", "a_c"},
-		{"", "", "c", "c"},
-		{"a", "b", "", ""},
-		{"a", "", "", ""},
-		{"", "b", "", ""},
-		{" ", "", "", ""},
-	}
+    scenarios := []struct{ namespace, subsystem, name, result string }{
+        {"a", "b", "c", "a_b_c"},
+        {"", "b", "c", "b_c"},
+        {"a", "", "c", "a_c"},
+        {"", "", "c", "c"},
+        {"a", "b", "", ""},
+        {"a", "", "", ""},
+        {"", "b", "", ""},
+        {" ", "", "", ""},
+    }
 
-	for i, s := range scenarios {
-		if want, got := s.result, BuildFQName(s.namespace, s.subsystem, s.name); want != got {
-			t.Errorf("%d. want %s, got %s", i, want, got)
-		}
-	}
+    for i, s := range scenarios {
+        if want, got := s.result, BuildFQName(s.namespace, s.subsystem, s.name); want != got {
+            t.Errorf("%d. want %s, got %s", i, want, got)
+        }
+    }
 }

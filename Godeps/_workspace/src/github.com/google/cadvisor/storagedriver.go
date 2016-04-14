@@ -15,33 +15,33 @@
 package main
 
 import (
-	"flag"
-	"time"
+    "flag"
+    "time"
 
-	"github.com/google/cadvisor/cache/memory"
-	"github.com/google/cadvisor/storage"
-	_ "github.com/google/cadvisor/storage/bigquery"
-	_ "github.com/google/cadvisor/storage/elasticsearch"
-	_ "github.com/google/cadvisor/storage/influxdb"
-	_ "github.com/google/cadvisor/storage/redis"
-	_ "github.com/google/cadvisor/storage/statsd"
-	_ "github.com/google/cadvisor/storage/stdout"
+    "github.com/google/cadvisor/cache/memory"
+    "github.com/google/cadvisor/storage"
+    _ "github.com/google/cadvisor/storage/bigquery"
+    _ "github.com/google/cadvisor/storage/elasticsearch"
+    _ "github.com/google/cadvisor/storage/influxdb"
+    _ "github.com/google/cadvisor/storage/redis"
+    _ "github.com/google/cadvisor/storage/statsd"
+    _ "github.com/google/cadvisor/storage/stdout"
 
-	"github.com/golang/glog"
+    "github.com/golang/glog"
 )
 
-var storageDuration = flag.Duration("storage_duration", 2*time.Minute, "How long to keep data stored (Default: 2min).")
+var storageDuration = flag.Duration("storage_duration", 2 * time.Minute, "How long to keep data stored (Default: 2min).")
 
 // NewMemoryStorage creates a memory storage with an optional backend storage option.
 func NewMemoryStorage(backendStorageName string) (*memory.InMemoryCache, error) {
-	backendStorage, err := storage.New(backendStorageName)
-	if err != nil {
-		return nil, err
-	}
-	if backendStorageName != "" {
-		glog.Infof("Using backend storage type %q", backendStorageName)
-	}
-	glog.Infof("Caching stats in memory for %v", *storageDuration)
-	storageDriver := memory.New(*storageDuration, backendStorage)
-	return storageDriver, nil
+    backendStorage, err := storage.New(backendStorageName)
+    if err != nil {
+        return nil, err
+    }
+    if backendStorageName != "" {
+        glog.Infof("Using backend storage type %q", backendStorageName)
+    }
+    glog.Infof("Caching stats in memory for %v", *storageDuration)
+    storageDriver := memory.New(*storageDuration, backendStorage)
+    return storageDriver, nil
 }

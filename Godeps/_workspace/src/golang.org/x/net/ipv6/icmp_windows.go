@@ -5,22 +5,22 @@
 package ipv6
 
 type sysICMPv6Filter struct {
-	// TODO(mikio): implement this
+    // TODO(mikio): implement this
 }
 
 func (f *sysICMPv6Filter) accept(typ ICMPType) {
-	// TODO(mikio): implement this
+    // TODO(mikio): implement this
 }
 
 func (f *sysICMPv6Filter) block(typ ICMPType) {
-	// TODO(mikio): implement this
+    // TODO(mikio): implement this
 }
 
 func (f *sysICMPv6Filter) setAll(block bool) {
-	// TODO(mikio): implement this
+    // TODO(mikio): implement this
 }
 
 func (f *sysICMPv6Filter) willBlock(typ ICMPType) bool {
-	// TODO(mikio): implement this
-	return false
+    // TODO(mikio): implement this
+    return false
 }

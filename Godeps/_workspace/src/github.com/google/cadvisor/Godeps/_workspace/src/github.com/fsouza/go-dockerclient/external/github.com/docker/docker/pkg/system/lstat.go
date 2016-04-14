@@ -3,7 +3,7 @@
 package system
 
 import (
-	"syscall"
+    "syscall"
 )
 
 // Lstat takes a path to a file and returns
@@ -11,9 +11,9 @@ import (
 //
 // Throws an error if the file does not exist
 func Lstat(path string) (*Stat_t, error) {
-	s := &syscall.Stat_t{}
-	if err := syscall.Lstat(path, s); err != nil {
-		return nil, err
-	}
-	return fromStatT(s)
+    s := &syscall.Stat_t{}
+    if err := syscall.Lstat(path, s); err != nil {
+        return nil, err
+    }
+    return fromStatT(s)
 }

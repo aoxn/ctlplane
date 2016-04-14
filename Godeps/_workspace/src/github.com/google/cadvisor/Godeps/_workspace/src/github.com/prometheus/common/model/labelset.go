@@ -14,10 +14,10 @@
 package model
 
 import (
-	"encoding/json"
-	"fmt"
-	"sort"
-	"strings"
+    "encoding/json"
+    "fmt"
+    "sort"
+    "strings"
 )
 
 // A LabelSet is a collection of LabelName and LabelValue pairs.  The LabelSet
@@ -28,19 +28,19 @@ import (
 type LabelSet map[LabelName]LabelValue
 
 func (ls LabelSet) Equal(o LabelSet) bool {
-	if len(ls) != len(o) {
-		return false
-	}
-	for ln, lv := range ls {
-		olv, ok := o[ln]
-		if !ok {
-			return false
-		}
-		if olv != lv {
-			return false
-		}
-	}
-	return true
+    if len(ls) != len(o) {
+        return false
+    }
+    for ln, lv := range ls {
+        olv, ok := o[ln]
+        if !ok {
+            return false
+        }
+        if olv != lv {
+            return false
+        }
+    }
+    return true
 }
 
 // Before compares the metrics, using the following criteria:
@@ -55,99 +55,99 @@ func (ls LabelSet) Equal(o LabelSet) bool {
 //
 // If m and o are equal, the method returns false.
 func (ls LabelSet) Before(o LabelSet) bool {
-	if len(ls) < len(o) {
-		return true
-	}
-	if len(ls) > len(o) {
-		return false
-	}
+    if len(ls) < len(o) {
+        return true
+    }
+    if len(ls) > len(o) {
+        return false
+    }
 
-	lns := make(LabelNames, 0, len(ls)+len(o))
-	for ln := range ls {
-		lns = append(lns, ln)
-	}
-	for ln := range o {
-		lns = append(lns, ln)
-	}
-	// It's probably not worth it to de-dup lns.
-	sort.Sort(lns)
-	for _, ln := range lns {
-		mlv, ok := ls[ln]
-		if !ok {
-			return true
-		}
-		olv, ok := o[ln]
-		if !ok {
-			return false
-		}
-		if mlv < olv {
-			return true
-		}
-		if mlv > olv {
-			return false
-		}
-	}
-	return false
+    lns := make(LabelNames, 0, len(ls) + len(o))
+    for ln := range ls {
+        lns = append(lns, ln)
+    }
+    for ln := range o {
+        lns = append(lns, ln)
+    }
+    // It's probably not worth it to de-dup lns.
+    sort.Sort(lns)
+    for _, ln := range lns {
+        mlv, ok := ls[ln]
+        if !ok {
+            return true
+        }
+        olv, ok := o[ln]
+        if !ok {
+            return false
+        }
+        if mlv < olv {
+            return true
+        }
+        if mlv > olv {
+            return false
+        }
+    }
+    return false
 }
 
 func (ls LabelSet) Clone() LabelSet {
-	lsn := make(LabelSet, len(ls))
-	for ln, lv := range ls {
-		lsn[ln] = lv
-	}
-	return lsn
+    lsn := make(LabelSet, len(ls))
+    for ln, lv := range ls {
+        lsn[ln] = lv
+    }
+    return lsn
 }
 
 // Merge is a helper function to non-destructively merge two label sets.
 func (l LabelSet) Merge(other LabelSet) LabelSet {
-	result := make(LabelSet, len(l))
+    result := make(LabelSet, len(l))
 
-	for k, v := range l {
-		result[k] = v
-	}
+    for k, v := range l {
+        result[k] = v
+    }
 
-	for k, v := range other {
-		result[k] = v
-	}
+    for k, v := range other {
+        result[k] = v
+    }
 
-	return result
+    return result
 }
 
 func (l LabelSet) String() string {
-	lstrs := make([]string, 0, len(l))
-	for l, v := range l {
-		lstrs = append(lstrs, fmt.Sprintf("%s=%q", l, v))
-	}
+    lstrs := make([]string, 0, len(l))
+    for l, v := range l {
+        lstrs = append(lstrs, fmt.Sprintf("%s=%q", l, v))
+    }
 
-	sort.Strings(lstrs)
-	return fmt.Sprintf("{%s}", strings.Join(lstrs, ", "))
+    sort.Strings(lstrs)
+    return fmt.Sprintf("{%s}", strings.Join(lstrs, ", "))
 }
 
 // Fingerprint returns the LabelSet's fingerprint.
 func (ls LabelSet) Fingerprint() Fingerprint {
-	return labelSetToFingerprint(ls)
+    return labelSetToFingerprint(ls)
 }
 
 // FastFingerprint returns the LabelSet's Fingerprint calculated by a faster hashing
 // algorithm, which is, however, more susceptible to hash collisions.
 func (ls LabelSet) FastFingerprint() Fingerprint {
-	return labelSetToFastFingerprint(ls)
+    return labelSetToFastFingerprint(ls)
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (l *LabelSet) UnmarshalJSON(b []byte) error {
-	var m map[LabelName]LabelValue
-	if err := json.Unmarshal(b, &m); err != nil {
-		return err
-	}
-	// encoding/json only unmarshals maps of the form map[string]T. It treats
-	// LabelName as a string and does not call its UnmarshalJSON method.
-	// Thus, we have to replicate the behavior here.
-	for ln := range m {
-		if !LabelNameRE.MatchString(string(ln)) {
-			return fmt.Errorf("%q is not a valid label name", ln)
-		}
-	}
-	*l = LabelSet(m)
-	return nil
+    var m map[LabelName]LabelValue
+    if err := json.Unmarshal(b, &m); err != nil {
+        return err
+    }
+    // encoding/json only unmarshals maps of the form map[string]T. It treats
+    // LabelName as a string and does not call its UnmarshalJSON method.
+    // Thus, we have to replicate the behavior here.
+    for ln := range m {
+        if !LabelNameRE.MatchString(string(ln)) {
+            return fmt.Errorf("%q is not a valid label name", ln)
+        }
+    }
+    *l = LabelSet(m)
+    return nil
 }

@@ -5,59 +5,59 @@
 package packet
 
 import (
-	"bytes"
-	"encoding/hex"
-	"io"
-	"testing"
+    "bytes"
+    "encoding/hex"
+    "io"
+    "testing"
 )
 
 // Test packet.Read error handling in OpaquePacket.Parse,
 // which attempts to re-read an OpaquePacket as a supported
 // Packet type.
 func TestOpaqueParseReason(t *testing.T) {
-	buf, err := hex.DecodeString(UnsupportedKeyHex)
-	if err != nil {
-		t.Fatal(err)
-	}
-	or := NewOpaqueReader(bytes.NewBuffer(buf))
-	count := 0
-	badPackets := 0
-	var uid *UserId
-	for {
-		op, err := or.Next()
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			t.Errorf("#%d: opaque read error: %v", count, err)
-			break
-		}
-		// try to parse opaque packet
-		p, err := op.Parse()
-		switch pkt := p.(type) {
-		case *UserId:
-			uid = pkt
-		case *OpaquePacket:
-			// If an OpaquePacket can't re-parse, packet.Read
-			// certainly had its reasons.
-			if pkt.Reason == nil {
-				t.Errorf("#%d: opaque packet, no reason", count)
-			} else {
-				badPackets++
-			}
-		}
-		count++
-	}
+    buf, err := hex.DecodeString(UnsupportedKeyHex)
+    if err != nil {
+        t.Fatal(err)
+    }
+    or := NewOpaqueReader(bytes.NewBuffer(buf))
+    count := 0
+    badPackets := 0
+    var uid *UserId
+    for {
+        op, err := or.Next()
+        if err == io.EOF {
+            break
+        } else if err != nil {
+            t.Errorf("#%d: opaque read error: %v", count, err)
+            break
+        }
+        // try to parse opaque packet
+        p, err := op.Parse()
+        switch pkt := p.(type) {
+        case *UserId:
+            uid = pkt
+        case *OpaquePacket:
+            // If an OpaquePacket can't re-parse, packet.Read
+            // certainly had its reasons.
+            if pkt.Reason == nil {
+                t.Errorf("#%d: opaque packet, no reason", count)
+            } else {
+                badPackets++
+            }
+        }
+        count++
+    }
 
-	const expectedBad = 3
-	// Test post-conditions, make sure we actually parsed packets as expected.
-	if badPackets != expectedBad {
-		t.Errorf("unexpected # unparseable packets: %d (want %d)", badPackets, expectedBad)
-	}
-	if uid == nil {
-		t.Errorf("failed to find expected UID in unsupported keyring")
-	} else if uid.Id != "Armin M. Warda <warda@nephilim.ruhr.de>" {
-		t.Errorf("unexpected UID: %v", uid.Id)
-	}
+    const expectedBad = 3
+    // Test post-conditions, make sure we actually parsed packets as expected.
+    if badPackets != expectedBad {
+        t.Errorf("unexpected # unparseable packets: %d (want %d)", badPackets, expectedBad)
+    }
+    if uid == nil {
+        t.Errorf("failed to find expected UID in unsupported keyring")
+    } else if uid.Id != "Armin M. Warda <warda@nephilim.ruhr.de>" {
+        t.Errorf("unexpected UID: %v", uid.Id)
+    }
 }
 
 // This key material has public key and signature packet versions modified to

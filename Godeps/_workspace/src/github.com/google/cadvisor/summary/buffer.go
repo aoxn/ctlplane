@@ -15,7 +15,7 @@
 package summary
 
 import (
-	info "github.com/google/cadvisor/info/v2"
+    info "github.com/google/cadvisor/info/v2"
 )
 
 // Manages a buffer of usage samples.
@@ -23,52 +23,52 @@ import (
 // The main difference is that we do not pre-allocate the buffer as most containers
 // won't live that long.
 type SamplesBuffer struct {
-	// list of collected samples.
-	samples []info.Usage
-	// maximum size this buffer can grow to.
-	maxSize int
-	// index for the latest sample.
-	index int
+    // list of collected samples.
+    samples []info.Usage
+    // maximum size this buffer can grow to.
+    maxSize int
+    // index for the latest sample.
+    index   int
 }
 
 // Initializes an empty buffer.
 func NewSamplesBuffer(size int) *SamplesBuffer {
-	return &SamplesBuffer{
-		index:   -1,
-		maxSize: size,
-	}
+    return &SamplesBuffer{
+        index:   -1,
+        maxSize: size,
+    }
 }
 
 // Returns the current number of samples in the buffer.
 func (s *SamplesBuffer) Size() int {
-	return len(s.samples)
+    return len(s.samples)
 }
 
 // Add an element to the buffer. Oldest one is overwritten if required.
 func (s *SamplesBuffer) Add(stat info.Usage) {
-	if len(s.samples) < s.maxSize {
-		s.samples = append(s.samples, stat)
-		s.index++
-		return
-	}
-	s.index = (s.index + 1) % s.maxSize
-	s.samples[s.index] = stat
+    if len(s.samples) < s.maxSize {
+        s.samples = append(s.samples, stat)
+        s.index++
+        return
+    }
+    s.index = (s.index + 1) % s.maxSize
+    s.samples[s.index] = stat
 }
 
 // Returns pointers to the last 'n' stats.
 func (s *SamplesBuffer) RecentStats(n int) []*info.Usage {
-	if n > len(s.samples) {
-		n = len(s.samples)
-	}
-	start := s.index - (n - 1)
-	if start < 0 {
-		start += len(s.samples)
-	}
+    if n > len(s.samples) {
+        n = len(s.samples)
+    }
+    start := s.index - (n - 1)
+    if start < 0 {
+        start += len(s.samples)
+    }
 
-	out := make([]*info.Usage, n)
-	for i := 0; i < n; i++ {
-		index := (start + i) % len(s.samples)
-		out[i] = &s.samples[index]
-	}
-	return out
+    out := make([]*info.Usage, n)
+    for i := 0; i < n; i++ {
+        index := (start + i) % len(s.samples)
+        out[i] = &s.samples[index]
+    }
+    return out
 }

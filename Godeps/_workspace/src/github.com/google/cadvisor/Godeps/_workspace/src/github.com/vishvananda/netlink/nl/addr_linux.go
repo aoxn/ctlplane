@@ -1,20 +1,20 @@
 package nl
 
 import (
-	"syscall"
-	"unsafe"
+    "syscall"
+    "unsafe"
 )
 
 type IfAddrmsg struct {
-	syscall.IfAddrmsg
+    syscall.IfAddrmsg
 }
 
 func NewIfAddrmsg(family int) *IfAddrmsg {
-	return &IfAddrmsg{
-		IfAddrmsg: syscall.IfAddrmsg{
-			Family: uint8(family),
-		},
-	}
+    return &IfAddrmsg{
+        IfAddrmsg: syscall.IfAddrmsg{
+            Family: uint8(family),
+        },
+    }
 }
 
 // struct ifaddrmsg {
@@ -35,13 +35,13 @@ func NewIfAddrmsg(family int) *IfAddrmsg {
 // SizeofIfAddrmsg     = 0x8
 
 func DeserializeIfAddrmsg(b []byte) *IfAddrmsg {
-	return (*IfAddrmsg)(unsafe.Pointer(&b[0:syscall.SizeofIfAddrmsg][0]))
+    return (*IfAddrmsg)(unsafe.Pointer(&b[0:syscall.SizeofIfAddrmsg][0]))
 }
 
 func (msg *IfAddrmsg) Serialize() []byte {
-	return (*(*[syscall.SizeofIfAddrmsg]byte)(unsafe.Pointer(msg)))[:]
+    return (*(*[syscall.SizeofIfAddrmsg]byte)(unsafe.Pointer(msg)))[:]
 }
 
 func (msg *IfAddrmsg) Len() int {
-	return syscall.SizeofIfAddrmsg
+    return syscall.SizeofIfAddrmsg
 }

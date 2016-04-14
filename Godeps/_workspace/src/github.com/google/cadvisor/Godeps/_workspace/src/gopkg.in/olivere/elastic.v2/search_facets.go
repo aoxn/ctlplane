@@ -8,5 +8,5 @@ package elastic
 // For more details about facets, visit:
 // http://elasticsearch.org/guide/reference/api/search/facets/
 type Facet interface {
-	Source() interface{}
+    Source() interface{}
 }

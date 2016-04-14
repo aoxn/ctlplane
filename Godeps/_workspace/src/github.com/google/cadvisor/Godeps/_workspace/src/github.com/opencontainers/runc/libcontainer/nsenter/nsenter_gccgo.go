@@ -16,10 +16,10 @@ import "C"
 var AlwaysFalse bool
 
 func init() {
-	if AlwaysFalse {
-		// by referencing this C init() in a noop test, it will ensure the compiler
-		// links in the C function.
-		// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65134
-		C.init()
-	}
+    if AlwaysFalse {
+        // by referencing this C init() in a noop test, it will ensure the compiler
+        // links in the C function.
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65134
+        C.init()
+    }
 }

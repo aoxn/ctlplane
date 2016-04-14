@@ -5,21 +5,21 @@
 package ipv4
 
 func (f *sysICMPFilter) accept(typ ICMPType) {
-	f.Data &^= 1 << (uint32(typ) & 31)
+    f.Data &^= 1 << (uint32(typ) & 31)
 }
 
 func (f *sysICMPFilter) block(typ ICMPType) {
-	f.Data |= 1 << (uint32(typ) & 31)
+    f.Data |= 1 << (uint32(typ) & 31)
 }
 
 func (f *sysICMPFilter) setAll(block bool) {
-	if block {
-		f.Data = 1<<32 - 1
-	} else {
-		f.Data = 0
-	}
+    if block {
+        f.Data = 1 << 32 - 1
+    } else {
+        f.Data = 0
+    }
 }
 
 func (f *sysICMPFilter) willBlock(typ ICMPType) bool {
-	return f.Data&(1<<(uint32(typ)&31)) != 0
+    return f.Data & (1 << (uint32(typ) & 31)) != 0
 }

@@ -15,62 +15,62 @@
 package collector
 
 import (
-	"testing"
-	"time"
+    "testing"
+    "time"
 
-	"github.com/google/cadvisor/info/v1"
+    "github.com/google/cadvisor/info/v1"
 
-	"github.com/stretchr/testify/assert"
+    "github.com/stretchr/testify/assert"
 )
 
 type fakeCollector struct {
-	nextCollectionTime time.Time
-	err                error
-	collectedFrom      int
+    nextCollectionTime time.Time
+    err                error
+    collectedFrom      int
 }
 
 func (fc *fakeCollector) Collect(metric map[string][]v1.MetricVal) (time.Time, map[string][]v1.MetricVal, error) {
-	fc.collectedFrom++
-	return fc.nextCollectionTime, metric, fc.err
+    fc.collectedFrom++
+    return fc.nextCollectionTime, metric, fc.err
 }
 
 func (fc *fakeCollector) Name() string {
-	return "fake-collector"
+    return "fake-collector"
 }
 
 func (fc *fakeCollector) GetSpec() []v1.MetricSpec {
-	return []v1.MetricSpec{}
+    return []v1.MetricSpec{}
 }
 
 func TestCollect(t *testing.T) {
-	cm := &GenericCollectorManager{}
+    cm := &GenericCollectorManager{}
 
-	firstTime := time.Now().Add(-time.Hour)
-	secondTime := time.Now().Add(time.Hour)
-	f1 := &fakeCollector{
-		nextCollectionTime: firstTime,
-	}
-	f2 := &fakeCollector{
-		nextCollectionTime: secondTime,
-	}
+    firstTime := time.Now().Add(-time.Hour)
+    secondTime := time.Now().Add(time.Hour)
+    f1 := &fakeCollector{
+        nextCollectionTime: firstTime,
+    }
+    f2 := &fakeCollector{
+        nextCollectionTime: secondTime,
+    }
 
-	assert := assert.New(t)
-	assert.NoError(cm.RegisterCollector(f1))
-	assert.NoError(cm.RegisterCollector(f2))
+    assert := assert.New(t)
+    assert.NoError(cm.RegisterCollector(f1))
+    assert.NoError(cm.RegisterCollector(f2))
 
-	// First collection, everyone gets collected from.
-	nextTime, _, err := cm.Collect()
-	assert.Equal(firstTime, nextTime)
-	assert.NoError(err)
-	assert.Equal(1, f1.collectedFrom)
-	assert.Equal(1, f2.collectedFrom)
+    // First collection, everyone gets collected from.
+    nextTime, _, err := cm.Collect()
+    assert.Equal(firstTime, nextTime)
+    assert.NoError(err)
+    assert.Equal(1, f1.collectedFrom)
+    assert.Equal(1, f2.collectedFrom)
 
-	f1.nextCollectionTime = time.Now().Add(2 * time.Hour)
+    f1.nextCollectionTime = time.Now().Add(2 * time.Hour)
 
-	// Second collection, only the one that is ready gets collected from.
-	nextTime, _, err = cm.Collect()
-	assert.Equal(secondTime, nextTime)
-	assert.NoError(err)
-	assert.Equal(2, f1.collectedFrom)
-	assert.Equal(1, f2.collectedFrom)
+    // Second collection, only the one that is ready gets collected from.
+    nextTime, _, err = cm.Collect()
+    assert.Equal(secondTime, nextTime)
+    assert.NoError(err)
+    assert.Equal(2, f1.collectedFrom)
+    assert.Equal(1, f2.collectedFrom)
 }

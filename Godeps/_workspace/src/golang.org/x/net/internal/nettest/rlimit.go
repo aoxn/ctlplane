@@ -8,4 +8,6 @@ const defaultMaxOpenFiles = 256
 
 // MaxOpenFiles returns the maximum number of open files for the
 // caller's process.
-func MaxOpenFiles() int { return maxOpenFiles() }
+func MaxOpenFiles() int {
+    return maxOpenFiles()
+}

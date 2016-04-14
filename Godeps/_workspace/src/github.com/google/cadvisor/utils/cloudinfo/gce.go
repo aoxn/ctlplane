@@ -15,23 +15,23 @@
 package cloudinfo
 
 import (
-	"strings"
+    "strings"
 
-	info "github.com/google/cadvisor/info/v1"
+    info "github.com/google/cadvisor/info/v1"
 
-	"google.golang.org/cloud/compute/metadata"
+    "google.golang.org/cloud/compute/metadata"
 )
 
 func onGCE() bool {
-	return metadata.OnGCE()
+    return metadata.OnGCE()
 }
 
 func getGceInstanceType() info.InstanceType {
-	machineType, err := metadata.Get("instance/machine-type")
-	if err != nil {
-		return info.UnknownInstance
-	}
+    machineType, err := metadata.Get("instance/machine-type")
+    if err != nil {
+        return info.UnknownInstance
+    }
 
-	responseParts := strings.Split(machineType, "/") // Extract the instance name from the machine type.
-	return info.InstanceType(responseParts[len(responseParts)-1])
+    responseParts := strings.Split(machineType, "/") // Extract the instance name from the machine type.
+    return info.InstanceType(responseParts[len(responseParts) - 1])
 }

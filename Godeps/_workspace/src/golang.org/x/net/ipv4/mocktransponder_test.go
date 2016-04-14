@@ -5,17 +5,19 @@
 package ipv4_test
 
 import (
-	"net"
-	"testing"
+    "net"
+    "testing"
 )
 
-func acceptor(t *testing.T, ln net.Listener, done chan<- bool) {
-	defer func() { done <- true }()
+func acceptor(t *testing.T, ln net.Listener, done chan <- bool) {
+    defer func() {
+        done <- true
+    }()
 
-	c, err := ln.Accept()
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	c.Close()
+    c, err := ln.Accept()
+    if err != nil {
+        t.Error(err)
+        return
+    }
+    c.Close()
 }

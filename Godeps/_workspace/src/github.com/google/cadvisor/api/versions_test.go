@@ -15,67 +15,67 @@
 package api
 
 import (
-	"io"
-	"net/http"
-	"reflect"
-	"testing"
+    "io"
+    "net/http"
+    "reflect"
+    "testing"
 
-	"github.com/google/cadvisor/events"
-	info "github.com/google/cadvisor/info/v1"
+    "github.com/google/cadvisor/events"
+    info "github.com/google/cadvisor/info/v1"
 
-	"github.com/stretchr/testify/assert"
+    "github.com/stretchr/testify/assert"
 )
 
 // returns an http.Request pointer for an input url test string
 func makeHTTPRequest(requestURL string, t *testing.T) *http.Request {
-	dummyReader, _ := io.Pipe()
-	r, err := http.NewRequest("GET", requestURL, dummyReader)
-	assert.Nil(t, err)
-	return r
+    dummyReader, _ := io.Pipe()
+    r, err := http.NewRequest("GET", requestURL, dummyReader)
+    assert.Nil(t, err)
+    return r
 }
 
 func TestGetEventRequestBasicRequest(t *testing.T) {
-	r := makeHTTPRequest("http://localhost:8080/api/v1.3/events?oom_events=true&stream=false&max_events=20", t)
-	expectedQuery := events.NewRequest()
-	expectedQuery.EventType = map[info.EventType]bool{
-		info.EventOom: true,
-	}
-	expectedQuery.MaxEventsReturned = 20
+    r := makeHTTPRequest("http://localhost:8080/api/v1.3/events?oom_events=true&stream=false&max_events=20", t)
+    expectedQuery := events.NewRequest()
+    expectedQuery.EventType = map[info.EventType]bool{
+        info.EventOom: true,
+    }
+    expectedQuery.MaxEventsReturned = 20
 
-	receivedQuery, stream, err := getEventRequest(r)
+    receivedQuery, stream, err := getEventRequest(r)
 
-	if !reflect.DeepEqual(expectedQuery, receivedQuery) {
-		t.Errorf("expected %#v but received %#v", expectedQuery, receivedQuery)
-	}
-	assert.False(t, stream)
-	assert.Nil(t, err)
+    if !reflect.DeepEqual(expectedQuery, receivedQuery) {
+        t.Errorf("expected %#v but received %#v", expectedQuery, receivedQuery)
+    }
+    assert.False(t, stream)
+    assert.Nil(t, err)
 }
 
 func TestGetEventEmptyRequest(t *testing.T) {
-	r := makeHTTPRequest("", t)
-	expectedQuery := events.NewRequest()
+    r := makeHTTPRequest("", t)
+    expectedQuery := events.NewRequest()
 
-	receivedQuery, stream, err := getEventRequest(r)
+    receivedQuery, stream, err := getEventRequest(r)
 
-	if !reflect.DeepEqual(expectedQuery, receivedQuery) {
-		t.Errorf("expected %#v but received %#v", expectedQuery, receivedQuery)
-	}
-	assert.False(t, stream)
-	assert.Nil(t, err)
+    if !reflect.DeepEqual(expectedQuery, receivedQuery) {
+        t.Errorf("expected %#v but received %#v", expectedQuery, receivedQuery)
+    }
+    assert.False(t, stream)
+    assert.Nil(t, err)
 }
 
 func TestGetEventRequestDoubleArgument(t *testing.T) {
-	r := makeHTTPRequest("http://localhost:8080/api/v1.3/events?stream=true&oom_events=true&oom_events=false", t)
-	expectedQuery := events.NewRequest()
-	expectedQuery.EventType = map[info.EventType]bool{
-		info.EventOom: true,
-	}
+    r := makeHTTPRequest("http://localhost:8080/api/v1.3/events?stream=true&oom_events=true&oom_events=false", t)
+    expectedQuery := events.NewRequest()
+    expectedQuery.EventType = map[info.EventType]bool{
+        info.EventOom: true,
+    }
 
-	receivedQuery, stream, err := getEventRequest(r)
+    receivedQuery, stream, err := getEventRequest(r)
 
-	if !reflect.DeepEqual(expectedQuery, receivedQuery) {
-		t.Errorf("expected %#v but received %#v", expectedQuery, receivedQuery)
-	}
-	assert.True(t, stream)
-	assert.Nil(t, err)
+    if !reflect.DeepEqual(expectedQuery, receivedQuery) {
+        t.Errorf("expected %#v but received %#v", expectedQuery, receivedQuery)
+    }
+    assert.True(t, stream)
+    assert.Nil(t, err)
 }

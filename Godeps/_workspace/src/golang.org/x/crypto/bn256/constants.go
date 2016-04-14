@@ -5,12 +5,12 @@
 package bn256
 
 import (
-	"math/big"
+    "math/big"
 )
 
 func bigFromBase10(s string) *big.Int {
-	n, _ := new(big.Int).SetString(s, 10)
-	return n
+    n, _ := new(big.Int).SetString(s, 10)
+    return n
 }
 
 // u is the BN parameter that determines the prime: 1868033³.

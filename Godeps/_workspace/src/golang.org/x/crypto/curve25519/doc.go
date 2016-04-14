@@ -12,12 +12,12 @@ var basePoint = [32]byte{9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 // ScalarMult sets dst to the product in*base where dst and base are the x
 // coordinates of group points and all values are in little-endian form.
 func ScalarMult(dst, in, base *[32]byte) {
-	scalarMult(dst, in, base)
+    scalarMult(dst, in, base)
 }
 
 // ScalarBaseMult sets dst to the product in*base where dst and base are the x
 // coordinates of group points, base is the standard generator and all values
 // are in little-endian form.
 func ScalarBaseMult(dst, in *[32]byte) {
-	ScalarMult(dst, in, &basePoint)
+    ScalarMult(dst, in, &basePoint)
 }

@@ -8,9 +8,9 @@
 package pretty
 
 import (
-	"fmt"
-	"io"
-	"log"
+    "fmt"
+    "io"
+    "log"
 )
 
 // Errorf is a convenience wrapper for fmt.Errorf.
@@ -18,7 +18,7 @@ import (
 // Calling Errorf(f, x, y) is equivalent to
 // fmt.Errorf(f, Formatter(x), Formatter(y)).
 func Errorf(format string, a ...interface{}) error {
-	return fmt.Errorf(format, wrap(a, false)...)
+    return fmt.Errorf(format, wrap(a, false)...)
 }
 
 // Fprintf is a convenience wrapper for fmt.Fprintf.
@@ -26,7 +26,7 @@ func Errorf(format string, a ...interface{}) error {
 // Calling Fprintf(w, f, x, y) is equivalent to
 // fmt.Fprintf(w, f, Formatter(x), Formatter(y)).
 func Fprintf(w io.Writer, format string, a ...interface{}) (n int, error error) {
-	return fmt.Fprintf(w, format, wrap(a, false)...)
+    return fmt.Fprintf(w, format, wrap(a, false)...)
 }
 
 // Log is a convenience wrapper for log.Printf.
@@ -35,7 +35,7 @@ func Fprintf(w io.Writer, format string, a ...interface{}) (n int, error error) 
 // log.Print(Formatter(x), Formatter(y)), but each operand is
 // formatted with "%# v".
 func Log(a ...interface{}) {
-	log.Print(wrap(a, true)...)
+    log.Print(wrap(a, true)...)
 }
 
 // Logf is a convenience wrapper for log.Printf.
@@ -43,7 +43,7 @@ func Log(a ...interface{}) {
 // Calling Logf(f, x, y) is equivalent to
 // log.Printf(f, Formatter(x), Formatter(y)).
 func Logf(format string, a ...interface{}) {
-	log.Printf(format, wrap(a, false)...)
+    log.Printf(format, wrap(a, false)...)
 }
 
 // Logln is a convenience wrapper for log.Printf.
@@ -52,7 +52,7 @@ func Logf(format string, a ...interface{}) {
 // log.Println(Formatter(x), Formatter(y)), but each operand is
 // formatted with "%# v".
 func Logln(a ...interface{}) {
-	log.Println(wrap(a, true)...)
+    log.Println(wrap(a, true)...)
 }
 
 // Print pretty-prints its operands and writes to standard output.
@@ -61,7 +61,7 @@ func Logln(a ...interface{}) {
 // fmt.Print(Formatter(x), Formatter(y)), but each operand is
 // formatted with "%# v".
 func Print(a ...interface{}) (n int, errno error) {
-	return fmt.Print(wrap(a, true)...)
+    return fmt.Print(wrap(a, true)...)
 }
 
 // Printf is a convenience wrapper for fmt.Printf.
@@ -69,7 +69,7 @@ func Print(a ...interface{}) (n int, errno error) {
 // Calling Printf(f, x, y) is equivalent to
 // fmt.Printf(f, Formatter(x), Formatter(y)).
 func Printf(format string, a ...interface{}) (n int, errno error) {
-	return fmt.Printf(format, wrap(a, false)...)
+    return fmt.Printf(format, wrap(a, false)...)
 }
 
 // Println pretty-prints its operands and writes to standard output.
@@ -78,7 +78,7 @@ func Printf(format string, a ...interface{}) (n int, errno error) {
 // fmt.Println(Formatter(x), Formatter(y)), but each operand is
 // formatted with "%# v".
 func Println(a ...interface{}) (n int, errno error) {
-	return fmt.Println(wrap(a, true)...)
+    return fmt.Println(wrap(a, true)...)
 }
 
 // Sprintf is a convenience wrapper for fmt.Sprintf.
@@ -86,13 +86,13 @@ func Println(a ...interface{}) (n int, errno error) {
 // Calling Sprintf(f, x, y) is equivalent to
 // fmt.Sprintf(f, Formatter(x), Formatter(y)).
 func Sprintf(format string, a ...interface{}) string {
-	return fmt.Sprintf(format, wrap(a, false)...)
+    return fmt.Sprintf(format, wrap(a, false)...)
 }
 
 func wrap(a []interface{}, force bool) []interface{} {
-	w := make([]interface{}, len(a))
-	for i, x := range a {
-		w[i] = formatter{x: x, force: force}
-	}
-	return w
+    w := make([]interface{}, len(a))
+    for i, x := range a {
+        w[i] = formatter{x: x, force: force}
+    }
+    return w
 }

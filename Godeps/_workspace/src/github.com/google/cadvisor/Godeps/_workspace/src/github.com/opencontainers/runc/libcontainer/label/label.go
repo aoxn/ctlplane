@@ -6,71 +6,71 @@ package label
 // the container.  A list of options can be passed into this function to alter
 // the labels.
 func InitLabels(options []string) (string, string, error) {
-	return "", "", nil
+    return "", "", nil
 }
 
 func GenLabels(options string) (string, string, error) {
-	return "", "", nil
+    return "", "", nil
 }
 
 func FormatMountLabel(src string, mountLabel string) string {
-	return src
+    return src
 }
 
 func SetProcessLabel(processLabel string) error {
-	return nil
+    return nil
 }
 
 func SetFileLabel(path string, fileLabel string) error {
-	return nil
+    return nil
 }
 
 func SetFileCreateLabel(fileLabel string) error {
-	return nil
+    return nil
 }
 
 func Relabel(path string, fileLabel string, shared bool) error {
-	return nil
+    return nil
 }
 
 func GetPidLabel(pid int) (string, error) {
-	return "", nil
+    return "", nil
 }
 
 func Init() {
 }
 
 func ReserveLabel(label string) error {
-	return nil
+    return nil
 }
 
 func UnreserveLabel(label string) error {
-	return nil
+    return nil
 }
 
 // DupSecOpt takes an process label and returns security options that
 // can be used to set duplicate labels on future container processes
 func DupSecOpt(src string) []string {
-	return nil
+    return nil
 }
 
 // DisableSecOpt returns a security opt that can disable labeling
 // support for future container processes
 func DisableSecOpt() []string {
-	return nil
+    return nil
 }
 
 // Validate checks that the label does not include unexpected options
 func Validate(label string) error {
-	return nil
+    return nil
 }
 
 // RelabelNeeded checks whether the user requested a relabel
 func RelabelNeeded(label string) bool {
-	return false
+    return false
 }
 
 // IsShared checks that the label includes a "shared" mark
 func IsShared(label string) bool {
-	return false
+    return false
 }

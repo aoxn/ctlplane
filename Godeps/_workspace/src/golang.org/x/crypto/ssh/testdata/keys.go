@@ -5,7 +5,7 @@
 package testdata
 
 var PEMBytes = map[string][]byte{
-	"dsa": []byte(`-----BEGIN DSA PRIVATE KEY-----
+    "dsa": []byte(`-----BEGIN DSA PRIVATE KEY-----
 MIIBuwIBAAKBgQD6PDSEyXiI9jfNs97WuM46MSDCYlOqWw80ajN16AohtBncs1YB
 lHk//dQOvCYOsYaE+gNix2jtoRjwXhDsc25/IqQbU1ahb7mB8/rsaILRGIbA5WH3
 EgFtJmXFovDz3if6F6TzvhFpHgJRmLYVR8cqsezL3hEZOvvs2iH7MorkxwIVAJHD
@@ -18,13 +18,13 @@ nOwuxb0Kce+gWI8voWcqC9cyRm09jGzu2Ab3Bhtpg8JJ8L7gS3MRZK4CFEx4UAfY
 Fmsr0W6fHB9nhS4/UXM8
 -----END DSA PRIVATE KEY-----
 `),
-	"ecdsa": []byte(`-----BEGIN EC PRIVATE KEY-----
+    "ecdsa": []byte(`-----BEGIN EC PRIVATE KEY-----
 MHcCAQEEINGWx0zo6fhJ/0EAfrPzVFyFC9s18lBt3cRoEDhS3ARooAoGCCqGSM49
 AwEHoUQDQgAEi9Hdw6KvZcWxfg2IDhA7UkpDtzzt6ZqJXSsFdLd+Kx4S3Sx4cVO+
 6/ZOXRnPmNAlLUqjShUsUBBngG0u2fqEqA==
 -----END EC PRIVATE KEY-----
 `),
-	"rsa": []byte(`-----BEGIN RSA PRIVATE KEY-----
+    "rsa": []byte(`-----BEGIN RSA PRIVATE KEY-----
 MIIBOwIBAAJBALdGZxkXDAjsYk10ihwU6Id2KeILz1TAJuoq4tOgDWxEEGeTrcld
 r/ZwVaFzjWzxaf6zQIJbfaSEAhqD5yo72+sCAwEAAQJBAK8PEVU23Wj8mV0QjwcJ
 tZ4GcTUYQL7cF4+ezTCE9a1NrGnCP2RuQkHEKxuTVrxXt+6OF15/1/fuXnxKjmJC
@@ -34,7 +34,7 @@ y2VdEyF7DPCZewIhAI7GOI/6LDIFOvtPo6Bj2nNmyQ1HU6k/LRtNIXi4c9NJAiAr
 rrxx26itVhJmcvoUhOjwuzSlP2bE5VHAvkGB352YBg==
 -----END RSA PRIVATE KEY-----
 `),
-	"user": []byte(`-----BEGIN EC PRIVATE KEY-----
+    "user": []byte(`-----BEGIN EC PRIVATE KEY-----
 MHcCAQEEILYCAeq8f7V4vSSypRw7pxy8yz3V5W4qg8kSC3zJhqpQoAoGCCqGSM49
 AwEHoUQDQgAEYcO2xNKiRUYOLEHM7VYAp57HNyKbOdYtHD83Z4hzNPVC4tM5mdGD
 PLL8IEwvYu2wq+lpXfGQnNMbzYf9gspG0w==

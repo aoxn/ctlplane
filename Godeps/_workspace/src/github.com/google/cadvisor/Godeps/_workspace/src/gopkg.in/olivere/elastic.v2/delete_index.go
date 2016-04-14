@@ -5,53 +5,53 @@
 package elastic
 
 import (
-	"encoding/json"
+    "encoding/json"
 
-	"gopkg.in/olivere/elastic.v2/uritemplates"
+    "gopkg.in/olivere/elastic.v2/uritemplates"
 )
 
 type DeleteIndexService struct {
-	client *Client
-	index  string
+    client *Client
+    index  string
 }
 
 func NewDeleteIndexService(client *Client) *DeleteIndexService {
-	builder := &DeleteIndexService{
-		client: client,
-	}
-	return builder
+    builder := &DeleteIndexService{
+        client: client,
+    }
+    return builder
 }
 
 func (b *DeleteIndexService) Index(index string) *DeleteIndexService {
-	b.index = index
-	return b
+    b.index = index
+    return b
 }
 
 func (b *DeleteIndexService) Do() (*DeleteIndexResult, error) {
-	// Build url
-	path, err := uritemplates.Expand("/{index}/", map[string]string{
-		"index": b.index,
-	})
-	if err != nil {
-		return nil, err
-	}
+    // Build url
+    path, err := uritemplates.Expand("/{index}/", map[string]string{
+        "index": b.index,
+    })
+    if err != nil {
+        return nil, err
+    }
 
-	// Get response
-	res, err := b.client.PerformRequest("DELETE", path, nil, nil)
-	if err != nil {
-		return nil, err
-	}
+    // Get response
+    res, err := b.client.PerformRequest("DELETE", path, nil, nil)
+    if err != nil {
+        return nil, err
+    }
 
-	// Return result
-	ret := new(DeleteIndexResult)
-	if err := json.Unmarshal(res.Body, ret); err != nil {
-		return nil, err
-	}
-	return ret, nil
+    // Return result
+    ret := new(DeleteIndexResult)
+    if err := json.Unmarshal(res.Body, ret); err != nil {
+        return nil, err
+    }
+    return ret, nil
 }
 
 // -- Result of a delete index request.
 
 type DeleteIndexResult struct {
-	Acknowledged bool `json:"acknowledged"`
+    Acknowledged bool `json:"acknowledged"`
 }

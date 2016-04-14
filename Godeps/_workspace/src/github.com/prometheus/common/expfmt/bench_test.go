@@ -14,15 +14,15 @@
 package expfmt
 
 import (
-	"bytes"
-	"compress/gzip"
-	"io"
-	"io/ioutil"
-	"testing"
+    "bytes"
+    "compress/gzip"
+    "io"
+    "io/ioutil"
+    "testing"
 
-	"github.com/matttproud/golang_protobuf_extensions/pbutil"
+    "github.com/matttproud/golang_protobuf_extensions/pbutil"
 
-	dto "github.com/prometheus/client_model/go"
+    dto "github.com/prometheus/client_model/go"
 )
 
 var parser TextParser
@@ -50,39 +50,39 @@ var parser TextParser
 // BenchmarkParseText benchmarks the parsing of a text-format scrape into metric
 // family DTOs.
 func BenchmarkParseText(b *testing.B) {
-	b.StopTimer()
-	data, err := ioutil.ReadFile("testdata/text")
-	if err != nil {
-		b.Fatal(err)
-	}
-	b.StartTimer()
+    b.StopTimer()
+    data, err := ioutil.ReadFile("testdata/text")
+    if err != nil {
+        b.Fatal(err)
+    }
+    b.StartTimer()
 
-	for i := 0; i < b.N; i++ {
-		if _, err := parser.TextToMetricFamilies(bytes.NewReader(data)); err != nil {
-			b.Fatal(err)
-		}
-	}
+    for i := 0; i < b.N; i++ {
+        if _, err := parser.TextToMetricFamilies(bytes.NewReader(data)); err != nil {
+            b.Fatal(err)
+        }
+    }
 }
 
 // BenchmarkParseTextGzip benchmarks the parsing of a gzipped text-format scrape
 // into metric family DTOs.
 func BenchmarkParseTextGzip(b *testing.B) {
-	b.StopTimer()
-	data, err := ioutil.ReadFile("testdata/text.gz")
-	if err != nil {
-		b.Fatal(err)
-	}
-	b.StartTimer()
+    b.StopTimer()
+    data, err := ioutil.ReadFile("testdata/text.gz")
+    if err != nil {
+        b.Fatal(err)
+    }
+    b.StartTimer()
 
-	for i := 0; i < b.N; i++ {
-		in, err := gzip.NewReader(bytes.NewReader(data))
-		if err != nil {
-			b.Fatal(err)
-		}
-		if _, err := parser.TextToMetricFamilies(in); err != nil {
-			b.Fatal(err)
-		}
-	}
+    for i := 0; i < b.N; i++ {
+        in, err := gzip.NewReader(bytes.NewReader(data))
+        if err != nil {
+            b.Fatal(err)
+        }
+        if _, err := parser.TextToMetricFamilies(in); err != nil {
+            b.Fatal(err)
+        }
+    }
 }
 
 // BenchmarkParseProto benchmarks the parsing of a protobuf-format scrape into
@@ -92,54 +92,54 @@ func BenchmarkParseTextGzip(b *testing.B) {
 // the metric family might be sprinkled all over the text, while the
 // protobuf-format guarantees bundling at one place.)
 func BenchmarkParseProto(b *testing.B) {
-	b.StopTimer()
-	data, err := ioutil.ReadFile("testdata/protobuf")
-	if err != nil {
-		b.Fatal(err)
-	}
-	b.StartTimer()
+    b.StopTimer()
+    data, err := ioutil.ReadFile("testdata/protobuf")
+    if err != nil {
+        b.Fatal(err)
+    }
+    b.StartTimer()
 
-	for i := 0; i < b.N; i++ {
-		family := &dto.MetricFamily{}
-		in := bytes.NewReader(data)
-		for {
-			family.Reset()
-			if _, err := pbutil.ReadDelimited(in, family); err != nil {
-				if err == io.EOF {
-					break
-				}
-				b.Fatal(err)
-			}
-		}
-	}
+    for i := 0; i < b.N; i++ {
+        family := &dto.MetricFamily{}
+        in := bytes.NewReader(data)
+        for {
+            family.Reset()
+            if _, err := pbutil.ReadDelimited(in, family); err != nil {
+                if err == io.EOF {
+                    break
+                }
+                b.Fatal(err)
+            }
+        }
+    }
 }
 
 // BenchmarkParseProtoGzip is like BenchmarkParseProto above, but parses gzipped
 // protobuf format.
 func BenchmarkParseProtoGzip(b *testing.B) {
-	b.StopTimer()
-	data, err := ioutil.ReadFile("testdata/protobuf.gz")
-	if err != nil {
-		b.Fatal(err)
-	}
-	b.StartTimer()
+    b.StopTimer()
+    data, err := ioutil.ReadFile("testdata/protobuf.gz")
+    if err != nil {
+        b.Fatal(err)
+    }
+    b.StartTimer()
 
-	for i := 0; i < b.N; i++ {
-		family := &dto.MetricFamily{}
-		in, err := gzip.NewReader(bytes.NewReader(data))
-		if err != nil {
-			b.Fatal(err)
-		}
-		for {
-			family.Reset()
-			if _, err := pbutil.ReadDelimited(in, family); err != nil {
-				if err == io.EOF {
-					break
-				}
-				b.Fatal(err)
-			}
-		}
-	}
+    for i := 0; i < b.N; i++ {
+        family := &dto.MetricFamily{}
+        in, err := gzip.NewReader(bytes.NewReader(data))
+        if err != nil {
+            b.Fatal(err)
+        }
+        for {
+            family.Reset()
+            if _, err := pbutil.ReadDelimited(in, family); err != nil {
+                if err == io.EOF {
+                    break
+                }
+                b.Fatal(err)
+            }
+        }
+    }
 }
 
 // BenchmarkParseProtoMap is like BenchmarkParseProto but DOES put the parsed
@@ -147,25 +147,25 @@ func BenchmarkParseProtoGzip(b *testing.B) {
 // ingestion. It is just here to measure the overhead of that map creation and
 // separate it from the overhead of the text format parsing.
 func BenchmarkParseProtoMap(b *testing.B) {
-	b.StopTimer()
-	data, err := ioutil.ReadFile("testdata/protobuf")
-	if err != nil {
-		b.Fatal(err)
-	}
-	b.StartTimer()
+    b.StopTimer()
+    data, err := ioutil.ReadFile("testdata/protobuf")
+    if err != nil {
+        b.Fatal(err)
+    }
+    b.StartTimer()
 
-	for i := 0; i < b.N; i++ {
-		families := map[string]*dto.MetricFamily{}
-		in := bytes.NewReader(data)
-		for {
-			family := &dto.MetricFamily{}
-			if _, err := pbutil.ReadDelimited(in, family); err != nil {
-				if err == io.EOF {
-					break
-				}
-				b.Fatal(err)
-			}
-			families[family.GetName()] = family
-		}
-	}
+    for i := 0; i < b.N; i++ {
+        families := map[string]*dto.MetricFamily{}
+        in := bytes.NewReader(data)
+        for {
+            family := &dto.MetricFamily{}
+            if _, err := pbutil.ReadDelimited(in, family); err != nil {
+                if err == io.EOF {
+                    break
+                }
+                b.Fatal(err)
+            }
+            families[family.GetName()] = family
+        }
+    }
 }

@@ -16,9 +16,9 @@ Note! These are NOT the same as the MAJOR(dev_t device);, MINOR(dev_t device); a
 */
 
 func Major(devNumber int) int64 {
-	return int64((devNumber >> 8) & 0xfff)
+    return int64((devNumber >> 8) & 0xfff)
 }
 
 func Minor(devNumber int) int64 {
-	return int64((devNumber & 0xff) | ((devNumber >> 12) & 0xfff00))
+    return int64((devNumber & 0xff) | ((devNumber >> 12) & 0xfff00))
 }

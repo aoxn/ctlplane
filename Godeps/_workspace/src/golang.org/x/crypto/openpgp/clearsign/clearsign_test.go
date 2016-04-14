@@ -5,118 +5,118 @@
 package clearsign
 
 import (
-	"bytes"
-	"golang.org/x/crypto/openpgp"
-	"testing"
+    "bytes"
+    "golang.org/x/crypto/openpgp"
+    "testing"
 )
 
 func testParse(t *testing.T, input []byte, expected, expectedPlaintext string) {
-	b, rest := Decode(input)
-	if b == nil {
-		t.Fatal("failed to decode clearsign message")
-	}
-	if !bytes.Equal(rest, []byte("trailing")) {
-		t.Errorf("unexpected remaining bytes returned: %s", string(rest))
-	}
-	if b.ArmoredSignature.Type != "PGP SIGNATURE" {
-		t.Errorf("bad armor type, got:%s, want:PGP SIGNATURE", b.ArmoredSignature.Type)
-	}
-	if !bytes.Equal(b.Bytes, []byte(expected)) {
-		t.Errorf("bad body, got:%x want:%x", b.Bytes, expected)
-	}
+    b, rest := Decode(input)
+    if b == nil {
+        t.Fatal("failed to decode clearsign message")
+    }
+    if !bytes.Equal(rest, []byte("trailing")) {
+        t.Errorf("unexpected remaining bytes returned: %s", string(rest))
+    }
+    if b.ArmoredSignature.Type != "PGP SIGNATURE" {
+        t.Errorf("bad armor type, got:%s, want:PGP SIGNATURE", b.ArmoredSignature.Type)
+    }
+    if !bytes.Equal(b.Bytes, []byte(expected)) {
+        t.Errorf("bad body, got:%x want:%x", b.Bytes, expected)
+    }
 
-	if !bytes.Equal(b.Plaintext, []byte(expectedPlaintext)) {
-		t.Errorf("bad plaintext, got:%x want:%x", b.Plaintext, expectedPlaintext)
-	}
+    if !bytes.Equal(b.Plaintext, []byte(expectedPlaintext)) {
+        t.Errorf("bad plaintext, got:%x want:%x", b.Plaintext, expectedPlaintext)
+    }
 
-	keyring, err := openpgp.ReadArmoredKeyRing(bytes.NewBufferString(signingKey))
-	if err != nil {
-		t.Errorf("failed to parse public key: %s", err)
-	}
+    keyring, err := openpgp.ReadArmoredKeyRing(bytes.NewBufferString(signingKey))
+    if err != nil {
+        t.Errorf("failed to parse public key: %s", err)
+    }
 
-	if _, err := openpgp.CheckDetachedSignature(keyring, bytes.NewBuffer(b.Bytes), b.ArmoredSignature.Body); err != nil {
-		t.Errorf("failed to check signature: %s", err)
-	}
+    if _, err := openpgp.CheckDetachedSignature(keyring, bytes.NewBuffer(b.Bytes), b.ArmoredSignature.Body); err != nil {
+        t.Errorf("failed to check signature: %s", err)
+    }
 }
 
 func TestParse(t *testing.T) {
-	testParse(t, clearsignInput, "Hello world\r\nline 2", "Hello world\nline 2\n")
-	testParse(t, clearsignInput2, "\r\n\r\n(This message has a couple of blank lines at the start and end.)\r\n\r\n", "\n\n(This message has a couple of blank lines at the start and end.)\n\n\n")
+    testParse(t, clearsignInput, "Hello world\r\nline 2", "Hello world\nline 2\n")
+    testParse(t, clearsignInput2, "\r\n\r\n(This message has a couple of blank lines at the start and end.)\r\n\r\n", "\n\n(This message has a couple of blank lines at the start and end.)\n\n\n")
 }
 
 func TestParseWithNoNewlineAtEnd(t *testing.T) {
-	input := clearsignInput
-	input = input[:len(input)-len("trailing")-1]
-	b, rest := Decode(input)
-	if b == nil {
-		t.Fatal("failed to decode clearsign message")
-	}
-	if len(rest) > 0 {
-		t.Errorf("unexpected remaining bytes returned: %s", string(rest))
-	}
+    input := clearsignInput
+    input = input[:len(input) - len("trailing") - 1]
+    b, rest := Decode(input)
+    if b == nil {
+        t.Fatal("failed to decode clearsign message")
+    }
+    if len(rest) > 0 {
+        t.Errorf("unexpected remaining bytes returned: %s", string(rest))
+    }
 }
 
 var signingTests = []struct {
-	in, signed, plaintext string
+    in, signed, plaintext string
 }{
-	{"", "", ""},
-	{"a", "a", "a\n"},
-	{"a\n", "a", "a\n"},
-	{"-a\n", "-a", "-a\n"},
-	{"--a\nb", "--a\r\nb", "--a\nb\n"},
-	// leading whitespace
-	{" a\n", " a", " a\n"},
-	{"  a\n", "  a", "  a\n"},
-	// trailing whitespace (should be stripped)
-	{"a \n", "a", "a\n"},
-	{"a ", "a", "a\n"},
-	// whitespace-only lines (should be stripped)
-	{"  \n", "", "\n"},
-	{"  ", "", "\n"},
-	{"a\n  \n  \nb\n", "a\r\n\r\n\r\nb", "a\n\n\nb\n"},
+    {"", "", ""},
+    {"a", "a", "a\n"},
+    {"a\n", "a", "a\n"},
+    {"-a\n", "-a", "-a\n"},
+    {"--a\nb", "--a\r\nb", "--a\nb\n"},
+    // leading whitespace
+    {" a\n", " a", " a\n"},
+    {"  a\n", "  a", "  a\n"},
+    // trailing whitespace (should be stripped)
+    {"a \n", "a", "a\n"},
+    {"a ", "a", "a\n"},
+    // whitespace-only lines (should be stripped)
+    {"  \n", "", "\n"},
+    {"  ", "", "\n"},
+    {"a\n  \n  \nb\n", "a\r\n\r\n\r\nb", "a\n\n\nb\n"},
 }
 
 func TestSigning(t *testing.T) {
-	keyring, err := openpgp.ReadArmoredKeyRing(bytes.NewBufferString(signingKey))
-	if err != nil {
-		t.Errorf("failed to parse public key: %s", err)
-	}
+    keyring, err := openpgp.ReadArmoredKeyRing(bytes.NewBufferString(signingKey))
+    if err != nil {
+        t.Errorf("failed to parse public key: %s", err)
+    }
 
-	for i, test := range signingTests {
-		var buf bytes.Buffer
+    for i, test := range signingTests {
+        var buf bytes.Buffer
 
-		plaintext, err := Encode(&buf, keyring[0].PrivateKey, nil)
-		if err != nil {
-			t.Errorf("#%d: error from Encode: %s", i, err)
-			continue
-		}
-		if _, err := plaintext.Write([]byte(test.in)); err != nil {
-			t.Errorf("#%d: error from Write: %s", i, err)
-			continue
-		}
-		if err := plaintext.Close(); err != nil {
-			t.Fatalf("#%d: error from Close: %s", i, err)
-			continue
-		}
+        plaintext, err := Encode(&buf, keyring[0].PrivateKey, nil)
+        if err != nil {
+            t.Errorf("#%d: error from Encode: %s", i, err)
+            continue
+        }
+        if _, err := plaintext.Write([]byte(test.in)); err != nil {
+            t.Errorf("#%d: error from Write: %s", i, err)
+            continue
+        }
+        if err := plaintext.Close(); err != nil {
+            t.Fatalf("#%d: error from Close: %s", i, err)
+            continue
+        }
 
-		b, _ := Decode(buf.Bytes())
-		if b == nil {
-			t.Errorf("#%d: failed to decode clearsign message", i)
-			continue
-		}
-		if !bytes.Equal(b.Bytes, []byte(test.signed)) {
-			t.Errorf("#%d: bad result, got:%x, want:%x", i, b.Bytes, test.signed)
-			continue
-		}
-		if !bytes.Equal(b.Plaintext, []byte(test.plaintext)) {
-			t.Errorf("#%d: bad result, got:%x, want:%x", i, b.Plaintext, test.plaintext)
-			continue
-		}
+        b, _ := Decode(buf.Bytes())
+        if b == nil {
+            t.Errorf("#%d: failed to decode clearsign message", i)
+            continue
+        }
+        if !bytes.Equal(b.Bytes, []byte(test.signed)) {
+            t.Errorf("#%d: bad result, got:%x, want:%x", i, b.Bytes, test.signed)
+            continue
+        }
+        if !bytes.Equal(b.Plaintext, []byte(test.plaintext)) {
+            t.Errorf("#%d: bad result, got:%x, want:%x", i, b.Plaintext, test.plaintext)
+            continue
+        }
 
-		if _, err := openpgp.CheckDetachedSignature(keyring, bytes.NewBuffer(b.Bytes), b.ArmoredSignature.Body); err != nil {
-			t.Errorf("#%d: failed to check signature: %s", i, err)
-		}
-	}
+        if _, err := openpgp.CheckDetachedSignature(keyring, bytes.NewBuffer(b.Bytes), b.ArmoredSignature.Body); err != nil {
+            t.Errorf("#%d: failed to check signature: %s", i, err)
+        }
+    }
 }
 
 var clearsignInput = []byte(`

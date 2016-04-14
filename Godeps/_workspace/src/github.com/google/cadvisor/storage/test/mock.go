@@ -15,25 +15,25 @@
 package test
 
 import (
-	info "github.com/google/cadvisor/info/v1"
+    info "github.com/google/cadvisor/info/v1"
 
-	"github.com/stretchr/testify/mock"
+    "github.com/stretchr/testify/mock"
 )
 
 type MockStorageDriver struct {
-	mock.Mock
-	MockCloseMethod bool
+    mock.Mock
+    MockCloseMethod bool
 }
 
 func (self *MockStorageDriver) AddStats(ref info.ContainerReference, stats *info.ContainerStats) error {
-	args := self.Called(ref, stats)
-	return args.Error(0)
+    args := self.Called(ref, stats)
+    return args.Error(0)
 }
 
 func (self *MockStorageDriver) Close() error {
-	if self.MockCloseMethod {
-		args := self.Called()
-		return args.Error(0)
-	}
-	return nil
+    if self.MockCloseMethod {
+        args := self.Called()
+        return args.Error(0)
+    }
+    return nil
 }

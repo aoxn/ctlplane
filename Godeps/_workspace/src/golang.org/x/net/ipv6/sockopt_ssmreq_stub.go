@@ -9,9 +9,9 @@ package ipv6
 import "net"
 
 func setsockoptGroupReq(fd int, opt *sockOpt, ifi *net.Interface, grp net.IP) error {
-	return errOpNoSupport
+    return errOpNoSupport
 }
 
 func setsockoptGroupSourceReq(fd int, opt *sockOpt, ifi *net.Interface, grp, src net.IP) error {
-	return errOpNoSupport
+    return errOpNoSupport
 }

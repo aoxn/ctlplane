@@ -1,10 +1,10 @@
 package logrus_bugsnag
 
 import (
-	"errors"
+    "errors"
 
-	"github.com/Sirupsen/logrus"
-	"github.com/bugsnag/bugsnag-go"
+    "github.com/Sirupsen/logrus"
+    "github.com/bugsnag/bugsnag-go"
 )
 
 type bugsnagHook struct{}
@@ -17,11 +17,11 @@ var ErrBugsnagUnconfigured = errors.New("bugsnag must be configured before insta
 // bugsnag. The error was successfully generated, but `bugsnag.Notify()`
 // failed.
 type ErrBugsnagSendFailed struct {
-	err error
+    err error
 }
 
 func (e ErrBugsnagSendFailed) Error() string {
-	return "failed to send error to Bugsnag: " + e.err.Error()
+    return "failed to send error to Bugsnag: " + e.err.Error()
 }
 
 // NewBugsnagHook initializes a logrus hook which sends exceptions to an
@@ -32,37 +32,37 @@ func (e ErrBugsnagSendFailed) Error() string {
 // Entries that trigger an Error, Fatal or Panic should now include an "error"
 // field to send to Bugsnag.
 func NewBugsnagHook() (*bugsnagHook, error) {
-	if bugsnag.Config.APIKey == "" {
-		return nil, ErrBugsnagUnconfigured
-	}
-	return &bugsnagHook{}, nil
+    if bugsnag.Config.APIKey == "" {
+        return nil, ErrBugsnagUnconfigured
+    }
+    return &bugsnagHook{}, nil
 }
 
 // Fire forwards an error to Bugsnag. Given a logrus.Entry, it extracts the
 // "error" field (or the Message if the error isn't present) and sends it off.
 func (hook *bugsnagHook) Fire(entry *logrus.Entry) error {
-	var notifyErr error
-	err, ok := entry.Data["error"].(error)
-	if ok {
-		notifyErr = err
-	} else {
-		notifyErr = errors.New(entry.Message)
-	}
+    var notifyErr error
+    err, ok := entry.Data["error"].(error)
+    if ok {
+        notifyErr = err
+    } else {
+        notifyErr = errors.New(entry.Message)
+    }
 
-	bugsnagErr := bugsnag.Notify(notifyErr)
-	if bugsnagErr != nil {
-		return ErrBugsnagSendFailed{bugsnagErr}
-	}
+    bugsnagErr := bugsnag.Notify(notifyErr)
+    if bugsnagErr != nil {
+        return ErrBugsnagSendFailed{bugsnagErr}
+    }
 
-	return nil
+    return nil
 }
 
 // Levels enumerates the log levels on which the error should be forwarded to
 // bugsnag: everything at or above the "Error" level.
 func (hook *bugsnagHook) Levels() []logrus.Level {
-	return []logrus.Level{
-		logrus.ErrorLevel,
-		logrus.FatalLevel,
-		logrus.PanicLevel,
-	}
+    return []logrus.Level{
+        logrus.ErrorLevel,
+        logrus.FatalLevel,
+        logrus.PanicLevel,
+    }
 }

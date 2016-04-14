@@ -14,45 +14,45 @@
 package prometheus
 
 import (
-	"math"
-	"testing"
+    "math"
+    "testing"
 
-	dto "github.com/prometheus/client_model/go"
+    dto "github.com/prometheus/client_model/go"
 )
 
 func TestCounterAdd(t *testing.T) {
-	counter := NewCounter(CounterOpts{
-		Name:        "test",
-		Help:        "test help",
-		ConstLabels: Labels{"a": "1", "b": "2"},
-	}).(*counter)
-	counter.Inc()
-	if expected, got := 1., math.Float64frombits(counter.valBits); expected != got {
-		t.Errorf("Expected %f, got %f.", expected, got)
-	}
-	counter.Add(42)
-	if expected, got := 43., math.Float64frombits(counter.valBits); expected != got {
-		t.Errorf("Expected %f, got %f.", expected, got)
-	}
+    counter := NewCounter(CounterOpts{
+        Name:        "test",
+        Help:        "test help",
+        ConstLabels: Labels{"a": "1", "b": "2"},
+    }).(*counter)
+    counter.Inc()
+    if expected, got := 1., math.Float64frombits(counter.valBits); expected != got {
+        t.Errorf("Expected %f, got %f.", expected, got)
+    }
+    counter.Add(42)
+    if expected, got := 43., math.Float64frombits(counter.valBits); expected != got {
+        t.Errorf("Expected %f, got %f.", expected, got)
+    }
 
-	if expected, got := "counter cannot decrease in value", decreaseCounter(counter).Error(); expected != got {
-		t.Errorf("Expected error %q, got %q.", expected, got)
-	}
+    if expected, got := "counter cannot decrease in value", decreaseCounter(counter).Error(); expected != got {
+        t.Errorf("Expected error %q, got %q.", expected, got)
+    }
 
-	m := &dto.Metric{}
-	counter.Write(m)
+    m := &dto.Metric{}
+    counter.Write(m)
 
-	if expected, got := `label:<name:"a" value:"1" > label:<name:"b" value:"2" > counter:<value:43 > `, m.String(); expected != got {
-		t.Errorf("expected %q, got %q", expected, got)
-	}
+    if expected, got := `label:<name:"a" value:"1" > label:<name:"b" value:"2" > counter:<value:43 > `, m.String(); expected != got {
+        t.Errorf("expected %q, got %q", expected, got)
+    }
 }
 
 func decreaseCounter(c *counter) (err error) {
-	defer func() {
-		if e := recover(); e != nil {
-			err = e.(error)
-		}
-	}()
-	c.Add(-1)
-	return nil
+    defer func() {
+        if e := recover(); e != nil {
+            err = e.(error)
+        }
+    }()
+    c.Add(-1)
+    return nil
 }

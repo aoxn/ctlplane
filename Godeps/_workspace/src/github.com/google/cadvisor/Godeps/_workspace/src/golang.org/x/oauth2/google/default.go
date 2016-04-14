@@ -5,19 +5,19 @@
 package google
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"path/filepath"
-	"runtime"
+    "encoding/json"
+    "errors"
+    "fmt"
+    "io/ioutil"
+    "net/http"
+    "os"
+    "path/filepath"
+    "runtime"
 
-	"golang.org/x/net/context"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/jwt"
-	"google.golang.org/cloud/compute/metadata"
+    "golang.org/x/net/context"
+    "golang.org/x/oauth2"
+    "golang.org/x/oauth2/jwt"
+    "google.golang.org/cloud/compute/metadata"
 )
 
 // DefaultClient returns an HTTP Client that uses the
@@ -31,11 +31,11 @@ import (
 // https://developers.google.com/accounts/application-default-credentials
 //
 func DefaultClient(ctx context.Context, scope ...string) (*http.Client, error) {
-	ts, err := DefaultTokenSource(ctx, scope...)
-	if err != nil {
-		return nil, err
-	}
-	return oauth2.NewClient(ctx, ts), nil
+    ts, err := DefaultTokenSource(ctx, scope...)
+    if err != nil {
+        return nil, err
+    }
+    return oauth2.NewClient(ctx, ts), nil
 }
 
 // DefaultTokenSource is a token source that uses
@@ -57,98 +57,98 @@ func DefaultClient(ctx context.Context, scope ...string) (*http.Client, error) {
 // https://developers.google.com/accounts/application-default-credentials
 //
 func DefaultTokenSource(ctx context.Context, scope ...string) (oauth2.TokenSource, error) {
-	// First, try the environment variable.
-	const envVar = "GOOGLE_APPLICATION_CREDENTIALS"
-	if filename := os.Getenv(envVar); filename != "" {
-		ts, err := tokenSourceFromFile(ctx, filename, scope)
-		if err != nil {
-			return nil, fmt.Errorf("google: error getting credentials using %v environment variable: %v", envVar, err)
-		}
-		return ts, nil
-	}
+    // First, try the environment variable.
+    const envVar = "GOOGLE_APPLICATION_CREDENTIALS"
+    if filename := os.Getenv(envVar); filename != "" {
+        ts, err := tokenSourceFromFile(ctx, filename, scope)
+        if err != nil {
+            return nil, fmt.Errorf("google: error getting credentials using %v environment variable: %v", envVar, err)
+        }
+        return ts, nil
+    }
 
-	// Second, try a well-known file.
-	filename := wellKnownFile()
-	_, err := os.Stat(filename)
-	if err == nil {
-		ts, err2 := tokenSourceFromFile(ctx, filename, scope)
-		if err2 == nil {
-			return ts, nil
-		}
-		err = err2
-	} else if os.IsNotExist(err) {
-		err = nil // ignore this error
-	}
-	if err != nil {
-		return nil, fmt.Errorf("google: error getting credentials using well-known file (%v): %v", filename, err)
-	}
+    // Second, try a well-known file.
+    filename := wellKnownFile()
+    _, err := os.Stat(filename)
+    if err == nil {
+        ts, err2 := tokenSourceFromFile(ctx, filename, scope)
+        if err2 == nil {
+            return ts, nil
+        }
+        err = err2
+    } else if os.IsNotExist(err) {
+        err = nil // ignore this error
+    }
+    if err != nil {
+        return nil, fmt.Errorf("google: error getting credentials using well-known file (%v): %v", filename, err)
+    }
 
-	// Third, if we're on Google App Engine use those credentials.
-	if appengineTokenFunc != nil {
-		return AppEngineTokenSource(ctx, scope...), nil
-	}
+    // Third, if we're on Google App Engine use those credentials.
+    if appengineTokenFunc != nil {
+        return AppEngineTokenSource(ctx, scope...), nil
+    }
 
-	// Fourth, if we're on Google Compute Engine use the metadata server.
-	if metadata.OnGCE() {
-		return ComputeTokenSource(""), nil
-	}
+    // Fourth, if we're on Google Compute Engine use the metadata server.
+    if metadata.OnGCE() {
+        return ComputeTokenSource(""), nil
+    }
 
-	// None are found; return helpful error.
-	const url = "https://developers.google.com/accounts/application-default-credentials"
-	return nil, fmt.Errorf("google: could not find default credentials. See %v for more information.", url)
+    // None are found; return helpful error.
+    const url = "https://developers.google.com/accounts/application-default-credentials"
+    return nil, fmt.Errorf("google: could not find default credentials. See %v for more information.", url)
 }
 
 func wellKnownFile() string {
-	const f = "application_default_credentials.json"
-	if runtime.GOOS == "windows" {
-		return filepath.Join(os.Getenv("APPDATA"), "gcloud", f)
-	}
-	return filepath.Join(guessUnixHomeDir(), ".config", "gcloud", f)
+    const f = "application_default_credentials.json"
+    if runtime.GOOS == "windows" {
+        return filepath.Join(os.Getenv("APPDATA"), "gcloud", f)
+    }
+    return filepath.Join(guessUnixHomeDir(), ".config", "gcloud", f)
 }
 
 func tokenSourceFromFile(ctx context.Context, filename string, scopes []string) (oauth2.TokenSource, error) {
-	b, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	var d struct {
-		// Common fields
-		Type     string
-		ClientID string `json:"client_id"`
+    b, err := ioutil.ReadFile(filename)
+    if err != nil {
+        return nil, err
+    }
+    var d struct {
+        // Common fields
+        Type         string
+        ClientID     string `json:"client_id"`
 
-		// User Credential fields
-		ClientSecret string `json:"client_secret"`
-		RefreshToken string `json:"refresh_token"`
+        // User Credential fields
+        ClientSecret string `json:"client_secret"`
+        RefreshToken string `json:"refresh_token"`
 
-		// Service Account fields
-		ClientEmail  string `json:"client_email"`
-		PrivateKeyID string `json:"private_key_id"`
-		PrivateKey   string `json:"private_key"`
-	}
-	if err := json.Unmarshal(b, &d); err != nil {
-		return nil, err
-	}
-	switch d.Type {
-	case "authorized_user":
-		cfg := &oauth2.Config{
-			ClientID:     d.ClientID,
-			ClientSecret: d.ClientSecret,
-			Scopes:       append([]string{}, scopes...), // copy
-			Endpoint:     Endpoint,
-		}
-		tok := &oauth2.Token{RefreshToken: d.RefreshToken}
-		return cfg.TokenSource(ctx, tok), nil
-	case "service_account":
-		cfg := &jwt.Config{
-			Email:      d.ClientEmail,
-			PrivateKey: []byte(d.PrivateKey),
-			Scopes:     append([]string{}, scopes...), // copy
-			TokenURL:   JWTTokenURL,
-		}
-		return cfg.TokenSource(ctx), nil
-	case "":
-		return nil, errors.New("missing 'type' field in credentials")
-	default:
-		return nil, fmt.Errorf("unknown credential type: %q", d.Type)
-	}
+        // Service Account fields
+        ClientEmail  string `json:"client_email"`
+        PrivateKeyID string `json:"private_key_id"`
+        PrivateKey   string `json:"private_key"`
+    }
+    if err := json.Unmarshal(b, &d); err != nil {
+        return nil, err
+    }
+    switch d.Type {
+    case "authorized_user":
+        cfg := &oauth2.Config{
+            ClientID:     d.ClientID,
+            ClientSecret: d.ClientSecret,
+            Scopes:       append([]string{}, scopes...), // copy
+            Endpoint:     Endpoint,
+        }
+        tok := &oauth2.Token{RefreshToken: d.RefreshToken}
+        return cfg.TokenSource(ctx, tok), nil
+    case "service_account":
+        cfg := &jwt.Config{
+            Email:      d.ClientEmail,
+            PrivateKey: []byte(d.PrivateKey),
+            Scopes:     append([]string{}, scopes...), // copy
+            TokenURL:   JWTTokenURL,
+        }
+        return cfg.TokenSource(ctx), nil
+    case "":
+        return nil, errors.New("missing 'type' field in credentials")
+    default:
+        return nil, fmt.Errorf("unknown credential type: %q", d.Type)
+    }
 }

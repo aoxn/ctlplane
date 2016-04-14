@@ -15,23 +15,23 @@
 package api
 
 import (
-	"testing"
+    "testing"
 
-	"github.com/google/cadvisor/integration/framework"
+    "github.com/google/cadvisor/integration/framework"
 
-	"github.com/stretchr/testify/assert"
+    "github.com/stretchr/testify/assert"
 )
 
 func TestAttributeInformationIsReturned(t *testing.T) {
-	fm := framework.New(t)
-	defer fm.Cleanup()
+    fm := framework.New(t)
+    defer fm.Cleanup()
 
-	attributes, err := fm.Cadvisor().ClientV2().Attributes()
-	if err != nil {
-		t.Fatal(err)
-	}
+    attributes, err := fm.Cadvisor().ClientV2().Attributes()
+    if err != nil {
+        t.Fatal(err)
+    }
 
-	vp := `\d+\.\d+\.\d+`
-	assert.True(t, assert.Regexp(t, vp, attributes.DockerVersion),
-		"Expected %s to match %s", attributes.DockerVersion, vp)
+    vp := `\d+\.\d+\.\d+`
+    assert.True(t, assert.Regexp(t, vp, attributes.DockerVersion),
+        "Expected %s to match %s", attributes.DockerVersion, vp)
 }

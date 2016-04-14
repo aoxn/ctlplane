@@ -3,9 +3,9 @@
 package archive
 
 import (
-	"path/filepath"
+    "path/filepath"
 )
 
 func normalizePath(path string) string {
-	return filepath.ToSlash(path)
+    return filepath.ToSlash(path)
 }

@@ -6,5 +6,5 @@ import "syscall"
 
 // LUtimesNano is not supported on platforms other than linux, freebsd and darwin.
 func LUtimesNano(path string, ts []syscall.Timespec) error {
-	return ErrNotSupportedPlatform
+    return ErrNotSupportedPlatform
 }

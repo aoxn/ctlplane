@@ -1,26 +1,26 @@
 package swagger
 
 import (
-	"net"
-	"testing"
-	"time"
+    "net"
+    "testing"
+    "time"
 )
 
 type YesNo bool
 
 func (y YesNo) MarshalJSON() ([]byte, error) {
-	if y {
-		return []byte("yes"), nil
-	}
-	return []byte("no"), nil
+    if y {
+        return []byte("yes"), nil
+    }
+    return []byte("no"), nil
 }
 
 // clear && go test -v -test.run TestRef_Issue190 ...swagger
 func TestRef_Issue190(t *testing.T) {
-	type User struct {
-		items []string
-	}
-	testJsonFromStruct(t, User{}, `{
+    type User struct {
+        items []string
+    }
+    testJsonFromStruct(t, User{}, `{
   "swagger.User": {
    "id": "swagger.User",
    "required": [
@@ -40,10 +40,10 @@ func TestRef_Issue190(t *testing.T) {
 
 // clear && go test -v -test.run TestCustomMarshaller_Issue96 ...swagger
 func TestCustomMarshaller_Issue96(t *testing.T) {
-	type Vote struct {
-		What YesNo
-	}
-	testJsonFromStruct(t, Vote{}, `{
+    type Vote struct {
+        What YesNo
+    }
+    testJsonFromStruct(t, Vote{}, `{
   "swagger.Vote": {
    "id": "swagger.Vote",
    "required": [
@@ -60,11 +60,11 @@ func TestCustomMarshaller_Issue96(t *testing.T) {
 
 // clear && go test -v -test.run TestPrimitiveTypes ...swagger
 func TestPrimitiveTypes(t *testing.T) {
-	type Prims struct {
-		f float64
-		t time.Time
-	}
-	testJsonFromStruct(t, Prims{}, `{
+    type Prims struct {
+        f float64
+        t time.Time
+    }
+    testJsonFromStruct(t, Prims{}, `{
   "swagger.Prims": {
    "id": "swagger.Prims",
    "required": [
@@ -87,14 +87,14 @@ func TestPrimitiveTypes(t *testing.T) {
 
 // clear && go test -v -test.run TestPrimitivePtrTypes ...swagger
 func TestPrimitivePtrTypes(t *testing.T) {
-	type Prims struct {
-		f *float64
-		t *time.Time
-		b *bool
-		s *string
-		i *int
-	}
-	testJsonFromStruct(t, Prims{}, `{
+    type Prims struct {
+        f *float64
+        t *time.Time
+        b *bool
+        s *string
+        i *int
+    }
+    testJsonFromStruct(t, Prims{}, `{
   "swagger.Prims": {
    "id": "swagger.Prims",
    "required": [
@@ -130,10 +130,10 @@ func TestPrimitivePtrTypes(t *testing.T) {
 
 // clear && go test -v -test.run TestS1 ...swagger
 func TestS1(t *testing.T) {
-	type S1 struct {
-		Id string
-	}
-	testJsonFromStruct(t, S1{}, `{
+    type S1 struct {
+        Id string
+    }
+    testJsonFromStruct(t, S1{}, `{
   "swagger.S1": {
    "id": "swagger.S1",
    "required": [
@@ -150,10 +150,10 @@ func TestS1(t *testing.T) {
 
 // clear && go test -v -test.run TestS2 ...swagger
 func TestS2(t *testing.T) {
-	type S2 struct {
-		Ids []string
-	}
-	testJsonFromStruct(t, S2{}, `{
+    type S2 struct {
+        Ids []string
+    }
+    testJsonFromStruct(t, S2{}, `{
   "swagger.S2": {
    "id": "swagger.S2",
    "required": [
@@ -173,13 +173,13 @@ func TestS2(t *testing.T) {
 
 // clear && go test -v -test.run TestS3 ...swagger
 func TestS3(t *testing.T) {
-	type NestedS3 struct {
-		Id string
-	}
-	type S3 struct {
-		Nested NestedS3
-	}
-	testJsonFromStruct(t, S3{}, `{
+    type NestedS3 struct {
+        Id string
+    }
+    type S3 struct {
+        Nested NestedS3
+    }
+    testJsonFromStruct(t, S3{}, `{
   "swagger.NestedS3": {
    "id": "swagger.NestedS3",
    "required": [
@@ -206,18 +206,18 @@ func TestS3(t *testing.T) {
 }
 
 type sample struct {
-	id       string `swagger:"required"` // TODO
-	items    []item
-	rootItem item `json:"root" description:"root desc"`
+    id       string `swagger:"required"` // TODO
+    items    []item
+    rootItem item `json:"root" description:"root desc"`
 }
 
 type item struct {
-	itemName string `json:"name"`
+    itemName string `json:"name"`
 }
 
 // clear && go test -v -test.run TestSampleToModelAsJson ...swagger
 func TestSampleToModelAsJson(t *testing.T) {
-	testJsonFromStruct(t, sample{items: []item{}}, `{
+    testJsonFromStruct(t, sample{items: []item{}}, `{
   "swagger.item": {
    "id": "swagger.item",
    "required": [
@@ -256,14 +256,14 @@ func TestSampleToModelAsJson(t *testing.T) {
 }
 
 func TestJsonTags(t *testing.T) {
-	type X struct {
-		A string
-		B string `json:"-"`
-		C int    `json:",string"`
-		D int    `json:","`
-	}
+    type X struct {
+        A string
+        B string `json:"-"`
+        C int    `json:",string"`
+        D int    `json:","`
+    }
 
-	expected := `{
+    expected := `{
   "swagger.X": {
    "id": "swagger.X",
    "required": [
@@ -286,16 +286,16 @@ func TestJsonTags(t *testing.T) {
   }
  }`
 
-	testJsonFromStruct(t, X{}, expected)
+    testJsonFromStruct(t, X{}, expected)
 }
 
 func TestJsonTagOmitempty(t *testing.T) {
-	type X struct {
-		A int `json:",omitempty"`
-		B int `json:"C,omitempty"`
-	}
+    type X struct {
+        A int `json:",omitempty"`
+        B int `json:"C,omitempty"`
+    }
 
-	expected := `{
+    expected := `{
   "swagger.X": {
    "id": "swagger.X",
    "properties": {
@@ -311,15 +311,15 @@ func TestJsonTagOmitempty(t *testing.T) {
   }
  }`
 
-	testJsonFromStruct(t, X{}, expected)
+    testJsonFromStruct(t, X{}, expected)
 }
 
 func TestJsonTagName(t *testing.T) {
-	type X struct {
-		A string `json:"B"`
-	}
+    type X struct {
+        A string `json:"B"`
+    }
 
-	expected := `{
+    expected := `{
   "swagger.X": {
    "id": "swagger.X",
    "required": [
@@ -333,17 +333,17 @@ func TestJsonTagName(t *testing.T) {
   }
  }`
 
-	testJsonFromStruct(t, X{}, expected)
+    testJsonFromStruct(t, X{}, expected)
 }
 
 func TestAnonymousStruct(t *testing.T) {
-	type X struct {
-		A struct {
-			B int
-		}
-	}
+    type X struct {
+        A struct {
+              B int
+          }
+    }
 
-	expected := `{
+    expected := `{
   "swagger.X": {
    "id": "swagger.X",
    "required": [
@@ -369,17 +369,17 @@ func TestAnonymousStruct(t *testing.T) {
   }
  }`
 
-	testJsonFromStruct(t, X{}, expected)
+    testJsonFromStruct(t, X{}, expected)
 }
 
 func TestAnonymousPtrStruct(t *testing.T) {
-	type X struct {
-		A *struct {
-			B int
-		}
-	}
+    type X struct {
+        A *struct {
+            B int
+        }
+    }
 
-	expected := `{
+    expected := `{
   "swagger.X": {
    "id": "swagger.X",
    "required": [
@@ -405,17 +405,17 @@ func TestAnonymousPtrStruct(t *testing.T) {
   }
  }`
 
-	testJsonFromStruct(t, X{}, expected)
+    testJsonFromStruct(t, X{}, expected)
 }
 
 func TestAnonymousArrayStruct(t *testing.T) {
-	type X struct {
-		A []struct {
-			B int
-		}
-	}
+    type X struct {
+        A []struct {
+            B int
+        }
+    }
 
-	expected := `{
+    expected := `{
   "swagger.X": {
    "id": "swagger.X",
    "required": [
@@ -444,17 +444,17 @@ func TestAnonymousArrayStruct(t *testing.T) {
   }
  }`
 
-	testJsonFromStruct(t, X{}, expected)
+    testJsonFromStruct(t, X{}, expected)
 }
 
 func TestAnonymousPtrArrayStruct(t *testing.T) {
-	type X struct {
-		A *[]struct {
-			B int
-		}
-	}
+    type X struct {
+        A *[]struct {
+            B int
+        }
+    }
 
-	expected := `{
+    expected := `{
   "swagger.X": {
    "id": "swagger.X",
    "required": [
@@ -483,18 +483,18 @@ func TestAnonymousPtrArrayStruct(t *testing.T) {
   }
  }`
 
-	testJsonFromStruct(t, X{}, expected)
+    testJsonFromStruct(t, X{}, expected)
 }
 
 // go test -v -test.run TestEmbeddedStruct_Issue98 ...swagger
 func TestEmbeddedStruct_Issue98(t *testing.T) {
-	type Y struct {
-		A int
-	}
-	type X struct {
-		Y
-	}
-	testJsonFromStruct(t, X{}, `{
+    type Y struct {
+        A int
+    }
+    type X struct {
+        Y
+    }
+    testJsonFromStruct(t, X{}, `{
   "swagger.X": {
    "id": "swagger.X",
    "required": [
@@ -511,13 +511,13 @@ func TestEmbeddedStruct_Issue98(t *testing.T) {
 }
 
 type Dataset struct {
-	Names []string
+    Names []string
 }
 
 // clear && go test -v -test.run TestIssue85 ...swagger
 func TestIssue85(t *testing.T) {
-	anon := struct{ Datasets []Dataset }{}
-	testJsonFromStruct(t, anon, `{
+    anon := struct{ Datasets []Dataset }{}
+    testJsonFromStruct(t, anon, `{
   "struct { Datasets ||swagger.Dataset }": {
    "id": "struct { Datasets ||swagger.Dataset }",
    "required": [
@@ -550,13 +550,13 @@ func TestIssue85(t *testing.T) {
 }
 
 type File struct {
-	History     []File
-	HistoryPtrs []*File
+    History     []File
+    HistoryPtrs []*File
 }
 
 // go test -v -test.run TestRecursiveStructure ...swagger
 func TestRecursiveStructure(t *testing.T) {
-	testJsonFromStruct(t, File{}, `{
+    testJsonFromStruct(t, File{}, `{
   "swagger.File": {
    "id": "swagger.File",
    "required": [
@@ -582,15 +582,15 @@ func TestRecursiveStructure(t *testing.T) {
 }
 
 type A1 struct {
-	B struct {
-		Id      int
-		Comment string `json:"comment,omitempty"`
-	}
+    B struct {
+          Id      int
+          Comment string `json:"comment,omitempty"`
+      }
 }
 
 // go test -v -test.run TestEmbeddedStructA1 ...swagger
 func TestEmbeddedStructA1(t *testing.T) {
-	testJsonFromStruct(t, A1{}, `{
+    testJsonFromStruct(t, A1{}, `{
   "swagger.A1": {
    "id": "swagger.A1",
    "required": [
@@ -621,17 +621,17 @@ func TestEmbeddedStructA1(t *testing.T) {
 }
 
 type A2 struct {
-	C
+    C
 }
 type C struct {
-	Id      int    `json:"B"`
-	Comment string `json:"comment,omitempty"`
-	Secure  bool   `json:"secure"`
+    Id      int    `json:"B"`
+    Comment string `json:"comment,omitempty"`
+    Secure  bool   `json:"secure"`
 }
 
 // go test -v -test.run TestEmbeddedStructA2 ...swagger
 func TestEmbeddedStructA2(t *testing.T) {
-	testJsonFromStruct(t, A2{}, `{
+    testJsonFromStruct(t, A2{}, `{
   "swagger.A2": {
    "id": "swagger.A2",
    "required": [
@@ -655,16 +655,16 @@ func TestEmbeddedStructA2(t *testing.T) {
 }
 
 type A3 struct {
-	B D
+    B D
 }
 
 type D struct {
-	Id int
+    Id int
 }
 
 // clear && go test -v -test.run TestStructA3 ...swagger
 func TestStructA3(t *testing.T) {
-	testJsonFromStruct(t, A3{}, `{
+    testJsonFromStruct(t, A3{}, `{
   "swagger.A3": {
    "id": "swagger.A3",
    "required": [
@@ -692,12 +692,12 @@ func TestStructA3(t *testing.T) {
 }
 
 type A4 struct {
-	D "json:,inline"
+    D "json:,inline"
 }
 
 // clear && go test -v -test.run TestStructA4 ...swagger
 func TestEmbeddedStructA4(t *testing.T) {
-	testJsonFromStruct(t, A4{}, `{
+    testJsonFromStruct(t, A4{}, `{
   "swagger.A4": {
    "id": "swagger.A4",
    "required": [
@@ -714,12 +714,12 @@ func TestEmbeddedStructA4(t *testing.T) {
 }
 
 type A5 struct {
-	D `json:"d"`
+    D `json:"d"`
 }
 
 // clear && go test -v -test.run TestStructA5 ...swagger
 func TestEmbeddedStructA5(t *testing.T) {
-	testJsonFromStruct(t, A5{}, `{
+    testJsonFromStruct(t, A5{}, `{
   "swagger.A5": {
    "id": "swagger.A5",
    "required": [
@@ -747,17 +747,17 @@ func TestEmbeddedStructA5(t *testing.T) {
 }
 
 type D2 struct {
-	id int
-	D  []D
+    id int
+    D  []D
 }
 
 type A6 struct {
-	D2 "json:,inline"
+    D2 "json:,inline"
 }
 
 // clear && go test -v -test.run TestStructA4 ...swagger
 func TestEmbeddedStructA6(t *testing.T) {
-	testJsonFromStruct(t, A6{}, `{
+    testJsonFromStruct(t, A6{}, `{
   "swagger.A6": {
    "id": "swagger.A6",
    "required": [
@@ -795,14 +795,14 @@ func TestEmbeddedStructA6(t *testing.T) {
 type ObjectId []byte
 
 type Region struct {
-	Id   ObjectId `bson:"_id" json:"id"`
-	Name string   `bson:"name" json:"name"`
-	Type string   `bson:"type" json:"type"`
+    Id   ObjectId `bson:"_id" json:"id"`
+    Name string   `bson:"name" json:"name"`
+    Type string   `bson:"type" json:"type"`
 }
 
 // clear && go test -v -test.run TestRegion_Issue113 ...swagger
 func TestRegion_Issue113(t *testing.T) {
-	testJsonFromStruct(t, []Region{}, `{
+    testJsonFromStruct(t, []Region{}, `{
   "||swagger.Region": {
    "id": "||swagger.Region",
    "properties": {}
@@ -834,15 +834,15 @@ func TestRegion_Issue113(t *testing.T) {
 
 // clear && go test -v -test.run TestIssue158 ...swagger
 func TestIssue158(t *testing.T) {
-	type Address struct {
-		Country string `json:"country,omitempty"`
-	}
+    type Address struct {
+        Country string `json:"country,omitempty"`
+    }
 
-	type Customer struct {
-		Name    string  `json:"name"`
-		Address Address `json:"address"`
-	}
-	expected := `{
+    type Customer struct {
+        Name    string  `json:"name"`
+        Address Address `json:"address"`
+    }
+    expected := `{
   "swagger.Address": {
    "id": "swagger.Address",
    "properties": {
@@ -867,14 +867,14 @@ func TestIssue158(t *testing.T) {
    }
   }
  }`
-	testJsonFromStruct(t, Customer{}, expected)
+    testJsonFromStruct(t, Customer{}, expected)
 }
 
 func TestSlices(t *testing.T) {
-	type Address struct {
-		Country string `json:"country,omitempty"`
-	}
-	expected := `{
+    type Address struct {
+        Country string `json:"country,omitempty"`
+    }
+    expected := `{
   "swagger.Address": {
    "id": "swagger.Address",
    "properties": {
@@ -902,46 +902,46 @@ func TestSlices(t *testing.T) {
    }
   }
  }`
-	// both slices (with pointer value and with type value) should have equal swagger representation
-	{
-		type Customer struct {
-			Name      string    `json:"name"`
-			Addresses []Address `json:"addresses"`
-		}
-		testJsonFromStruct(t, Customer{}, expected)
-	}
-	{
-		type Customer struct {
-			Name      string     `json:"name"`
-			Addresses []*Address `json:"addresses"`
-		}
-		testJsonFromStruct(t, Customer{}, expected)
-	}
+    // both slices (with pointer value and with type value) should have equal swagger representation
+    {
+        type Customer struct {
+            Name      string    `json:"name"`
+            Addresses []Address `json:"addresses"`
+        }
+        testJsonFromStruct(t, Customer{}, expected)
+    }
+    {
+        type Customer struct {
+            Name      string     `json:"name"`
+            Addresses []*Address `json:"addresses"`
+        }
+        testJsonFromStruct(t, Customer{}, expected)
+    }
 
 }
 
 type Name struct {
-	Value string
+    Value string
 }
 
 func (n Name) PostBuildModel(m *Model) *Model {
-	m.Description = "titles must be upcase"
-	return m
+    m.Description = "titles must be upcase"
+    return m
 }
 
 type TOC struct {
-	Titles []Name
+    Titles []Name
 }
 
 type Discography struct {
-	Title Name
-	TOC
+    Title Name
+    TOC
 }
 
 // clear && go test -v -test.run TestEmbeddedStructPull204 ...swagger
 func TestEmbeddedStructPull204(t *testing.T) {
-	b := Discography{}
-	testJsonFromStruct(t, b, `
+    b := Discography{}
+    testJsonFromStruct(t, b, `
 {
   "swagger.Discography": {
    "id": "swagger.Discography",
@@ -977,20 +977,20 @@ func TestEmbeddedStructPull204(t *testing.T) {
 }
 
 type AddressWithMethod struct {
-	Country  string `json:"country,omitempty"`
-	PostCode int    `json:"postcode,omitempty"`
+    Country  string `json:"country,omitempty"`
+    PostCode int    `json:"postcode,omitempty"`
 }
 
 func (AddressWithMethod) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"":         "Address doc",
-		"country":  "Country doc",
-		"postcode": "PostCode doc",
-	}
+    return map[string]string{
+        "":         "Address doc",
+        "country":  "Country doc",
+        "postcode": "PostCode doc",
+    }
 }
 
 func TestDocInMethodSwaggerDoc(t *testing.T) {
-	expected := `{
+    expected := `{
 		  "swagger.AddressWithMethod": {
 		   "id": "swagger.AddressWithMethod",
 		   "description": "Address doc",
@@ -1007,16 +1007,16 @@ func TestDocInMethodSwaggerDoc(t *testing.T) {
 		   }
 		  }
 		 }`
-	testJsonFromStruct(t, AddressWithMethod{}, expected)
+    testJsonFromStruct(t, AddressWithMethod{}, expected)
 }
 
 type RefDesc struct {
-	f1 *int64 `description:"desc"`
+    f1 *int64 `description:"desc"`
 }
 
 func TestPtrDescription(t *testing.T) {
-	b := RefDesc{}
-	expected := `{
+    b := RefDesc{}
+    expected := `{
    "swagger.RefDesc": {
     "id": "swagger.RefDesc",
     "required": [
@@ -1031,46 +1031,46 @@ func TestPtrDescription(t *testing.T) {
     }
    }
   }`
-	testJsonFromStruct(t, b, expected)
+    testJsonFromStruct(t, b, expected)
 }
 
 type A struct {
-	B  `json:",inline"`
-	C1 `json:"metadata,omitempty"`
+    B  `json:",inline"`
+    C1 `json:"metadata,omitempty"`
 }
 
 type B struct {
-	SB string
+    SB string
 }
 
 type C1 struct {
-	SC string
+    SC string
 }
 
 func (A) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"":         "A struct",
-		"B":        "B field", // We should not get anything from this
-		"metadata": "C1 field",
-	}
+    return map[string]string{
+        "":         "A struct",
+        "B":        "B field", // We should not get anything from this
+        "metadata": "C1 field",
+    }
 }
 
 func (B) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"":   "B struct",
-		"SB": "SB field",
-	}
+    return map[string]string{
+        "":   "B struct",
+        "SB": "SB field",
+    }
 }
 
 func (C1) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"":   "C1 struct",
-		"SC": "SC field",
-	}
+    return map[string]string{
+        "":   "C1 struct",
+        "SC": "SC field",
+    }
 }
 
 func TestNestedStructDescription(t *testing.T) {
-	expected := `
+    expected := `
 {
   "swagger.A": {
    "id": "swagger.A",
@@ -1104,18 +1104,18 @@ func TestNestedStructDescription(t *testing.T) {
   }
  }
 `
-	testJsonFromStruct(t, A{}, expected)
+    testJsonFromStruct(t, A{}, expected)
 }
 
 // This tests a primitive with type overrides in the struct tags
 type FakeInt int
 type E struct {
-	Id FakeInt `type:"integer"`
-	IP net.IP  `type:"string"`
+    Id FakeInt `type:"integer"`
+    IP net.IP  `type:"string"`
 }
 
 func TestOverridenTypeTagE1(t *testing.T) {
-	expected := `
+    expected := `
 {
   "swagger.E": {
    "id": "swagger.E",
@@ -1134,5 +1134,5 @@ func TestOverridenTypeTagE1(t *testing.T) {
   }
  }
 `
-	testJsonFromStruct(t, E{}, expected)
+    testJsonFromStruct(t, E{}, expected)
 }

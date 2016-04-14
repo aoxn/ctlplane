@@ -3,5 +3,5 @@
 package system
 
 func ReadMemInfo() (*MemInfo, error) {
-	return nil, ErrNotSupportedPlatform
+    return nil, ErrNotSupportedPlatform
 }

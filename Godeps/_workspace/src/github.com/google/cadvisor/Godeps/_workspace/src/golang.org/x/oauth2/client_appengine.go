@@ -9,16 +9,16 @@
 package oauth2
 
 import (
-	"net/http"
+    "net/http"
 
-	"golang.org/x/net/context"
-	"google.golang.org/appengine/urlfetch"
+    "golang.org/x/net/context"
+    "google.golang.org/appengine/urlfetch"
 )
 
 func init() {
-	registerContextClientFunc(contextClientAppEngine)
+    registerContextClientFunc(contextClientAppEngine)
 }
 
 func contextClientAppEngine(ctx context.Context) (*http.Client, error) {
-	return urlfetch.Client(ctx), nil
+    return urlfetch.Client(ctx), nil
 }

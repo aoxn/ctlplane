@@ -2,79 +2,87 @@
 {{template "header" .}}
 
 <div class="main">
-<div class="container">
+    <div class="container">
         <ol class="breadcrumb">
-            <li ><a href="/repository">仓库列表</a></li>
+            <li><a href="/repository">仓库列表</a></li>
             <li class="active"><a href="#">标签列表<strong>[ {{.repo.RepoName}} ]</strong></a></li>
         </ol>
 
-    <div id="accord" class="panel-group">
+        <div id="accord" class="panel-group">
 
-        {{if .has}}
-        {{$repName := .repo.RepoName}}
-        {{$currTag := .currtag}}
-        {{range $idx,$item := .repo.Tags}}
+            {{if .has}}
+            {{$repName := .repo.RepoName}}
+            {{$currTag := .currtag}}
+            {{range $idx,$item := .repo.Tags}}
 
-        <div class="panel panel-success">
-            <div class="panel-heading">
-                标签： <strong>[{{$item.Name}}]</strong>
-                <a class="pull-right" data-toggle="collapse" data-parent="#accord" href="#accord-{{$idx}}">描述 <i class="glyphicon glyphicon-collapse-down"></i></a>
-                <label class="pull-right">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                <a id="dmark-{{$idx}}" name="dmark-{{$idx}}" class="pull-right" href="/tags/delete?it={{$repName}}&tag={{$item.Name}}">删除</a>
-            </div>
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    标签： <strong>[{{$item.Name}}]</strong>
+                    <a class="pull-right" data-toggle="collapse" data-parent="#accord" href="#accord-{{$idx}}">描述 <i
+                            class="glyphicon glyphicon-collapse-down"></i></a>
+                    <label class="pull-right">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    <a id="dmark-{{$idx}}" name="dmark-{{$idx}}" class="pull-right"
+                       href="/tags/delete?it={{$repName}}&tag={{$item.Name}}">删除</a>
+                </div>
 
-            <div id="accord-{{$idx}}" class="panel-collapse collapse">
-                <div class="panel-body">
-                    <form role="form"  id="descform-{{$idx}}" method="post" name="descform-{{$idx}}" action="/detail?it={{$repName}}&tag={{$item.Name}}">
-                        <div class="row ">
-                            <div class="hidden-xs col-sm-12 list-inline text-right" >
-                                <button id="edittag-{{$idx}}" class="btn" name="edittag-{{$idx}}">
-                                    <span class="hidden">{{$idx}}</span>
-                                    <span class="hidden">{{$item.Name}}</span>
-                                    <span>Edit</span>
-                                </button>
+                <div id="accord-{{$idx}}" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <form role="form" id="descform-{{$idx}}" method="post" name="descform-{{$idx}}"
+                              action="/detail?it={{$repName}}&tag={{$item.Name}}">
+                            <div class="row ">
+                                <div class="hidden-xs col-sm-12 list-inline text-right">
+                                    <button id="edittag-{{$idx}}" class="btn" name="edittag-{{$idx}}">
+                                        <span class="hidden">{{$idx}}</span>
+                                        <span class="hidden">{{$item.Name}}</span>
+                                        <span>Edit</span>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="page-header">
-                            <h6></h6>
-                        </div>
-                        <div class="popover-content">
-                            <span id="content-{{$idx}}" name="content-{{$idx}}">{{$item.Description}}</span>
-                            <textarea id="txtbody-{{$item.Name}}" name="txtbody-{{$item.Name}}" class="hidden center-block">{{$item.Description}}</textarea>
-                        </div>
+                            <div class="page-header">
+                                <h6></h6>
+                            </div>
+                            <div class="popover-content">
+                                <span id="content-{{$idx}}" name="content-{{$idx}}">{{$item.Description}}</span>
+                                <textarea id="txtbody-{{$item.Name}}" name="txtbody-{{$item.Name}}"
+                                          class="hidden center-block">{{$item.Description}}</textarea>
+                            </div>
 
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-        {{end}}
-        {{else}}
-        <div class="container">
-            <p><strong>{{.errorinfo}}</strong></p>
-        </div>
-        {{end}}
+            {{end}}
+            {{else}}
+            <div class="container">
+                <p><strong>{{.errorinfo}}</strong></p>
+            </div>
+            {{end}}
 
-        <div id="confirm" class="modal fade" tabindex="-1" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">删除确认</h4>
+            <div id="confirm" class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">删除确认</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>是否确认删除标签？&hellip;</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button id="deleteconfirm" type="button" class="btn btn-primary">确定删除</button>
+                        </div>
                     </div>
-                    <div class="modal-body">
-                        <p>是否确认删除标签？&hellip;</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                        <button id="deleteconfirm" type="button" class="btn btn-primary">确定删除</button>
-                    </div>
-                </div><!-- /.modal-content -->
-            </div><!-- /.modal-dialog -->
-        </div><!-- /.modal -->
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+            <!-- /.modal -->
+
+        </div>
 
     </div>
-
-</div>
 
 
 </div>
@@ -83,10 +91,10 @@
 <script>
     function edit(e) {
         var idx = e.data.idx
-        $("#content-"+idx).hide()
-        var TAG = $("#edittag-"+idx).find("span")[2]
+        $("#content-" + idx).hide()
+        var TAG = $("#edittag-" + idx).find("span")[2]
         var txt = TAG.textContent
-        if (txt == "Edit"){
+        if (txt == "Edit") {
             TAG.innerText = "Save"
             tinymce.init({
                 selector: 'textarea',
@@ -105,32 +113,32 @@
             e.preventDefault()
         }
 
-        if (txt == "Save"){
-            $("#descform-"+idx).submit()
+        if (txt == "Save") {
+            $("#descform-" + idx).submit()
         }
 
     }
 
-    $(document).ready(function(){
+    $(document).ready(function () {
 
-        $.each($("span[id*=content]"),function(idx,s){
-            var span = $("#content-"+idx)
+        $.each($("span[id*=content]"), function (idx, s) {
+            var span = $("#content-" + idx)
             span.html(span.text())
         })
 
-        $.each($("button[id*=edittag]"),function(idx,btn){
-            var b = $("#"+btn.id)
+        $.each($("button[id*=edittag]"), function (idx, btn) {
+            var b = $("#" + btn.id)
             var x = b.find("span")
-            b.click({idx:x[0].textContent,tag:x[1].textContent}, edit)
+            b.click({idx: x[0].textContent, tag: x[1].textContent}, edit)
         })
 
-        $.each($("a[id*=dmark]"),function(idx,a){
-            var b = $("#"+a.id)
-            b.click(function(){
+        $.each($("a[id*=dmark]"), function (idx, a) {
+            var b = $("#" + a.id)
+            b.click(function () {
                 $('#confirm').modal('show')
-                $("#deleteconfirm").click( function() {
+                $("#deleteconfirm").click(function () {
                     //触发href连接
-                    window.location.href=b.attr("href")
+                    window.location.href = b.attr("href")
                 });
                 return false
             })

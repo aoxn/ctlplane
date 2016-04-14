@@ -6,11 +6,11 @@
 package github
 
 import (
-	"golang.org/x/oauth2"
+    "golang.org/x/oauth2"
 )
 
 // Endpoint is Github's OAuth 2.0 endpoint.
 var Endpoint = oauth2.Endpoint{
-	AuthURL:  "https://github.com/login/oauth/authorize",
-	TokenURL: "https://github.com/login/oauth/access_token",
+    AuthURL:  "https://github.com/login/oauth/authorize",
+    TokenURL: "https://github.com/login/oauth/access_token",
 }

@@ -15,26 +15,26 @@
 package main
 
 import (
-	"log"
+    "log"
 
-	"github.com/google/cadvisor/utils/cpuload/netlink"
+    "github.com/google/cadvisor/utils/cpuload/netlink"
 )
 
 func main() {
-	n, err := netlink.New()
-	if err != nil {
-		log.Printf("Failed to create cpu load util: %s", err)
-		return
-	}
-	defer n.Stop()
+    n, err := netlink.New()
+    if err != nil {
+        log.Printf("Failed to create cpu load util: %s", err)
+        return
+    }
+    defer n.Stop()
 
-	paths := []string{"/sys/fs/cgroup/cpu", "/sys/fs/cgroup/cpu/docker"}
-	names := []string{"/", "/docker"}
-	for i, path := range paths {
-		stats, err := n.GetCpuLoad(names[i], path)
-		if err != nil {
-			log.Printf("Error getting cpu load for %q: %s", path, err)
-		}
-		log.Printf("Task load for %s: %+v", path, stats)
-	}
+    paths := []string{"/sys/fs/cgroup/cpu", "/sys/fs/cgroup/cpu/docker"}
+    names := []string{"/", "/docker"}
+    for i, path := range paths {
+        stats, err := n.GetCpuLoad(names[i], path)
+        if err != nil {
+            log.Printf("Error getting cpu load for %q: %s", path, err)
+        }
+        log.Printf("Task load for %s: %+v", path, stats)
+    }
 }

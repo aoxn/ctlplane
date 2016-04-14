@@ -9,16 +9,16 @@
 package netlink
 
 import (
-	"net"
+    "net"
 
-	"github.com/vishvananda/netlink/nl"
+    "github.com/vishvananda/netlink/nl"
 )
 
 const (
-	// Family type definitions
-	FAMILY_ALL = nl.FAMILY_ALL
-	FAMILY_V4  = nl.FAMILY_V4
-	FAMILY_V6  = nl.FAMILY_V6
+// Family type definitions
+    FAMILY_ALL = nl.FAMILY_ALL
+    FAMILY_V4 = nl.FAMILY_V4
+    FAMILY_V6 = nl.FAMILY_V6
 )
 
 // ParseIPNet parses a string in ip/net format and returns a net.IPNet.
@@ -26,14 +26,14 @@ const (
 // ParseCIDR returns an IPNet with the IP part set to the base IP of the
 // range.
 func ParseIPNet(s string) (*net.IPNet, error) {
-	ip, ipNet, err := net.ParseCIDR(s)
-	if err != nil {
-		return nil, err
-	}
-	return &net.IPNet{IP: ip, Mask: ipNet.Mask}, nil
+    ip, ipNet, err := net.ParseCIDR(s)
+    if err != nil {
+        return nil, err
+    }
+    return &net.IPNet{IP: ip, Mask: ipNet.Mask}, nil
 }
 
 // NewIPNet generates an IPNet from an ip address using a netmask of 32.
 func NewIPNet(ip net.IP) *net.IPNet {
-	return &net.IPNet{IP: ip, Mask: net.CIDRMask(32, 32)}
+    return &net.IPNet{IP: ip, Mask: net.CIDRMask(32, 32)}
 }

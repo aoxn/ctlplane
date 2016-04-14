@@ -7,14 +7,14 @@
 package icmp
 
 import (
-	"net"
-	"os"
-	"runtime"
-	"syscall"
+    "net"
+    "os"
+    "runtime"
+    "syscall"
 
-	"golang.org/x/net/internal/iana"
-	"golang.org/x/net/ipv4"
-	"golang.org/x/net/ipv6"
+    "golang.org/x/net/internal/iana"
+    "golang.org/x/net/ipv4"
+    "golang.org/x/net/ipv6"
 )
 
 const sysIP_STRIPHDR = 0x17 // for now only darwin supports this option
@@ -42,57 +42,57 @@ const sysIP_STRIPHDR = 0x17 // for now only darwin supports this option
 //	ListenPacket("ip6:ipv6-icmp", "fe80::1%en0")
 //	ListenPacket("ip6:58", "::")
 func ListenPacket(network, address string) (*PacketConn, error) {
-	var family, proto int
-	switch network {
-	case "udp4":
-		family, proto = syscall.AF_INET, iana.ProtocolICMP
-	case "udp6":
-		family, proto = syscall.AF_INET6, iana.ProtocolIPv6ICMP
-	default:
-		i := last(network, ':')
-		switch network[:i] {
-		case "ip4":
-			proto = iana.ProtocolICMP
-		case "ip6":
-			proto = iana.ProtocolIPv6ICMP
-		}
-	}
-	var cerr error
-	var c net.PacketConn
-	switch family {
-	case syscall.AF_INET, syscall.AF_INET6:
-		s, err := syscall.Socket(family, syscall.SOCK_DGRAM, proto)
-		if err != nil {
-			return nil, os.NewSyscallError("socket", err)
-		}
-		defer syscall.Close(s)
-		if runtime.GOOS == "darwin" && family == syscall.AF_INET {
-			if err := syscall.SetsockoptInt(s, iana.ProtocolIP, sysIP_STRIPHDR, 1); err != nil {
-				return nil, os.NewSyscallError("setsockopt", err)
-			}
-		}
-		sa, err := sockaddr(family, address)
-		if err != nil {
-			return nil, err
-		}
-		if err := syscall.Bind(s, sa); err != nil {
-			return nil, os.NewSyscallError("bind", err)
-		}
-		f := os.NewFile(uintptr(s), "datagram-oriented icmp")
-		defer f.Close()
-		c, cerr = net.FilePacketConn(f)
-	default:
-		c, cerr = net.ListenPacket(network, address)
-	}
-	if cerr != nil {
-		return nil, cerr
-	}
-	switch proto {
-	case iana.ProtocolICMP:
-		return &PacketConn{c: c, p4: ipv4.NewPacketConn(c)}, nil
-	case iana.ProtocolIPv6ICMP:
-		return &PacketConn{c: c, p6: ipv6.NewPacketConn(c)}, nil
-	default:
-		return &PacketConn{c: c}, nil
-	}
+    var family, proto int
+    switch network {
+    case "udp4":
+        family, proto = syscall.AF_INET, iana.ProtocolICMP
+    case "udp6":
+        family, proto = syscall.AF_INET6, iana.ProtocolIPv6ICMP
+    default:
+        i := last(network, ':')
+        switch network[:i] {
+        case "ip4":
+            proto = iana.ProtocolICMP
+        case "ip6":
+            proto = iana.ProtocolIPv6ICMP
+        }
+    }
+    var cerr error
+    var c net.PacketConn
+    switch family {
+    case syscall.AF_INET, syscall.AF_INET6:
+        s, err := syscall.Socket(family, syscall.SOCK_DGRAM, proto)
+        if err != nil {
+            return nil, os.NewSyscallError("socket", err)
+        }
+        defer syscall.Close(s)
+        if runtime.GOOS == "darwin" && family == syscall.AF_INET {
+            if err := syscall.SetsockoptInt(s, iana.ProtocolIP, sysIP_STRIPHDR, 1); err != nil {
+                return nil, os.NewSyscallError("setsockopt", err)
+            }
+        }
+        sa, err := sockaddr(family, address)
+        if err != nil {
+            return nil, err
+        }
+        if err := syscall.Bind(s, sa); err != nil {
+            return nil, os.NewSyscallError("bind", err)
+        }
+        f := os.NewFile(uintptr(s), "datagram-oriented icmp")
+        defer f.Close()
+        c, cerr = net.FilePacketConn(f)
+    default:
+        c, cerr = net.ListenPacket(network, address)
+    }
+    if cerr != nil {
+        return nil, cerr
+    }
+    switch proto {
+    case iana.ProtocolICMP:
+        return &PacketConn{c: c, p4: ipv4.NewPacketConn(c)}, nil
+    case iana.ProtocolIPv6ICMP:
+        return &PacketConn{c: c, p6: ipv6.NewPacketConn(c)}, nil
+    default:
+        return &PacketConn{c: c}, nil
+    }
 }

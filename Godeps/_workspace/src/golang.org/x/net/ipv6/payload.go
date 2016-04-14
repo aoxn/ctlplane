@@ -8,8 +8,10 @@ import "net"
 
 // A payloadHandler represents the IPv6 datagram payload handler.
 type payloadHandler struct {
-	net.PacketConn
-	rawOpt
+    net.PacketConn
+    rawOpt
 }
 
-func (c *payloadHandler) ok() bool { return c != nil && c.PacketConn != nil }
+func (c *payloadHandler) ok() bool {
+    return c != nil && c.PacketConn != nil
+}

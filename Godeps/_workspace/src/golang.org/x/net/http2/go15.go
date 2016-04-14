@@ -8,4 +8,6 @@ package http2
 
 import "net/http"
 
-func requestCancel(req *http.Request) <-chan struct{} { return req.Cancel }
+func requestCancel(req *http.Request) <-chan struct{} {
+    return req.Cancel
+}

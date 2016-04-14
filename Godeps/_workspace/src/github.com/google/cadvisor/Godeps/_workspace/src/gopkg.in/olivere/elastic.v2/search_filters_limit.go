@@ -8,24 +8,24 @@ package elastic
 // For details, see:
 // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-limit-filter.html
 type LimitFilter struct {
-	Filter
-	limit int
+    Filter
+    limit int
 }
 
 func NewLimitFilter(limit int) LimitFilter {
-	f := LimitFilter{limit: limit}
-	return f
+    f := LimitFilter{limit: limit}
+    return f
 }
 
 func (f LimitFilter) Source() interface{} {
-	// {
-	//   "limit" : {
-	//     "value" : "..."
-	//   }
-	// }
-	source := make(map[string]interface{})
-	params := make(map[string]interface{})
-	source["limit"] = params
-	params["value"] = f.limit
-	return source
+    // {
+    //   "limit" : {
+    //     "value" : "..."
+    //   }
+    // }
+    source := make(map[string]interface{})
+    params := make(map[string]interface{})
+    source["limit"] = params
+    params["value"] = f.limit
+    return source
 }

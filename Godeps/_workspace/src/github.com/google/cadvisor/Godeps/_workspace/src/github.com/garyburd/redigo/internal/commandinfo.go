@@ -15,31 +15,31 @@
 package internal
 
 import (
-	"strings"
+    "strings"
 )
 
 const (
-	WatchState = 1 << iota
-	MultiState
-	SubscribeState
-	MonitorState
+    WatchState = 1 << iota
+    MultiState
+    SubscribeState
+    MonitorState
 )
 
 type CommandInfo struct {
-	Set, Clear int
+    Set, Clear int
 }
 
 var commandInfos = map[string]CommandInfo{
-	"WATCH":      {Set: WatchState},
-	"UNWATCH":    {Clear: WatchState},
-	"MULTI":      {Set: MultiState},
-	"EXEC":       {Clear: WatchState | MultiState},
-	"DISCARD":    {Clear: WatchState | MultiState},
-	"PSUBSCRIBE": {Set: SubscribeState},
-	"SUBSCRIBE":  {Set: SubscribeState},
-	"MONITOR":    {Set: MonitorState},
+    "WATCH":      {Set: WatchState},
+    "UNWATCH":    {Clear: WatchState},
+    "MULTI":      {Set: MultiState},
+    "EXEC":       {Clear: WatchState | MultiState},
+    "DISCARD":    {Clear: WatchState | MultiState},
+    "PSUBSCRIBE": {Set: SubscribeState},
+    "SUBSCRIBE":  {Set: SubscribeState},
+    "MONITOR":    {Set: MonitorState},
 }
 
 func LookupCommandInfo(commandName string) CommandInfo {
-	return commandInfos[strings.ToUpper(commandName)]
+    return commandInfos[strings.ToUpper(commandName)]
 }

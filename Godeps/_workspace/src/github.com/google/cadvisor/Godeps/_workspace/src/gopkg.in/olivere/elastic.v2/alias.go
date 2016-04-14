@@ -5,103 +5,103 @@
 package elastic
 
 import (
-	"encoding/json"
-	"fmt"
-	"net/url"
+    "encoding/json"
+    "fmt"
+    "net/url"
 )
 
 type AliasService struct {
-	client  *Client
-	actions []aliasAction
-	pretty  bool
+    client  *Client
+    actions []aliasAction
+    pretty  bool
 }
 
 type aliasAction struct {
-	// "add" or "remove"
-	Type string
-	// Index name
-	Index string
-	// Alias name
-	Alias string
-	// Filter
-	Filter *Filter
+    // "add" or "remove"
+    Type   string
+    // Index name
+    Index  string
+    // Alias name
+    Alias  string
+    // Filter
+    Filter *Filter
 }
 
 func NewAliasService(client *Client) *AliasService {
-	builder := &AliasService{
-		client:  client,
-		actions: make([]aliasAction, 0),
-	}
-	return builder
+    builder := &AliasService{
+        client:  client,
+        actions: make([]aliasAction, 0),
+    }
+    return builder
 }
 
 func (s *AliasService) Pretty(pretty bool) *AliasService {
-	s.pretty = pretty
-	return s
+    s.pretty = pretty
+    return s
 }
 
 func (s *AliasService) Add(indexName string, aliasName string) *AliasService {
-	action := aliasAction{Type: "add", Index: indexName, Alias: aliasName}
-	s.actions = append(s.actions, action)
-	return s
+    action := aliasAction{Type: "add", Index: indexName, Alias: aliasName}
+    s.actions = append(s.actions, action)
+    return s
 }
 
 func (s *AliasService) AddWithFilter(indexName string, aliasName string, filter *Filter) *AliasService {
-	action := aliasAction{Type: "add", Index: indexName, Alias: aliasName, Filter: filter}
-	s.actions = append(s.actions, action)
-	return s
+    action := aliasAction{Type: "add", Index: indexName, Alias: aliasName, Filter: filter}
+    s.actions = append(s.actions, action)
+    return s
 }
 
 func (s *AliasService) Remove(indexName string, aliasName string) *AliasService {
-	action := aliasAction{Type: "remove", Index: indexName, Alias: aliasName}
-	s.actions = append(s.actions, action)
-	return s
+    action := aliasAction{Type: "remove", Index: indexName, Alias: aliasName}
+    s.actions = append(s.actions, action)
+    return s
 }
 
 func (s *AliasService) Do() (*AliasResult, error) {
-	// Build url
-	path := "/_aliases"
+    // Build url
+    path := "/_aliases"
 
-	// Parameters
-	params := make(url.Values)
-	if s.pretty {
-		params.Set("pretty", fmt.Sprintf("%v", s.pretty))
-	}
+    // Parameters
+    params := make(url.Values)
+    if s.pretty {
+        params.Set("pretty", fmt.Sprintf("%v", s.pretty))
+    }
 
-	// Actions
-	body := make(map[string]interface{})
-	actionsJson := make([]interface{}, 0)
+    // Actions
+    body := make(map[string]interface{})
+    actionsJson := make([]interface{}, 0)
 
-	for _, action := range s.actions {
-		actionJson := make(map[string]interface{})
-		detailsJson := make(map[string]interface{})
-		detailsJson["index"] = action.Index
-		detailsJson["alias"] = action.Alias
-		if action.Filter != nil {
-			detailsJson["filter"] = (*action.Filter).Source()
-		}
-		actionJson[action.Type] = detailsJson
-		actionsJson = append(actionsJson, actionJson)
-	}
+    for _, action := range s.actions {
+        actionJson := make(map[string]interface{})
+        detailsJson := make(map[string]interface{})
+        detailsJson["index"] = action.Index
+        detailsJson["alias"] = action.Alias
+        if action.Filter != nil {
+            detailsJson["filter"] = (*action.Filter).Source()
+        }
+        actionJson[action.Type] = detailsJson
+        actionsJson = append(actionsJson, actionJson)
+    }
 
-	body["actions"] = actionsJson
+    body["actions"] = actionsJson
 
-	// Get response
-	res, err := s.client.PerformRequest("POST", path, params, body)
-	if err != nil {
-		return nil, err
-	}
+    // Get response
+    res, err := s.client.PerformRequest("POST", path, params, body)
+    if err != nil {
+        return nil, err
+    }
 
-	// Return results
-	ret := new(AliasResult)
-	if err := json.Unmarshal(res.Body, ret); err != nil {
-		return nil, err
-	}
-	return ret, nil
+    // Return results
+    ret := new(AliasResult)
+    if err := json.Unmarshal(res.Body, ret); err != nil {
+        return nil, err
+    }
+    return ret, nil
 }
 
 // -- Result of an alias request.
 
 type AliasResult struct {
-	Acknowledged bool `json:"acknowledged"`
+    Acknowledged bool `json:"acknowledged"`
 }

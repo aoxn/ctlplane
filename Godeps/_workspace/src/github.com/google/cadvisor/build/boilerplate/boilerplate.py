@@ -18,8 +18,6 @@ from __future__ import print_function
 
 import argparse
 import glob
-import json
-import mmap
 import os
 import re
 import sys
@@ -30,6 +28,7 @@ args = parser.parse_args()
 
 rootdir = os.path.dirname(__file__) + "/../../"
 rootdir = os.path.abspath(rootdir)
+
 
 def get_refs():
     refs = {}
@@ -42,6 +41,7 @@ def get_refs():
         refs[extension] = ref
 
     return refs
+
 
 def file_passes(filename, refs, regexs):
     try:
@@ -92,10 +92,14 @@ def file_passes(filename, refs, regexs):
 
     return True
 
+
 def file_extension(filename):
     return os.path.splitext(filename)[1].split(".")[-1].lower()
 
+
 skipped_dirs = ['Godeps', 'third_party', '_gopath', '_output', '.git']
+
+
 def normalize_files(files):
     newfiles = []
     for pathname in files:
@@ -106,6 +110,7 @@ def normalize_files(files):
         if not os.path.isabs(pathname):
             newfiles[i] = os.path.join(rootdir, pathname)
     return newfiles
+
 
 def get_files(extensions):
     files = []
@@ -133,17 +138,19 @@ def get_files(extensions):
             outfiles.append(pathname)
     return outfiles
 
+
 def get_regexs():
     regexs = {}
     # Search for "YEAR" which exists in the boilerplate, but shouldn't in the real thing
-    regexs["year"] = re.compile( 'YEAR' )
+    regexs["year"] = re.compile('YEAR')
     # dates can be 2014, 2015 or 2016, company holder names can be anything
-    regexs["date"] = re.compile( '(2014|2015|2016)' )
+    regexs["date"] = re.compile('(2014|2015|2016)')
     # strip // +build \n\n build constraints
     regexs["go_build_constraints"] = re.compile(r"^(// \+build.*\n)+\n", re.MULTILINE)
     # strip #!.* from shell scripts
     regexs["shebang"] = re.compile(r"^(#!.*\n)\n*", re.MULTILINE)
     return regexs
+
 
 def main():
     regexs = get_regexs()
@@ -154,5 +161,6 @@ def main():
         if not file_passes(filename, refs, regexs):
             print(filename, file=sys.stdout)
 
+
 if __name__ == "__main__":
-  sys.exit(main())
+    sys.exit(main())

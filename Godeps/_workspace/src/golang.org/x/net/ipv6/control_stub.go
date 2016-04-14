@@ -7,17 +7,17 @@
 package ipv6
 
 func setControlMessage(fd int, opt *rawOpt, cf ControlFlags, on bool) error {
-	return errOpNoSupport
+    return errOpNoSupport
 }
 
 func newControlMessage(opt *rawOpt) (oob []byte) {
-	return nil
+    return nil
 }
 
 func parseControlMessage(b []byte) (*ControlMessage, error) {
-	return nil, errOpNoSupport
+    return nil, errOpNoSupport
 }
 
 func marshalControlMessage(cm *ControlMessage) (oob []byte) {
-	return nil
+    return nil
 }

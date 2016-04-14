@@ -8,8 +8,8 @@
 package idna // import "golang.org/x/net/idna"
 
 import (
-	"strings"
-	"unicode/utf8"
+    "strings"
+    "unicode/utf8"
 )
 
 // TODO(nigeltao): specify when errors occur. For example, is ToASCII(".") or
@@ -22,47 +22,47 @@ const acePrefix = "xn--"
 // ToASCII("bücher.example.com") is "xn--bcher-kva.example.com", and
 // ToASCII("golang") is "golang".
 func ToASCII(s string) (string, error) {
-	if ascii(s) {
-		return s, nil
-	}
-	labels := strings.Split(s, ".")
-	for i, label := range labels {
-		if !ascii(label) {
-			a, err := encode(acePrefix, label)
-			if err != nil {
-				return "", err
-			}
-			labels[i] = a
-		}
-	}
-	return strings.Join(labels, "."), nil
+    if ascii(s) {
+        return s, nil
+    }
+    labels := strings.Split(s, ".")
+    for i, label := range labels {
+        if !ascii(label) {
+            a, err := encode(acePrefix, label)
+            if err != nil {
+                return "", err
+            }
+            labels[i] = a
+        }
+    }
+    return strings.Join(labels, "."), nil
 }
 
 // ToUnicode converts a domain or domain label to its Unicode form. For example,
 // ToUnicode("xn--bcher-kva.example.com") is "bücher.example.com", and
 // ToUnicode("golang") is "golang".
 func ToUnicode(s string) (string, error) {
-	if !strings.Contains(s, acePrefix) {
-		return s, nil
-	}
-	labels := strings.Split(s, ".")
-	for i, label := range labels {
-		if strings.HasPrefix(label, acePrefix) {
-			u, err := decode(label[len(acePrefix):])
-			if err != nil {
-				return "", err
-			}
-			labels[i] = u
-		}
-	}
-	return strings.Join(labels, "."), nil
+    if !strings.Contains(s, acePrefix) {
+        return s, nil
+    }
+    labels := strings.Split(s, ".")
+    for i, label := range labels {
+        if strings.HasPrefix(label, acePrefix) {
+            u, err := decode(label[len(acePrefix):])
+            if err != nil {
+                return "", err
+            }
+            labels[i] = u
+        }
+    }
+    return strings.Join(labels, "."), nil
 }
 
 func ascii(s string) bool {
-	for i := 0; i < len(s); i++ {
-		if s[i] >= utf8.RuneSelf {
-			return false
-		}
-	}
-	return true
+    for i := 0; i < len(s); i++ {
+        if s[i] >= utf8.RuneSelf {
+            return false
+        }
+    }
+    return true
 }

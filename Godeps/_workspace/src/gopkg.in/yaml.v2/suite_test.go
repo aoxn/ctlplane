@@ -1,11 +1,12 @@
 package yaml_test
 
 import (
-	. "gopkg.in/check.v1"
-	"testing"
+    "testing"
 )
 
-func Test(t *testing.T) { TestingT(t) }
+func Test(t *testing.T) {
+    TestingT(t)
+}
 
 type S struct{}
 

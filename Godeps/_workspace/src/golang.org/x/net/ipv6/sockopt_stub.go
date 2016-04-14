@@ -9,5 +9,5 @@ package ipv6
 import "net"
 
 func getMTUInfo(fd int, opt *sockOpt) (*net.Interface, int, error) {
-	return nil, 0, errOpNoSupport
+    return nil, 0, errOpNoSupport
 }

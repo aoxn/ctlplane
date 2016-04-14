@@ -14,19 +14,19 @@
 package prometheus_test
 
 import (
-	"runtime"
+    "runtime"
 
-	"github.com/golang/protobuf/proto"
+    "github.com/golang/protobuf/proto"
 
-	dto "github.com/prometheus/client_model/go"
+    dto "github.com/prometheus/client_model/go"
 
-	"github.com/prometheus/client_golang/prometheus"
+    "github.com/prometheus/client_golang/prometheus"
 )
 
 func NewCallbackMetric(desc *prometheus.Desc, callback func() float64) *CallbackMetric {
-	result := &CallbackMetric{desc: desc, callback: callback}
-	result.Init(result) // Initialize the SelfCollector.
-	return result
+    result := &CallbackMetric{desc: desc, callback: callback}
+    result.Init(result) // Initialize the SelfCollector.
+    return result
 }
 
 // TODO: Come up with a better example.
@@ -39,31 +39,31 @@ func NewCallbackMetric(desc *prometheus.Desc, callback func() float64) *Callback
 // Note that this example is pretty much academic as the prometheus package
 // already provides an UntypedFunc type.
 type CallbackMetric struct {
-	prometheus.SelfCollector
+    prometheus.SelfCollector
 
-	desc     *prometheus.Desc
-	callback func() float64
+    desc     *prometheus.Desc
+    callback func() float64
 }
 
 func (cm *CallbackMetric) Desc() *prometheus.Desc {
-	return cm.desc
+    return cm.desc
 }
 
 func (cm *CallbackMetric) Write(m *dto.Metric) error {
-	m.Untyped = &dto.Untyped{Value: proto.Float64(cm.callback())}
-	return nil
+    m.Untyped = &dto.Untyped{Value: proto.Float64(cm.callback())}
+    return nil
 }
 
 func ExampleSelfCollector() {
-	m := NewCallbackMetric(
-		prometheus.NewDesc(
-			"runtime_goroutines_count",
-			"Total number of goroutines that currently exist.",
-			nil, nil, // No labels, these must be nil.
-		),
-		func() float64 {
-			return float64(runtime.NumGoroutine())
-		},
-	)
-	prometheus.MustRegister(m)
+    m := NewCallbackMetric(
+        prometheus.NewDesc(
+            "runtime_goroutines_count",
+            "Total number of goroutines that currently exist.",
+            nil, nil, // No labels, these must be nil.
+        ),
+        func() float64 {
+            return float64(runtime.NumGoroutine())
+        },
+    )
+    prometheus.MustRegister(m)
 }

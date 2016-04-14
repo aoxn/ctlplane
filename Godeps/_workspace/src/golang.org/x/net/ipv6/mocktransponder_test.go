@@ -5,28 +5,32 @@
 package ipv6_test
 
 import (
-	"net"
-	"testing"
+    "net"
+    "testing"
 )
 
-func connector(t *testing.T, network, addr string, done chan<- bool) {
-	defer func() { done <- true }()
+func connector(t *testing.T, network, addr string, done chan <- bool) {
+    defer func() {
+        done <- true
+    }()
 
-	c, err := net.Dial(network, addr)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	c.Close()
+    c, err := net.Dial(network, addr)
+    if err != nil {
+        t.Error(err)
+        return
+    }
+    c.Close()
 }
 
-func acceptor(t *testing.T, ln net.Listener, done chan<- bool) {
-	defer func() { done <- true }()
+func acceptor(t *testing.T, ln net.Listener, done chan <- bool) {
+    defer func() {
+        done <- true
+    }()
 
-	c, err := ln.Accept()
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	c.Close()
+    c, err := ln.Accept()
+    if err != nil {
+        t.Error(err)
+        return
+    }
+    c.Close()
 }

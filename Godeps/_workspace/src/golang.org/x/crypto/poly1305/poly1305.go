@@ -26,7 +26,7 @@ const TagSize = 16
 // Verify returns true if mac is a valid authenticator for m with the given
 // key.
 func Verify(mac *[16]byte, m []byte, key *[32]byte) bool {
-	var tmp [16]byte
-	Sum(&tmp, m, key)
-	return subtle.ConstantTimeCompare(tmp[:], mac[:]) == 1
+    var tmp [16]byte
+    Sum(&tmp, m, key)
+    return subtle.ConstantTimeCompare(tmp[:], mac[:]) == 1
 }

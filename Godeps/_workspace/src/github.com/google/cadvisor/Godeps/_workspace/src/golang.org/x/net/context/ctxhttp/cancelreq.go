@@ -9,10 +9,10 @@ package ctxhttp
 import "net/http"
 
 func canceler(client *http.Client, req *http.Request) func() {
-	ch := make(chan struct{})
-	req.Cancel = ch
+    ch := make(chan struct{})
+    req.Cancel = ch
 
-	return func() {
-		close(ch)
-	}
+    return func() {
+        close(ch)
+    }
 }

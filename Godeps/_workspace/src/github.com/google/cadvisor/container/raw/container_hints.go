@@ -19,43 +19,43 @@
 package raw
 
 import (
-	"encoding/json"
-	"flag"
-	"io/ioutil"
-	"os"
+    "encoding/json"
+    "flag"
+    "io/ioutil"
+    "os"
 )
 
 var argContainerHints = flag.String("container_hints", "/etc/cadvisor/container_hints.json", "location of the container hints file")
 
 type containerHints struct {
-	AllHosts []containerHint `json:"all_hosts,omitempty"`
+    AllHosts []containerHint `json:"all_hosts,omitempty"`
 }
 
 type containerHint struct {
-	FullName         string            `json:"full_path,omitempty"`
-	NetworkInterface *networkInterface `json:"network_interface,omitempty"`
-	Mounts           []mount           `json:"mounts,omitempty"`
+    FullName         string            `json:"full_path,omitempty"`
+    NetworkInterface *networkInterface `json:"network_interface,omitempty"`
+    Mounts           []mount           `json:"mounts,omitempty"`
 }
 
 type mount struct {
-	HostDir      string `json:"host_dir,omitempty"`
-	ContainerDir string `json:"container_dir,omitempty"`
+    HostDir      string `json:"host_dir,omitempty"`
+    ContainerDir string `json:"container_dir,omitempty"`
 }
 
 type networkInterface struct {
-	VethHost  string `json:"veth_host,omitempty"`
-	VethChild string `json:"veth_child,omitempty"`
+    VethHost  string `json:"veth_host,omitempty"`
+    VethChild string `json:"veth_child,omitempty"`
 }
 
 func getContainerHintsFromFile(containerHintsFile string) (containerHints, error) {
-	dat, err := ioutil.ReadFile(containerHintsFile)
-	if os.IsNotExist(err) {
-		return containerHints{}, nil
-	}
-	var cHints containerHints
-	if err == nil {
-		err = json.Unmarshal(dat, &cHints)
-	}
+    dat, err := ioutil.ReadFile(containerHintsFile)
+    if os.IsNotExist(err) {
+        return containerHints{}, nil
+    }
+    var cHints containerHints
+    if err == nil {
+        err = json.Unmarshal(dat, &cHints)
+    }
 
-	return cHints, err
+    return cHints, err
 }

@@ -7,17 +7,17 @@
 package ipv4
 
 func (c *genericOpt) sysfd() (int, error) {
-	return 0, errOpNoSupport
+    return 0, errOpNoSupport
 }
 
 func (c *dgramOpt) sysfd() (int, error) {
-	return 0, errOpNoSupport
+    return 0, errOpNoSupport
 }
 
 func (c *payloadHandler) sysfd() (int, error) {
-	return 0, errOpNoSupport
+    return 0, errOpNoSupport
 }
 
 func (c *packetHandler) sysfd() (int, error) {
-	return 0, errOpNoSupport
+    return 0, errOpNoSupport
 }

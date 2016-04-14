@@ -9,5 +9,5 @@ package google
 import "google.golang.org/appengine"
 
 func init() {
-	appengineTokenFunc = appengine.AccessToken
+    appengineTokenFunc = appengine.AccessToken
 }

@@ -9,13 +9,13 @@ package ipv4
 import "net"
 
 func setsockoptIPMreq(fd, name int, ifi *net.Interface, grp net.IP) error {
-	return errOpNoSupport
+    return errOpNoSupport
 }
 
 func getsockoptInterface(fd, name int) (*net.Interface, error) {
-	return nil, errOpNoSupport
+    return nil, errOpNoSupport
 }
 
 func setsockoptInterface(fd, name int, ifi *net.Interface) error {
-	return errOpNoSupport
+    return errOpNoSupport
 }

@@ -17,10 +17,10 @@
 package spew
 
 import (
-	"bytes"
-	"fmt"
-	"io"
-	"os"
+    "bytes"
+    "fmt"
+    "io"
+    "os"
 )
 
 // ConfigState houses the configuration options used by spew to format and
@@ -35,60 +35,60 @@ import (
 // with default settings.  See the documentation of NewDefaultConfig for default
 // values.
 type ConfigState struct {
-	// Indent specifies the string to use for each indentation level.  The
-	// global config instance that all top-level functions use set this to a
-	// single space by default.  If you would like more indentation, you might
-	// set this to a tab with "\t" or perhaps two spaces with "  ".
-	Indent string
+    // Indent specifies the string to use for each indentation level.  The
+    // global config instance that all top-level functions use set this to a
+    // single space by default.  If you would like more indentation, you might
+    // set this to a tab with "\t" or perhaps two spaces with "  ".
+    Indent                string
 
-	// MaxDepth controls the maximum number of levels to descend into nested
-	// data structures.  The default, 0, means there is no limit.
-	//
-	// NOTE: Circular data structures are properly detected, so it is not
-	// necessary to set this value unless you specifically want to limit deeply
-	// nested data structures.
-	MaxDepth int
+    // MaxDepth controls the maximum number of levels to descend into nested
+    // data structures.  The default, 0, means there is no limit.
+    //
+    // NOTE: Circular data structures are properly detected, so it is not
+    // necessary to set this value unless you specifically want to limit deeply
+    // nested data structures.
+    MaxDepth              int
 
-	// DisableMethods specifies whether or not error and Stringer interfaces are
-	// invoked for types that implement them.
-	DisableMethods bool
+    // DisableMethods specifies whether or not error and Stringer interfaces are
+    // invoked for types that implement them.
+    DisableMethods        bool
 
-	// DisablePointerMethods specifies whether or not to check for and invoke
-	// error and Stringer interfaces on types which only accept a pointer
-	// receiver when the current type is not a pointer.
-	//
-	// NOTE: This might be an unsafe action since calling one of these methods
-	// with a pointer receiver could technically mutate the value, however,
-	// in practice, types which choose to satisify an error or Stringer
-	// interface with a pointer receiver should not be mutating their state
-	// inside these interface methods.  As a result, this option relies on
-	// access to the unsafe package, so it will not have any effect when
-	// running in environments without access to the unsafe package such as
-	// Google App Engine or with the "disableunsafe" build tag specified.
-	DisablePointerMethods bool
+    // DisablePointerMethods specifies whether or not to check for and invoke
+    // error and Stringer interfaces on types which only accept a pointer
+    // receiver when the current type is not a pointer.
+    //
+    // NOTE: This might be an unsafe action since calling one of these methods
+    // with a pointer receiver could technically mutate the value, however,
+    // in practice, types which choose to satisify an error or Stringer
+    // interface with a pointer receiver should not be mutating their state
+    // inside these interface methods.  As a result, this option relies on
+    // access to the unsafe package, so it will not have any effect when
+    // running in environments without access to the unsafe package such as
+    // Google App Engine or with the "disableunsafe" build tag specified.
+    DisablePointerMethods bool
 
-	// ContinueOnMethod specifies whether or not recursion should continue once
-	// a custom error or Stringer interface is invoked.  The default, false,
-	// means it will print the results of invoking the custom error or Stringer
-	// interface and return immediately instead of continuing to recurse into
-	// the internals of the data type.
-	//
-	// NOTE: This flag does not have any effect if method invocation is disabled
-	// via the DisableMethods or DisablePointerMethods options.
-	ContinueOnMethod bool
+    // ContinueOnMethod specifies whether or not recursion should continue once
+    // a custom error or Stringer interface is invoked.  The default, false,
+    // means it will print the results of invoking the custom error or Stringer
+    // interface and return immediately instead of continuing to recurse into
+    // the internals of the data type.
+    //
+    // NOTE: This flag does not have any effect if method invocation is disabled
+    // via the DisableMethods or DisablePointerMethods options.
+    ContinueOnMethod      bool
 
-	// SortKeys specifies map keys should be sorted before being printed. Use
-	// this to have a more deterministic, diffable output.  Note that only
-	// native types (bool, int, uint, floats, uintptr and string) and types
-	// that support the error or Stringer interfaces (if methods are
-	// enabled) are supported, with other types sorted according to the
-	// reflect.Value.String() output which guarantees display stability.
-	SortKeys bool
+    // SortKeys specifies map keys should be sorted before being printed. Use
+    // this to have a more deterministic, diffable output.  Note that only
+    // native types (bool, int, uint, floats, uintptr and string) and types
+    // that support the error or Stringer interfaces (if methods are
+    // enabled) are supported, with other types sorted according to the
+    // reflect.Value.String() output which guarantees display stability.
+    SortKeys              bool
 
-	// SpewKeys specifies that, as a last resort attempt, map keys should
-	// be spewed to strings and sorted by those strings.  This is only
-	// considered if SortKeys is true.
-	SpewKeys bool
+    // SpewKeys specifies that, as a last resort attempt, map keys should
+    // be spewed to strings and sorted by those strings.  This is only
+    // considered if SortKeys is true.
+    SpewKeys              bool
 }
 
 // Config is the active configuration of the top-level functions.
@@ -104,7 +104,7 @@ var Config = ConfigState{Indent: " "}
 //
 //	fmt.Errorf(format, c.NewFormatter(a), c.NewFormatter(b))
 func (c *ConfigState) Errorf(format string, a ...interface{}) (err error) {
-	return fmt.Errorf(format, c.convertArgs(a)...)
+    return fmt.Errorf(format, c.convertArgs(a)...)
 }
 
 // Fprint is a wrapper for fmt.Fprint that treats each argument as if it were
@@ -116,7 +116,7 @@ func (c *ConfigState) Errorf(format string, a ...interface{}) (err error) {
 //
 //	fmt.Fprint(w, c.NewFormatter(a), c.NewFormatter(b))
 func (c *ConfigState) Fprint(w io.Writer, a ...interface{}) (n int, err error) {
-	return fmt.Fprint(w, c.convertArgs(a)...)
+    return fmt.Fprint(w, c.convertArgs(a)...)
 }
 
 // Fprintf is a wrapper for fmt.Fprintf that treats each argument as if it were
@@ -128,7 +128,7 @@ func (c *ConfigState) Fprint(w io.Writer, a ...interface{}) (n int, err error) {
 //
 //	fmt.Fprintf(w, format, c.NewFormatter(a), c.NewFormatter(b))
 func (c *ConfigState) Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
-	return fmt.Fprintf(w, format, c.convertArgs(a)...)
+    return fmt.Fprintf(w, format, c.convertArgs(a)...)
 }
 
 // Fprintln is a wrapper for fmt.Fprintln that treats each argument as if it
@@ -139,7 +139,7 @@ func (c *ConfigState) Fprintf(w io.Writer, format string, a ...interface{}) (n i
 //
 //	fmt.Fprintln(w, c.NewFormatter(a), c.NewFormatter(b))
 func (c *ConfigState) Fprintln(w io.Writer, a ...interface{}) (n int, err error) {
-	return fmt.Fprintln(w, c.convertArgs(a)...)
+    return fmt.Fprintln(w, c.convertArgs(a)...)
 }
 
 // Print is a wrapper for fmt.Print that treats each argument as if it were
@@ -151,7 +151,7 @@ func (c *ConfigState) Fprintln(w io.Writer, a ...interface{}) (n int, err error)
 //
 //	fmt.Print(c.NewFormatter(a), c.NewFormatter(b))
 func (c *ConfigState) Print(a ...interface{}) (n int, err error) {
-	return fmt.Print(c.convertArgs(a)...)
+    return fmt.Print(c.convertArgs(a)...)
 }
 
 // Printf is a wrapper for fmt.Printf that treats each argument as if it were
@@ -163,7 +163,7 @@ func (c *ConfigState) Print(a ...interface{}) (n int, err error) {
 //
 //	fmt.Printf(format, c.NewFormatter(a), c.NewFormatter(b))
 func (c *ConfigState) Printf(format string, a ...interface{}) (n int, err error) {
-	return fmt.Printf(format, c.convertArgs(a)...)
+    return fmt.Printf(format, c.convertArgs(a)...)
 }
 
 // Println is a wrapper for fmt.Println that treats each argument as if it were
@@ -175,7 +175,7 @@ func (c *ConfigState) Printf(format string, a ...interface{}) (n int, err error)
 //
 //	fmt.Println(c.NewFormatter(a), c.NewFormatter(b))
 func (c *ConfigState) Println(a ...interface{}) (n int, err error) {
-	return fmt.Println(c.convertArgs(a)...)
+    return fmt.Println(c.convertArgs(a)...)
 }
 
 // Sprint is a wrapper for fmt.Sprint that treats each argument as if it were
@@ -186,7 +186,7 @@ func (c *ConfigState) Println(a ...interface{}) (n int, err error) {
 //
 //	fmt.Sprint(c.NewFormatter(a), c.NewFormatter(b))
 func (c *ConfigState) Sprint(a ...interface{}) string {
-	return fmt.Sprint(c.convertArgs(a)...)
+    return fmt.Sprint(c.convertArgs(a)...)
 }
 
 // Sprintf is a wrapper for fmt.Sprintf that treats each argument as if it were
@@ -197,7 +197,7 @@ func (c *ConfigState) Sprint(a ...interface{}) string {
 //
 //	fmt.Sprintf(format, c.NewFormatter(a), c.NewFormatter(b))
 func (c *ConfigState) Sprintf(format string, a ...interface{}) string {
-	return fmt.Sprintf(format, c.convertArgs(a)...)
+    return fmt.Sprintf(format, c.convertArgs(a)...)
 }
 
 // Sprintln is a wrapper for fmt.Sprintln that treats each argument as if it
@@ -208,7 +208,7 @@ func (c *ConfigState) Sprintf(format string, a ...interface{}) string {
 //
 //	fmt.Sprintln(c.NewFormatter(a), c.NewFormatter(b))
 func (c *ConfigState) Sprintln(a ...interface{}) string {
-	return fmt.Sprintln(c.convertArgs(a)...)
+    return fmt.Sprintln(c.convertArgs(a)...)
 }
 
 /*
@@ -229,13 +229,13 @@ use of the custom formatter by calling one of the convenience functions such as
 c.Printf, c.Println, or c.Printf.
 */
 func (c *ConfigState) NewFormatter(v interface{}) fmt.Formatter {
-	return newFormatter(c, v)
+    return newFormatter(c, v)
 }
 
 // Fdump formats and displays the passed arguments to io.Writer w.  It formats
 // exactly the same as Dump.
 func (c *ConfigState) Fdump(w io.Writer, a ...interface{}) {
-	fdump(c, w, a...)
+    fdump(c, w, a...)
 }
 
 /*
@@ -262,26 +262,26 @@ See Fdump if you would prefer dumping to an arbitrary io.Writer or Sdump to
 get the formatted result as a string.
 */
 func (c *ConfigState) Dump(a ...interface{}) {
-	fdump(c, os.Stdout, a...)
+    fdump(c, os.Stdout, a...)
 }
 
 // Sdump returns a string with the passed arguments formatted exactly the same
 // as Dump.
 func (c *ConfigState) Sdump(a ...interface{}) string {
-	var buf bytes.Buffer
-	fdump(c, &buf, a...)
-	return buf.String()
+    var buf bytes.Buffer
+    fdump(c, &buf, a...)
+    return buf.String()
 }
 
 // convertArgs accepts a slice of arguments and returns a slice of the same
 // length with each argument converted to a spew Formatter interface using
 // the ConfigState associated with s.
 func (c *ConfigState) convertArgs(args []interface{}) (formatters []interface{}) {
-	formatters = make([]interface{}, len(args))
-	for index, arg := range args {
-		formatters[index] = newFormatter(c, arg)
-	}
-	return formatters
+    formatters = make([]interface{}, len(args))
+    for index, arg := range args {
+        formatters[index] = newFormatter(c, arg)
+    }
+    return formatters
 }
 
 // NewDefaultConfig returns a ConfigState with the following default settings.
@@ -293,5 +293,5 @@ func (c *ConfigState) convertArgs(args []interface{}) (formatters []interface{})
 // 	ContinueOnMethod: false
 // 	SortKeys: false
 func NewDefaultConfig() *ConfigState {
-	return &ConfigState{Indent: " "}
+    return &ConfigState{Indent: " "}
 }

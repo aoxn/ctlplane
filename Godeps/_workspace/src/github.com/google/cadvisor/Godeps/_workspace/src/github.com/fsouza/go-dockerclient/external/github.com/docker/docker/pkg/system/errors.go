@@ -1,9 +1,9 @@
 package system
 
 import (
-	"errors"
+    "errors"
 )
 
 var (
-	ErrNotSupportedPlatform = errors.New("platform and architecture is not supported")
+    ErrNotSupportedPlatform = errors.New("platform and architecture is not supported")
 )

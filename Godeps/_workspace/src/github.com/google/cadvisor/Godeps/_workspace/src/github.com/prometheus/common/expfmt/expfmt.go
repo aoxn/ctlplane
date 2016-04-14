@@ -17,24 +17,24 @@ package expfmt
 type Format string
 
 const (
-	TextVersion = "0.0.4"
+    TextVersion = "0.0.4"
 
-	ProtoType     = `application/vnd.google.protobuf`
-	ProtoProtocol = `io.prometheus.client.MetricFamily`
-	ProtoFmt      = ProtoType + "; proto=" + ProtoProtocol + ";"
+    ProtoType = `application/vnd.google.protobuf`
+    ProtoProtocol = `io.prometheus.client.MetricFamily`
+    ProtoFmt = ProtoType + "; proto=" + ProtoProtocol + ";"
 
-	// The Content-Type values for the different wire protocols.
-	FmtUnknown      Format = `<unknown>`
-	FmtText         Format = `text/plain; version=` + TextVersion
-	FmtProtoDelim   Format = ProtoFmt + ` encoding=delimited`
-	FmtProtoText    Format = ProtoFmt + ` encoding=text`
-	FmtProtoCompact Format = ProtoFmt + ` encoding=compact-text`
+// The Content-Type values for the different wire protocols.
+    FmtUnknown Format = `<unknown>`
+    FmtText Format = `text/plain; version=` + TextVersion
+    FmtProtoDelim Format = ProtoFmt + ` encoding=delimited`
+    FmtProtoText Format = ProtoFmt + ` encoding=text`
+    FmtProtoCompact Format = ProtoFmt + ` encoding=compact-text`
 
-	// fmtJSON2 is hidden as it is deprecated.
-	fmtJSON2 Format = `application/json; version=0.0.2`
+// fmtJSON2 is hidden as it is deprecated.
+    fmtJSON2 Format = `application/json; version=0.0.2`
 )
 
 const (
-	hdrContentType = "Content-Type"
-	hdrAccept      = "Accept"
+    hdrContentType = "Content-Type"
+    hdrAccept = "Accept"
 )

@@ -24,31 +24,31 @@ package salsa20 // import "golang.org/x/crypto/salsa20"
 // TODO(agl): implement XORKeyStream12 and XORKeyStream8 - the reduced round variants of Salsa20.
 
 import (
-	"golang.org/x/crypto/salsa20/salsa"
+    "golang.org/x/crypto/salsa20/salsa"
 )
 
 // XORKeyStream crypts bytes from in to out using the given key and nonce. In
 // and out may be the same slice but otherwise should not overlap. Nonce must
 // be either 8 or 24 bytes long.
 func XORKeyStream(out, in []byte, nonce []byte, key *[32]byte) {
-	if len(out) < len(in) {
-		in = in[:len(out)]
-	}
+    if len(out) < len(in) {
+        in = in[:len(out)]
+    }
 
-	var subNonce [16]byte
+    var subNonce [16]byte
 
-	if len(nonce) == 24 {
-		var subKey [32]byte
-		var hNonce [16]byte
-		copy(hNonce[:], nonce[:16])
-		salsa.HSalsa20(&subKey, &hNonce, key, &salsa.Sigma)
-		copy(subNonce[:], nonce[16:])
-		key = &subKey
-	} else if len(nonce) == 8 {
-		copy(subNonce[:], nonce[:])
-	} else {
-		panic("salsa20: nonce must be 8 or 24 bytes")
-	}
+    if len(nonce) == 24 {
+        var subKey [32]byte
+        var hNonce [16]byte
+        copy(hNonce[:], nonce[:16])
+        salsa.HSalsa20(&subKey, &hNonce, key, &salsa.Sigma)
+        copy(subNonce[:], nonce[16:])
+        key = &subKey
+    } else if len(nonce) == 8 {
+        copy(subNonce[:], nonce[:])
+    } else {
+        panic("salsa20: nonce must be 8 or 24 bytes")
+    }
 
-	salsa.XORKeyStream(out, in, &subNonce, key)
+    salsa.XORKeyStream(out, in, &subNonce, key)
 }

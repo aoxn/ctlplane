@@ -14,9 +14,9 @@
 package model
 
 import (
-	"fmt"
-	"sort"
-	"strings"
+    "fmt"
+    "sort"
+    "strings"
 )
 
 var separator = []byte{0}
@@ -27,55 +27,55 @@ type Metric LabelSet
 
 // Equal compares the metrics.
 func (m Metric) Equal(o Metric) bool {
-	return LabelSet(m).Equal(LabelSet(o))
+    return LabelSet(m).Equal(LabelSet(o))
 }
 
 // Before compares the metrics' underlying label sets.
 func (m Metric) Before(o Metric) bool {
-	return LabelSet(m).Before(LabelSet(o))
+    return LabelSet(m).Before(LabelSet(o))
 }
 
 // Clone returns a copy of the Metric.
 func (m Metric) Clone() Metric {
-	clone := Metric{}
-	for k, v := range m {
-		clone[k] = v
-	}
-	return clone
+    clone := Metric{}
+    for k, v := range m {
+        clone[k] = v
+    }
+    return clone
 }
 
 func (m Metric) String() string {
-	metricName, hasName := m[MetricNameLabel]
-	numLabels := len(m) - 1
-	if !hasName {
-		numLabels = len(m)
-	}
-	labelStrings := make([]string, 0, numLabels)
-	for label, value := range m {
-		if label != MetricNameLabel {
-			labelStrings = append(labelStrings, fmt.Sprintf("%s=%q", label, value))
-		}
-	}
+    metricName, hasName := m[MetricNameLabel]
+    numLabels := len(m) - 1
+    if !hasName {
+        numLabels = len(m)
+    }
+    labelStrings := make([]string, 0, numLabels)
+    for label, value := range m {
+        if label != MetricNameLabel {
+            labelStrings = append(labelStrings, fmt.Sprintf("%s=%q", label, value))
+        }
+    }
 
-	switch numLabels {
-	case 0:
-		if hasName {
-			return string(metricName)
-		}
-		return "{}"
-	default:
-		sort.Strings(labelStrings)
-		return fmt.Sprintf("%s{%s}", metricName, strings.Join(labelStrings, ", "))
-	}
+    switch numLabels {
+    case 0:
+        if hasName {
+            return string(metricName)
+        }
+        return "{}"
+    default:
+        sort.Strings(labelStrings)
+        return fmt.Sprintf("%s{%s}", metricName, strings.Join(labelStrings, ", "))
+    }
 }
 
 // Fingerprint returns a Metric's Fingerprint.
 func (m Metric) Fingerprint() Fingerprint {
-	return LabelSet(m).Fingerprint()
+    return LabelSet(m).Fingerprint()
 }
 
 // FastFingerprint returns a Metric's Fingerprint calculated by a faster hashing
 // algorithm, which is, however, more susceptible to hash collisions.
 func (m Metric) FastFingerprint() Fingerprint {
-	return LabelSet(m).FastFingerprint()
+    return LabelSet(m).FastFingerprint()
 }

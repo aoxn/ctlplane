@@ -7,5 +7,5 @@
 package nettest
 
 func protocolNotSupported(err error) bool {
-	return false
+    return false
 }

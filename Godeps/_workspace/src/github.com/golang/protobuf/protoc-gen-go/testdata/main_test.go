@@ -34,13 +34,13 @@
 package testdata
 
 import (
-	"testing"
+    "testing"
 
-	mytestpb "./my_test"
-	multipb "github.com/golang/protobuf/protoc-gen-go/testdata/multi"
+    mytestpb "./my_test"
+    multipb "github.com/golang/protobuf/protoc-gen-go/testdata/multi"
 )
 
 func TestLink(t *testing.T) {
-	_ = &multipb.Multi1{}
-	_ = &mytestpb.Request{}
+    _ = &multipb.Multi1{}
+    _ = &mytestpb.Request{}
 }

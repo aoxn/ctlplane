@@ -6,4 +6,6 @@
 
 package nettest
 
-func maxOpenFiles() int { return defaultMaxOpenFiles }
+func maxOpenFiles() int {
+    return defaultMaxOpenFiles
+}

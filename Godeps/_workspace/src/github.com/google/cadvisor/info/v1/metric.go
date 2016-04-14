@@ -15,65 +15,65 @@
 package v1
 
 import (
-	"time"
+    "time"
 )
 
 // Type of metric being exported.
 type MetricType string
 
 const (
-	// Instantaneous value. May increase or decrease.
-	MetricGauge MetricType = "gauge"
+// Instantaneous value. May increase or decrease.
+    MetricGauge MetricType = "gauge"
 
-	// A counter-like value that is only expected to increase.
-	MetricCumulative = "cumulative"
+// A counter-like value that is only expected to increase.
+    MetricCumulative = "cumulative"
 
-	// Rate over a time period.
-	MetricDelta = "delta"
+// Rate over a time period.
+    MetricDelta = "delta"
 )
 
 // DataType for metric being exported.
 type DataType string
 
 const (
-	IntType   DataType = "int"
-	FloatType          = "float"
+    IntType DataType = "int"
+    FloatType = "float"
 )
 
 // Spec for custom metric.
 type MetricSpec struct {
-	// The name of the metric.
-	Name string `json:"name"`
+    // The name of the metric.
+    Name   string `json:"name"`
 
-	// Type of the metric.
-	Type MetricType `json:"type"`
+    // Type of the metric.
+    Type   MetricType `json:"type"`
 
-	// Data Type for the stats.
-	Format DataType `json:"format"`
+    // Data Type for the stats.
+    Format DataType `json:"format"`
 
-	// Display Units for the stats.
-	Units string `json:"units"`
+    // Display Units for the stats.
+    Units  string `json:"units"`
 }
 
 // An exported metric.
 type MetricValBasic struct {
-	// Time at which the metric was queried
-	Timestamp time.Time `json:"timestamp"`
+    // Time at which the metric was queried
+    Timestamp  time.Time `json:"timestamp"`
 
-	// The value of the metric at this point.
-	IntValue   int64   `json:"int_value,omitempty"`
-	FloatValue float64 `json:"float_value,omitempty"`
+    // The value of the metric at this point.
+    IntValue   int64   `json:"int_value,omitempty"`
+    FloatValue float64 `json:"float_value,omitempty"`
 }
 
 // An exported metric.
 type MetricVal struct {
-	// Label associated with a metric
-	Label string `json:"label,omitempty"`
+    // Label associated with a metric
+    Label      string `json:"label,omitempty"`
 
-	// Time at which the metric was queried
-	Timestamp time.Time `json:"timestamp"`
+    // Time at which the metric was queried
+    Timestamp  time.Time `json:"timestamp"`
 
-	// The value of the metric at this point.
-	IntValue   int64   `json:"int_value,omitempty"`
-	FloatValue float64 `json:"float_value,omitempty"`
+    // The value of the metric at this point.
+    IntValue   int64   `json:"int_value,omitempty"`
+    FloatValue float64 `json:"float_value,omitempty"`
 }

@@ -15,12 +15,12 @@
 package mux
 
 import (
-	"net/http"
+    "net/http"
 )
 
 // Mux interface expected by cAdvisor components.
 type Mux interface {
-	HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request))
-	Handler(r *http.Request) (http.Handler, string)
-	Handle(pattern string, handler http.Handler)
+    HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request))
+    Handler(r *http.Request) (http.Handler, string)
+    Handle(pattern string, handler http.Handler)
 }

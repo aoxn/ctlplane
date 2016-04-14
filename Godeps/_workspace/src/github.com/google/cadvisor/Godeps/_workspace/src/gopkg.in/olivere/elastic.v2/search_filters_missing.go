@@ -8,52 +8,52 @@ package elastic
 // For details, see:
 // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-missing-filter.html
 type MissingFilter struct {
-	Filter
-	name       string
-	filterName string
-	nullValue  *bool
-	existence  *bool
+    Filter
+    name       string
+    filterName string
+    nullValue  *bool
+    existence  *bool
 }
 
 func NewMissingFilter(name string) MissingFilter {
-	f := MissingFilter{name: name}
-	return f
+    f := MissingFilter{name: name}
+    return f
 }
 
 func (f MissingFilter) FilterName(filterName string) MissingFilter {
-	f.filterName = filterName
-	return f
+    f.filterName = filterName
+    return f
 }
 
 func (f MissingFilter) NullValue(nullValue bool) MissingFilter {
-	f.nullValue = &nullValue
-	return f
+    f.nullValue = &nullValue
+    return f
 }
 
 func (f MissingFilter) Existence(existence bool) MissingFilter {
-	f.existence = &existence
-	return f
+    f.existence = &existence
+    return f
 }
 
 func (f MissingFilter) Source() interface{} {
-	// {
-	//   "missing" : {
-	//     "field" : "..."
-	//   }
-	// }
+    // {
+    //   "missing" : {
+    //     "field" : "..."
+    //   }
+    // }
 
-	source := make(map[string]interface{})
-	params := make(map[string]interface{})
-	source["missing"] = params
-	params["field"] = f.name
-	if f.nullValue != nil {
-		params["null_value"] = *f.nullValue
-	}
-	if f.existence != nil {
-		params["existence"] = *f.existence
-	}
-	if f.filterName != "" {
-		params["_name"] = f.filterName
-	}
-	return source
+    source := make(map[string]interface{})
+    params := make(map[string]interface{})
+    source["missing"] = params
+    params["field"] = f.name
+    if f.nullValue != nil {
+        params["null_value"] = *f.nullValue
+    }
+    if f.existence != nil {
+        params["existence"] = *f.existence
+    }
+    if f.filterName != "" {
+        params["_name"] = f.filterName
+    }
+    return source
 }

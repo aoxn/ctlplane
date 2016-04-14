@@ -8,14 +8,14 @@
 package logrus
 
 import (
-	"syscall"
-	"unsafe"
+    "syscall"
+    "unsafe"
 )
 
 // IsTerminal returns true if the given file descriptor is a terminal.
 func IsTerminal() bool {
-	fd := syscall.Stdout
-	var termios Termios
-	_, _, err := syscall.Syscall6(syscall.SYS_IOCTL, uintptr(fd), ioctlReadTermios, uintptr(unsafe.Pointer(&termios)), 0, 0, 0)
-	return err == 0
+    fd := syscall.Stdout
+    var termios Termios
+    _, _, err := syscall.Syscall6(syscall.SYS_IOCTL, uintptr(fd), ioctlReadTermios, uintptr(unsafe.Pointer(&termios)), 0, 0, 0)
+    return err == 0
 }

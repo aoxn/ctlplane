@@ -14,26 +14,26 @@
 package cmd
 
 import (
-	"fmt"
-	"path/filepath"
-	"strings"
+    "fmt"
+    "path/filepath"
+    "strings"
 
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+    "github.com/spf13/cobra"
+    "github.com/spf13/viper"
 )
 
 func init() {
-	RootCmd.AddCommand(addCmd)
+    RootCmd.AddCommand(addCmd)
 }
 
 var pName string
 
 // initialize Command
 var addCmd = &cobra.Command{
-	Use:     "add [command name]",
-	Aliases: []string{"command"},
-	Short:   "Add a command to a Cobra Application",
-	Long: `Add (cobra add) will create a new command, with a license and
+    Use:     "add [command name]",
+    Aliases: []string{"command"},
+    Short:   "Add a command to a Cobra Application",
+    Long: `Add (cobra add) will create a new command, with a license and
 the appropriate structure for a Cobra-based CLI application,
 and register it to its parent (default RootCmd).
 
@@ -43,31 +43,31 @@ with an initial uppercase letter.
 Example: cobra add server  -> resulting in a new cmd/server.go
   `,
 
-	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) != 1 {
-			er("add needs a name for the command")
-		}
-		guessProjectPath()
-		createCmdFile(args[0])
-	},
+    Run: func(cmd *cobra.Command, args []string) {
+        if len(args) != 1 {
+            er("add needs a name for the command")
+        }
+        guessProjectPath()
+        createCmdFile(args[0])
+    },
 }
 
 func init() {
-	addCmd.Flags().StringVarP(&pName, "parent", "p", "RootCmd", "name of parent command for this command")
+    addCmd.Flags().StringVarP(&pName, "parent", "p", "RootCmd", "name of parent command for this command")
 }
 
 func parentName() string {
-	if !strings.HasSuffix(strings.ToLower(pName), "cmd") {
-		return pName + "Cmd"
-	}
+    if !strings.HasSuffix(strings.ToLower(pName), "cmd") {
+        return pName + "Cmd"
+    }
 
-	return pName
+    return pName
 }
 
 func createCmdFile(cmdName string) {
-	lic := getLicense()
+    lic := getLicense()
 
-	template := `{{ comment .copyright }}
+    template := `{{ comment .copyright }}
 {{ comment .license }}
 
 package cmd
@@ -110,19 +110,19 @@ func init() {
 }
 `
 
-	var data map[string]interface{}
-	data = make(map[string]interface{})
+    var data map[string]interface{}
+    data = make(map[string]interface{})
 
-	data["copyright"] = copyrightLine()
-	data["license"] = lic.Header
-	data["appName"] = projectName()
-	data["viper"] = viper.GetBool("useViper")
-	data["parentName"] = parentName()
-	data["cmdName"] = cmdName
+    data["copyright"] = copyrightLine()
+    data["license"] = lic.Header
+    data["appName"] = projectName()
+    data["viper"] = viper.GetBool("useViper")
+    data["parentName"] = parentName()
+    data["cmdName"] = cmdName
 
-	err := writeTemplateToFile(filepath.Join(ProjectPath(), guessCmdDir()), cmdName+".go", template, data)
-	if err != nil {
-		er(err)
-	}
-	fmt.Println(cmdName, "created at", filepath.Join(ProjectPath(), guessCmdDir(), cmdName+".go"))
+    err := writeTemplateToFile(filepath.Join(ProjectPath(), guessCmdDir()), cmdName + ".go", template, data)
+    if err != nil {
+        er(err)
+    }
+    fmt.Println(cmdName, "created at", filepath.Join(ProjectPath(), guessCmdDir(), cmdName + ".go"))
 }

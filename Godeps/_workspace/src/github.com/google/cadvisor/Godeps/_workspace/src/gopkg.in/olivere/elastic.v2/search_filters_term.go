@@ -8,59 +8,59 @@ package elastic
 // a term (not analyzed). For details, see:
 // http://www.elasticsearch.org/guide/reference/query-dsl/term-filter.html
 type TermFilter struct {
-	Filter
-	name       string
-	value      interface{}
-	cache      *bool
-	cacheKey   string
-	filterName string
+    Filter
+    name       string
+    value      interface{}
+    cache      *bool
+    cacheKey   string
+    filterName string
 }
 
 func NewTermFilter(name string, value interface{}) TermFilter {
-	f := TermFilter{name: name, value: value}
-	return f
+    f := TermFilter{name: name, value: value}
+    return f
 }
 
 func (f TermFilter) Cache(cache bool) TermFilter {
-	f.cache = &cache
-	return f
+    f.cache = &cache
+    return f
 }
 
 func (f TermFilter) CacheKey(cacheKey string) TermFilter {
-	f.cacheKey = cacheKey
-	return f
+    f.cacheKey = cacheKey
+    return f
 }
 
 func (f TermFilter) FilterName(filterName string) TermFilter {
-	f.filterName = filterName
-	return f
+    f.filterName = filterName
+    return f
 }
 
 func (f TermFilter) Source() interface{} {
-	// {
-	//   "term" : {
-	//     "..." : "..."
-	//   }
-	// }
+    // {
+    //   "term" : {
+    //     "..." : "..."
+    //   }
+    // }
 
-	source := make(map[string]interface{})
+    source := make(map[string]interface{})
 
-	params := make(map[string]interface{})
-	source["term"] = params
+    params := make(map[string]interface{})
+    source["term"] = params
 
-	params[f.name] = f.value
+    params[f.name] = f.value
 
-	if f.filterName != "" {
-		params["_name"] = f.filterName
-	}
+    if f.filterName != "" {
+        params["_name"] = f.filterName
+    }
 
-	if f.cache != nil {
-		params["_cache"] = *f.cache
-	}
+    if f.cache != nil {
+        params["_cache"] = *f.cache
+    }
 
-	if f.cacheKey != "" {
-		params["_cache_key"] = f.cacheKey
-	}
+    if f.cacheKey != "" {
+        params["_cache_key"] = f.cacheKey
+    }
 
-	return source
+    return source
 }

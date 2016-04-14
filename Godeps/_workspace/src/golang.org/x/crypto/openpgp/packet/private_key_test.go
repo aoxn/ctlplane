@@ -5,60 +5,60 @@
 package packet
 
 import (
-	"testing"
-	"time"
+    "testing"
+    "time"
 )
 
 var privateKeyTests = []struct {
-	privateKeyHex string
-	creationTime  time.Time
+    privateKeyHex string
+    creationTime  time.Time
 }{
-	{
-		privKeyRSAHex,
-		time.Unix(0x4cc349a8, 0),
-	},
-	{
-		privKeyElGamalHex,
-		time.Unix(0x4df9ee1a, 0),
-	},
+    {
+        privKeyRSAHex,
+        time.Unix(0x4cc349a8, 0),
+    },
+    {
+        privKeyElGamalHex,
+        time.Unix(0x4df9ee1a, 0),
+    },
 }
 
 func TestPrivateKeyRead(t *testing.T) {
-	for i, test := range privateKeyTests {
-		packet, err := Read(readerFromHex(test.privateKeyHex))
-		if err != nil {
-			t.Errorf("#%d: failed to parse: %s", i, err)
-			continue
-		}
+    for i, test := range privateKeyTests {
+        packet, err := Read(readerFromHex(test.privateKeyHex))
+        if err != nil {
+            t.Errorf("#%d: failed to parse: %s", i, err)
+            continue
+        }
 
-		privKey := packet.(*PrivateKey)
+        privKey := packet.(*PrivateKey)
 
-		if !privKey.Encrypted {
-			t.Errorf("#%d: private key isn't encrypted", i)
-			continue
-		}
+        if !privKey.Encrypted {
+            t.Errorf("#%d: private key isn't encrypted", i)
+            continue
+        }
 
-		err = privKey.Decrypt([]byte("wrong password"))
-		if err == nil {
-			t.Errorf("#%d: decrypted with incorrect key", i)
-			continue
-		}
+        err = privKey.Decrypt([]byte("wrong password"))
+        if err == nil {
+            t.Errorf("#%d: decrypted with incorrect key", i)
+            continue
+        }
 
-		err = privKey.Decrypt([]byte("testing"))
-		if err != nil {
-			t.Errorf("#%d: failed to decrypt: %s", i, err)
-			continue
-		}
+        err = privKey.Decrypt([]byte("testing"))
+        if err != nil {
+            t.Errorf("#%d: failed to decrypt: %s", i, err)
+            continue
+        }
 
-		if !privKey.CreationTime.Equal(test.creationTime) || privKey.Encrypted {
-			t.Errorf("#%d: bad result, got: %#v", i, privKey)
-		}
-	}
+        if !privKey.CreationTime.Equal(test.creationTime) || privKey.Encrypted {
+            t.Errorf("#%d: bad result, got: %#v", i, privKey)
+        }
+    }
 }
 
 func TestIssue11505(t *testing.T) {
-	// parsing a rsa private key with p or q == 1 used to panic due to a divide by zero
-	_, _ = Read(readerFromHex("9c3004303030300100000011303030000000000000010130303030303030303030303030303030303030303030303030303030303030303030303030303030303030"))
+    // parsing a rsa private key with p or q == 1 used to panic due to a divide by zero
+    _, _ = Read(readerFromHex("9c3004303030300100000011303030000000000000010130303030303030303030303030303030303030303030303030303030303030303030303030303030303030"))
 }
 
 // Generated with `gpg --export-secret-keys "Test Key 2"`

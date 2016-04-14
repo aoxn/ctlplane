@@ -14,105 +14,105 @@
 package model
 
 import (
-	"strings"
-	"testing"
-	"time"
+    "strings"
+    "testing"
+    "time"
 )
 
 func TestAlertValidate(t *testing.T) {
-	ts := time.Now()
+    ts := time.Now()
 
-	var cases = []struct {
-		alert *Alert
-		err   string
-	}{
-		{
-			alert: &Alert{
-				Labels:   LabelSet{"a": "b"},
-				StartsAt: ts,
-			},
-		},
-		{
-			alert: &Alert{
-				Labels: LabelSet{"a": "b"},
-			},
-			err: "start time missing",
-		},
-		{
-			alert: &Alert{
-				Labels:   LabelSet{"a": "b"},
-				StartsAt: ts,
-				EndsAt:   ts,
-			},
-		},
-		{
-			alert: &Alert{
-				Labels:   LabelSet{"a": "b"},
-				StartsAt: ts,
-				EndsAt:   ts.Add(1 * time.Minute),
-			},
-		},
-		{
-			alert: &Alert{
-				Labels:   LabelSet{"a": "b"},
-				StartsAt: ts,
-				EndsAt:   ts.Add(-1 * time.Minute),
-			},
-			err: "start time must be before end time",
-		},
-		{
-			alert: &Alert{
-				StartsAt: ts,
-			},
-			err: "at least one label pair required",
-		},
-		{
-			alert: &Alert{
-				Labels:   LabelSet{"a": "b", "!bad": "label"},
-				StartsAt: ts,
-			},
-			err: "invalid label set: invalid name",
-		},
-		{
-			alert: &Alert{
-				Labels:   LabelSet{"a": "b", "bad": "\xfflabel"},
-				StartsAt: ts,
-			},
-			err: "invalid label set: invalid value",
-		},
-		{
-			alert: &Alert{
-				Labels:      LabelSet{"a": "b"},
-				Annotations: LabelSet{"!bad": "label"},
-				StartsAt:    ts,
-			},
-			err: "invalid annotations: invalid name",
-		},
-		{
-			alert: &Alert{
-				Labels:      LabelSet{"a": "b"},
-				Annotations: LabelSet{"bad": "\xfflabel"},
-				StartsAt:    ts,
-			},
-			err: "invalid annotations: invalid value",
-		},
-	}
+    var cases = []struct {
+        alert *Alert
+        err   string
+    }{
+        {
+            alert: &Alert{
+                Labels:   LabelSet{"a": "b"},
+                StartsAt: ts,
+            },
+        },
+        {
+            alert: &Alert{
+                Labels: LabelSet{"a": "b"},
+            },
+            err: "start time missing",
+        },
+        {
+            alert: &Alert{
+                Labels:   LabelSet{"a": "b"},
+                StartsAt: ts,
+                EndsAt:   ts,
+            },
+        },
+        {
+            alert: &Alert{
+                Labels:   LabelSet{"a": "b"},
+                StartsAt: ts,
+                EndsAt:   ts.Add(1 * time.Minute),
+            },
+        },
+        {
+            alert: &Alert{
+                Labels:   LabelSet{"a": "b"},
+                StartsAt: ts,
+                EndsAt:   ts.Add(-1 * time.Minute),
+            },
+            err: "start time must be before end time",
+        },
+        {
+            alert: &Alert{
+                StartsAt: ts,
+            },
+            err: "at least one label pair required",
+        },
+        {
+            alert: &Alert{
+                Labels:   LabelSet{"a": "b", "!bad": "label"},
+                StartsAt: ts,
+            },
+            err: "invalid label set: invalid name",
+        },
+        {
+            alert: &Alert{
+                Labels:   LabelSet{"a": "b", "bad": "\xfflabel"},
+                StartsAt: ts,
+            },
+            err: "invalid label set: invalid value",
+        },
+        {
+            alert: &Alert{
+                Labels:      LabelSet{"a": "b"},
+                Annotations: LabelSet{"!bad": "label"},
+                StartsAt:    ts,
+            },
+            err: "invalid annotations: invalid name",
+        },
+        {
+            alert: &Alert{
+                Labels:      LabelSet{"a": "b"},
+                Annotations: LabelSet{"bad": "\xfflabel"},
+                StartsAt:    ts,
+            },
+            err: "invalid annotations: invalid value",
+        },
+    }
 
-	for i, c := range cases {
-		err := c.alert.Validate()
-		if err == nil {
-			if c.err == "" {
-				continue
-			}
-			t.Errorf("%d. Expected error %q but got none", i, c.err)
-			continue
-		}
-		if c.err == "" && err != nil {
-			t.Errorf("%d. Expected no error but got %q", i, err)
-			continue
-		}
-		if !strings.Contains(err.Error(), c.err) {
-			t.Errorf("%d. Expected error to contain %q but got %q", i, c.err, err)
-		}
-	}
+    for i, c := range cases {
+        err := c.alert.Validate()
+        if err == nil {
+            if c.err == "" {
+                continue
+            }
+            t.Errorf("%d. Expected error %q but got none", i, c.err)
+            continue
+        }
+        if c.err == "" && err != nil {
+            t.Errorf("%d. Expected no error but got %q", i, err)
+            continue
+        }
+        if !strings.Contains(err.Error(), c.err) {
+            t.Errorf("%d. Expected error to contain %q but got %q", i, c.err, err)
+        }
+    }
 }

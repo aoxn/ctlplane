@@ -9,7 +9,7 @@ package ipv6
 type sysSockoptLen int32
 
 var (
-	ctlOpts = [ctlMax]ctlOpt{}
+    ctlOpts = [ctlMax]ctlOpt{}
 
-	sockOpts = [ssoMax]sockOpt{}
+    sockOpts = [ssoMax]sockOpt{}
 )

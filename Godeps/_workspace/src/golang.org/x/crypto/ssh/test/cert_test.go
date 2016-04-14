@@ -7,41 +7,41 @@
 package test
 
 import (
-	"crypto/rand"
-	"testing"
+    "crypto/rand"
+    "testing"
 
-	"golang.org/x/crypto/ssh"
+    "golang.org/x/crypto/ssh"
 )
 
 func TestCertLogin(t *testing.T) {
-	s := newServer(t)
-	defer s.Shutdown()
+    s := newServer(t)
+    defer s.Shutdown()
 
-	// Use a key different from the default.
-	clientKey := testSigners["dsa"]
-	caAuthKey := testSigners["ecdsa"]
-	cert := &ssh.Certificate{
-		Key:             clientKey.PublicKey(),
-		ValidPrincipals: []string{username()},
-		CertType:        ssh.UserCert,
-		ValidBefore:     ssh.CertTimeInfinity,
-	}
-	if err := cert.SignCert(rand.Reader, caAuthKey); err != nil {
-		t.Fatalf("SetSignature: %v", err)
-	}
+    // Use a key different from the default.
+    clientKey := testSigners["dsa"]
+    caAuthKey := testSigners["ecdsa"]
+    cert := &ssh.Certificate{
+        Key:             clientKey.PublicKey(),
+        ValidPrincipals: []string{username()},
+        CertType:        ssh.UserCert,
+        ValidBefore:     ssh.CertTimeInfinity,
+    }
+    if err := cert.SignCert(rand.Reader, caAuthKey); err != nil {
+        t.Fatalf("SetSignature: %v", err)
+    }
 
-	certSigner, err := ssh.NewCertSigner(cert, clientKey)
-	if err != nil {
-		t.Fatalf("NewCertSigner: %v", err)
-	}
+    certSigner, err := ssh.NewCertSigner(cert, clientKey)
+    if err != nil {
+        t.Fatalf("NewCertSigner: %v", err)
+    }
 
-	conf := &ssh.ClientConfig{
-		User: username(),
-	}
-	conf.Auth = append(conf.Auth, ssh.PublicKeys(certSigner))
-	client, err := s.TryDial(conf)
-	if err != nil {
-		t.Fatalf("TryDial: %v", err)
-	}
-	client.Close()
+    conf := &ssh.ClientConfig{
+        User: username(),
+    }
+    conf.Auth = append(conf.Auth, ssh.PublicKeys(certSigner))
+    client, err := s.TryDial(conf)
+    if err != nil {
+        t.Fatalf("TryDial: %v", err)
+    }
+    client.Close()
 }

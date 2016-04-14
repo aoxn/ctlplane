@@ -15,52 +15,52 @@
 package main
 
 import (
-	"flag"
+    "flag"
 
-	"github.com/google/cadvisor/client"
-	info "github.com/google/cadvisor/info/v1"
+    "github.com/google/cadvisor/client"
+    info "github.com/google/cadvisor/info/v1"
 
-	"github.com/golang/glog"
+    "github.com/golang/glog"
 )
 
 func staticClientExample() {
-	staticClient, err := client.NewClient("http://localhost:8080/")
-	if err != nil {
-		glog.Errorf("tried to make client and got error %v", err)
-		return
-	}
-	einfo, err := staticClient.EventStaticInfo("?oom_events=true")
-	if err != nil {
-		glog.Errorf("got error retrieving event info: %v", err)
-		return
-	}
-	for idx, ev := range einfo {
-		glog.Infof("static einfo %v: %v", idx, ev)
-	}
+    staticClient, err := client.NewClient("http://localhost:8080/")
+    if err != nil {
+        glog.Errorf("tried to make client and got error %v", err)
+        return
+    }
+    einfo, err := staticClient.EventStaticInfo("?oom_events=true")
+    if err != nil {
+        glog.Errorf("got error retrieving event info: %v", err)
+        return
+    }
+    for idx, ev := range einfo {
+        glog.Infof("static einfo %v: %v", idx, ev)
+    }
 }
 
 func streamingClientExample(url string) {
-	streamingClient, err := client.NewClient("http://localhost:8080/")
-	if err != nil {
-		glog.Errorf("tried to make client and got error %v", err)
-		return
-	}
-	einfo := make(chan *info.Event)
-	go func() {
-		err = streamingClient.EventStreamingInfo(url, einfo)
-		if err != nil {
-			glog.Errorf("got error retrieving event info: %v", err)
-			return
-		}
-	}()
-	for ev := range einfo {
-		glog.Infof("streaming einfo: %v\n", ev)
-	}
+    streamingClient, err := client.NewClient("http://localhost:8080/")
+    if err != nil {
+        glog.Errorf("tried to make client and got error %v", err)
+        return
+    }
+    einfo := make(chan *info.Event)
+    go func() {
+        err = streamingClient.EventStreamingInfo(url, einfo)
+        if err != nil {
+            glog.Errorf("got error retrieving event info: %v", err)
+            return
+        }
+    }()
+    for ev := range einfo {
+        glog.Infof("streaming einfo: %v\n", ev)
+    }
 }
 
 // demonstrates how to use event clients
 func main() {
-	flag.Parse()
-	staticClientExample()
-	streamingClientExample("?creation_events=true&stream=true&oom_events=true&deletion_events=true")
+    flag.Parse()
+    staticClientExample()
+    streamingClientExample("?creation_events=true&stream=true&oom_events=true&deletion_events=true")
 }

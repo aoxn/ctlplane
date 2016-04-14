@@ -14,15 +14,15 @@ import "net/url"
 // Example:
 // http://127.0.0.1:9200/path?query=1 -> http://127.0.0.1:9200
 func canonicalize(rawurls ...string) []string {
-	canonicalized := make([]string, 0)
-	for _, rawurl := range rawurls {
-		u, err := url.Parse(rawurl)
-		if err == nil && (u.Scheme == "http" || u.Scheme == "https") {
-			u.Fragment = ""
-			u.Path = ""
-			u.RawQuery = ""
-			canonicalized = append(canonicalized, u.String())
-		}
-	}
-	return canonicalized
+    canonicalized := make([]string, 0)
+    for _, rawurl := range rawurls {
+        u, err := url.Parse(rawurl)
+        if err == nil && (u.Scheme == "http" || u.Scheme == "https") {
+            u.Fragment = ""
+            u.Path = ""
+            u.RawQuery = ""
+            canonicalized = append(canonicalized, u.String())
+        }
+    }
+    return canonicalized
 }

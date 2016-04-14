@@ -9,51 +9,51 @@ import "hash"
 // NewCanonicalTextHash reformats text written to it into the canonical
 // form and then applies the hash h.  See RFC 4880, section 5.2.1.
 func NewCanonicalTextHash(h hash.Hash) hash.Hash {
-	return &canonicalTextHash{h, 0}
+    return &canonicalTextHash{h, 0}
 }
 
 type canonicalTextHash struct {
-	h hash.Hash
-	s int
+    h hash.Hash
+    s int
 }
 
 var newline = []byte{'\r', '\n'}
 
 func (cth *canonicalTextHash) Write(buf []byte) (int, error) {
-	start := 0
+    start := 0
 
-	for i, c := range buf {
-		switch cth.s {
-		case 0:
-			if c == '\r' {
-				cth.s = 1
-			} else if c == '\n' {
-				cth.h.Write(buf[start:i])
-				cth.h.Write(newline)
-				start = i + 1
-			}
-		case 1:
-			cth.s = 0
-		}
-	}
+    for i, c := range buf {
+        switch cth.s {
+        case 0:
+            if c == '\r' {
+                cth.s = 1
+            } else if c == '\n' {
+                cth.h.Write(buf[start:i])
+                cth.h.Write(newline)
+                start = i + 1
+            }
+        case 1:
+            cth.s = 0
+        }
+    }
 
-	cth.h.Write(buf[start:])
-	return len(buf), nil
+    cth.h.Write(buf[start:])
+    return len(buf), nil
 }
 
 func (cth *canonicalTextHash) Sum(in []byte) []byte {
-	return cth.h.Sum(in)
+    return cth.h.Sum(in)
 }
 
 func (cth *canonicalTextHash) Reset() {
-	cth.h.Reset()
-	cth.s = 0
+    cth.h.Reset()
+    cth.s = 0
 }
 
 func (cth *canonicalTextHash) Size() int {
-	return cth.h.Size()
+    return cth.h.Size()
 }
 
 func (cth *canonicalTextHash) BlockSize() int {
-	return cth.h.BlockSize()
+    return cth.h.BlockSize()
 }

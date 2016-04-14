@@ -15,45 +15,45 @@
 package netlink
 
 import (
-	"fmt"
-	"os"
+    "fmt"
+    "os"
 
-	info "github.com/google/cadvisor/info/v1"
+    info "github.com/google/cadvisor/info/v1"
 
-	"github.com/golang/glog"
+    "github.com/golang/glog"
 )
 
 type NetlinkReader struct {
-	familyId uint16
-	conn     *Connection
+    familyId uint16
+    conn     *Connection
 }
 
 func New() (*NetlinkReader, error) {
-	conn, err := newConnection()
-	if err != nil {
-		return nil, fmt.Errorf("failed to create a new connection: %s", err)
-	}
+    conn, err := newConnection()
+    if err != nil {
+        return nil, fmt.Errorf("failed to create a new connection: %s", err)
+    }
 
-	id, err := getFamilyId(conn)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get netlink family id for task stats: %s", err)
-	}
-	glog.V(4).Infof("Family id for taskstats: %d", id)
-	return &NetlinkReader{
-		familyId: id,
-		conn:     conn,
-	}, nil
+    id, err := getFamilyId(conn)
+    if err != nil {
+        return nil, fmt.Errorf("failed to get netlink family id for task stats: %s", err)
+    }
+    glog.V(4).Infof("Family id for taskstats: %d", id)
+    return &NetlinkReader{
+        familyId: id,
+        conn:     conn,
+    }, nil
 }
 
 func (self *NetlinkReader) Stop() {
-	if self.conn != nil {
-		self.conn.Close()
-	}
+    if self.conn != nil {
+        self.conn.Close()
+    }
 }
 
 func (self *NetlinkReader) Start() error {
-	// We do the start setup for netlink in New(). Nothing to do here.
-	return nil
+    // We do the start setup for netlink in New(). Nothing to do here.
+    return nil
 }
 
 // Returns instantaneous number of running tasks in a group.
@@ -61,19 +61,19 @@ func (self *NetlinkReader) Start() error {
 // path is an absolute filesystem path for a container under the CPU cgroup hierarchy.
 // NOTE: non-hierarchical load is returned. It does not include load for subcontainers.
 func (self *NetlinkReader) GetCpuLoad(name string, path string) (info.LoadStats, error) {
-	if len(path) == 0 {
-		return info.LoadStats{}, fmt.Errorf("cgroup path can not be empty!")
-	}
+    if len(path) == 0 {
+        return info.LoadStats{}, fmt.Errorf("cgroup path can not be empty!")
+    }
 
-	cfd, err := os.Open(path)
-	if err != nil {
-		return info.LoadStats{}, fmt.Errorf("failed to open cgroup path %s: %q", path, err)
-	}
+    cfd, err := os.Open(path)
+    if err != nil {
+        return info.LoadStats{}, fmt.Errorf("failed to open cgroup path %s: %q", path, err)
+    }
 
-	stats, err := getLoadStats(self.familyId, cfd.Fd(), self.conn)
-	if err != nil {
-		return info.LoadStats{}, err
-	}
-	glog.V(4).Infof("Task stats for %q: %+v", path, stats)
-	return stats, nil
+    stats, err := getLoadStats(self.familyId, cfd.Fd(), self.conn)
+    if err != nil {
+        return info.LoadStats{}, err
+    }
+    glog.V(4).Infof("Task stats for %q: %+v", path, stats)
+    return stats, nil
 }

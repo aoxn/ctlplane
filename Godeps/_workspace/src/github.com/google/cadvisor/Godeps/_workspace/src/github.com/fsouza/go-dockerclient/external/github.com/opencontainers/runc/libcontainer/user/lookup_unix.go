@@ -3,28 +3,28 @@
 package user
 
 import (
-	"io"
-	"os"
+    "io"
+    "os"
 )
 
 // Unix-specific path to the passwd and group formatted files.
 const (
-	unixPasswdPath = "/etc/passwd"
-	unixGroupPath  = "/etc/group"
+    unixPasswdPath = "/etc/passwd"
+    unixGroupPath = "/etc/group"
 )
 
 func GetPasswdPath() (string, error) {
-	return unixPasswdPath, nil
+    return unixPasswdPath, nil
 }
 
 func GetPasswd() (io.ReadCloser, error) {
-	return os.Open(unixPasswdPath)
+    return os.Open(unixPasswdPath)
 }
 
 func GetGroupPath() (string, error) {
-	return unixGroupPath, nil
+    return unixGroupPath, nil
 }
 
 func GetGroup() (io.ReadCloser, error) {
-	return os.Open(unixGroupPath)
+    return os.Open(unixGroupPath)
 }

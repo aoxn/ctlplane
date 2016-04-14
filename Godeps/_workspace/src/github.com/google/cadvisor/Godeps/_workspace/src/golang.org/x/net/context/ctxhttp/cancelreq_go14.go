@@ -9,15 +9,15 @@ package ctxhttp
 import "net/http"
 
 type requestCanceler interface {
-	CancelRequest(*http.Request)
+    CancelRequest(*http.Request)
 }
 
 func canceler(client *http.Client, req *http.Request) func() {
-	rc, ok := client.Transport.(requestCanceler)
-	if !ok {
-		return func() {}
-	}
-	return func() {
-		rc.CancelRequest(req)
-	}
+    rc, ok := client.Transport.(requestCanceler)
+    if !ok {
+        return func() {}
+    }
+    return func() {
+        rc.CancelRequest(req)
+    }
 }

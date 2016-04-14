@@ -17,7 +17,7 @@
 package util
 
 import (
-	"os"
+    "os"
 )
 
 // IsRunningSystemd checks whether the host was booted with systemd as its init
@@ -25,9 +25,9 @@ import (
 // checks whether /run/systemd/system/ exists and is a directory.
 // http://www.freedesktop.org/software/systemd/man/sd_booted.html
 func IsRunningSystemd() bool {
-	fi, err := os.Lstat("/run/systemd/system")
-	if err != nil {
-		return false
-	}
-	return fi.IsDir()
+    fi, err := os.Lstat("/run/systemd/system")
+    if err != nil {
+        return false
+    }
+    return fi.IsDir()
 }

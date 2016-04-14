@@ -1,86 +1,89 @@
 <html>
-	<head>
-	<title>
-		Codegen
-	</title>
-	<style>
-		body {
-			width: 800px;
-			margin: auto;
-		}
-		textarea {
-			width: 100%;
-			min-height: 100px;
-			font-family: Courier;
-		}
-	</style>
-	</head>
-	<body>
+<head>
+    <title>
+        Codegen
+    </title>
+    <style>
+        body {
+            width: 800px;
+            margin: auto;
+        }
 
-		<h2>
-			Template
-		</h2>
-		<p>
-			Use <code>{x}</code> as a placeholder for each argument.
-		</p>
-		<textarea id="template"></textarea>
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            font-family: Courier;
+        }
+    </style>
+</head>
+<body>
 
-		<h2>
-			Arguments (comma separated)
-		</h2>
-		<p>
-			One block per line
-		</p>
-		<textarea id="args"></textarea>
+<h2>
+    Template
+</h2>
 
-		<h2>
-			Output
-		</h2>
-		<input id="go" type="button" value="Generate code" />
+<p>
+    Use <code>{x}</code> as a placeholder for each argument.
+</p>
+<textarea id="template"></textarea>
 
-		<textarea id="output"></textarea>
+<h2>
+    Arguments (comma separated)
+</h2>
 
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-		<script>
+<p>
+    One block per line
+</p>
+<textarea id="args"></textarea>
 
-			$(function(){
+<h2>
+    Output
+</h2>
+<input id="go" type="button" value="Generate code"/>
 
-				$("#go").click(function(){
+<textarea id="output"></textarea>
 
-					var output = ""
-					var template = $("#template").val()
-					var args = $("#args").val()
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>
 
-					// collect the args
-					var argLines = args.split("\n")
-					for (var line in argLines) {
+    $(function () {
 
-						var argLine = argLines[line];
-						var thisTemp = template
+        $("#go").click(function () {
 
-						// get individual args
-						var args = argLine.split(",")
+            var output = ""
+            var template = $("#template").val()
+            var args = $("#args").val()
 
-						for (var argI in args) {
-							var argText = args[argI];
-							var argPlaceholder = "{" + argI + "}";
+            // collect the args
+            var argLines = args.split("\n")
+            for (var line in argLines) {
 
-							while (thisTemp.indexOf(argPlaceholder) > -1) {
-								thisTemp = thisTemp.replace(argPlaceholder, argText);
-							}
+                var argLine = argLines[line];
+                var thisTemp = template
 
-						}
+                // get individual args
+                var args = argLine.split(",")
 
-						output += thisTemp
+                for (var argI in args) {
+                    var argText = args[argI];
+                    var argPlaceholder = "{" + argI + "}";
 
-					}
+                    while (thisTemp.indexOf(argPlaceholder) > -1) {
+                        thisTemp = thisTemp.replace(argPlaceholder, argText);
+                    }
 
-					$("#output").val(output);
+                }
 
-				});
+                output += thisTemp
 
-			});
+            }
 
-		</script>
-	</body>
+            $("#output").val(output);
+
+        });
+
+    });
+
+</script>
+</body>
 </html>

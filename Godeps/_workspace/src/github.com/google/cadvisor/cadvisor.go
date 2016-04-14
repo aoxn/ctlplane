@@ -15,22 +15,22 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-	"net/http"
-	"net/http/pprof"
-	"os"
-	"os/signal"
-	"runtime"
-	"syscall"
-	"time"
+    "flag"
+    "fmt"
+    "net/http"
+    "net/http/pprof"
+    "os"
+    "os/signal"
+    "runtime"
+    "syscall"
+    "time"
 
-	cadvisorhttp "github.com/google/cadvisor/http"
-	"github.com/google/cadvisor/manager"
-	"github.com/google/cadvisor/utils/sysfs"
-	"github.com/google/cadvisor/version"
+    cadvisorhttp "github.com/google/cadvisor/http"
+    "github.com/google/cadvisor/manager"
+    "github.com/google/cadvisor/utils/sysfs"
+    "github.com/google/cadvisor/version"
 
-	"github.com/golang/glog"
+    "github.com/golang/glog"
 )
 
 var argIp = flag.String("listen_ip", "", "IP to listen on, defaults to all IPs")
@@ -47,97 +47,97 @@ var httpDigestRealm = flag.String("http_digest_realm", "localhost", "HTTP digest
 
 var prometheusEndpoint = flag.String("prometheus_endpoint", "/metrics", "Endpoint to expose Prometheus metrics on")
 
-var maxHousekeepingInterval = flag.Duration("max_housekeeping_interval", 60*time.Second, "Largest interval to allow between container housekeepings")
+var maxHousekeepingInterval = flag.Duration("max_housekeeping_interval", 60 * time.Second, "Largest interval to allow between container housekeepings")
 var allowDynamicHousekeeping = flag.Bool("allow_dynamic_housekeeping", true, "Whether to allow the housekeeping interval to be dynamic")
 
 var enableProfiling = flag.Bool("profiling", false, "Enable profiling via web interface host:port/debug/pprof/")
 
 func main() {
-	defer glog.Flush()
-	flag.Parse()
+    defer glog.Flush()
+    flag.Parse()
 
-	if *versionFlag {
-		fmt.Printf("cAdvisor version %s (%s)\n", version.Info["version"], version.Info["revision"])
-		os.Exit(0)
-	}
+    if *versionFlag {
+        fmt.Printf("cAdvisor version %s (%s)\n", version.Info["version"], version.Info["revision"])
+        os.Exit(0)
+    }
 
-	setMaxProcs()
+    setMaxProcs()
 
-	memoryStorage, err := NewMemoryStorage(*argDbDriver)
-	if err != nil {
-		glog.Fatalf("Failed to connect to database: %s", err)
-	}
+    memoryStorage, err := NewMemoryStorage(*argDbDriver)
+    if err != nil {
+        glog.Fatalf("Failed to connect to database: %s", err)
+    }
 
-	sysFs, err := sysfs.NewRealSysFs()
-	if err != nil {
-		glog.Fatalf("Failed to create a system interface: %s", err)
-	}
+    sysFs, err := sysfs.NewRealSysFs()
+    if err != nil {
+        glog.Fatalf("Failed to create a system interface: %s", err)
+    }
 
-	containerManager, err := manager.New(memoryStorage, sysFs, *maxHousekeepingInterval, *allowDynamicHousekeeping)
-	if err != nil {
-		glog.Fatalf("Failed to create a Container Manager: %s", err)
-	}
+    containerManager, err := manager.New(memoryStorage, sysFs, *maxHousekeepingInterval, *allowDynamicHousekeeping)
+    if err != nil {
+        glog.Fatalf("Failed to create a Container Manager: %s", err)
+    }
 
-	mux := http.NewServeMux()
+    mux := http.NewServeMux()
 
-	if *enableProfiling {
-		mux.HandleFunc("/debug/pprof/", pprof.Index)
-		mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
-		mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
-		mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
-	}
+    if *enableProfiling {
+        mux.HandleFunc("/debug/pprof/", pprof.Index)
+        mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+        mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+        mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+    }
 
-	// Register all HTTP handlers.
-	err = cadvisorhttp.RegisterHandlers(mux, containerManager, *httpAuthFile, *httpAuthRealm, *httpDigestFile, *httpDigestRealm)
-	if err != nil {
-		glog.Fatalf("Failed to register HTTP handlers: %v", err)
-	}
+    // Register all HTTP handlers.
+    err = cadvisorhttp.RegisterHandlers(mux, containerManager, *httpAuthFile, *httpAuthRealm, *httpDigestFile, *httpDigestRealm)
+    if err != nil {
+        glog.Fatalf("Failed to register HTTP handlers: %v", err)
+    }
 
-	cadvisorhttp.RegisterPrometheusHandler(mux, containerManager, *prometheusEndpoint, nil)
+    cadvisorhttp.RegisterPrometheusHandler(mux, containerManager, *prometheusEndpoint, nil)
 
-	// Start the manager.
-	if err := containerManager.Start(); err != nil {
-		glog.Fatalf("Failed to start container manager: %v", err)
-	}
+    // Start the manager.
+    if err := containerManager.Start(); err != nil {
+        glog.Fatalf("Failed to start container manager: %v", err)
+    }
 
-	// Install signal handler.
-	installSignalHandler(containerManager)
+    // Install signal handler.
+    installSignalHandler(containerManager)
 
-	glog.Infof("Starting cAdvisor version: %s-%s on port %d", version.Info["version"], version.Info["revision"], *argPort)
+    glog.Infof("Starting cAdvisor version: %s-%s on port %d", version.Info["version"], version.Info["revision"], *argPort)
 
-	addr := fmt.Sprintf("%s:%d", *argIp, *argPort)
-	glog.Fatal(http.ListenAndServe(addr, mux))
+    addr := fmt.Sprintf("%s:%d", *argIp, *argPort)
+    glog.Fatal(http.ListenAndServe(addr, mux))
 }
 
 func setMaxProcs() {
-	// TODO(vmarmol): Consider limiting if we have a CPU mask in effect.
-	// Allow as many threads as we have cores unless the user specified a value.
-	var numProcs int
-	if *maxProcs < 1 {
-		numProcs = runtime.NumCPU()
-	} else {
-		numProcs = *maxProcs
-	}
-	runtime.GOMAXPROCS(numProcs)
+    // TODO(vmarmol): Consider limiting if we have a CPU mask in effect.
+    // Allow as many threads as we have cores unless the user specified a value.
+    var numProcs int
+    if *maxProcs < 1 {
+        numProcs = runtime.NumCPU()
+    } else {
+        numProcs = *maxProcs
+    }
+    runtime.GOMAXPROCS(numProcs)
 
-	// Check if the setting was successful.
-	actualNumProcs := runtime.GOMAXPROCS(0)
-	if actualNumProcs != numProcs {
-		glog.Warningf("Specified max procs of %v but using %v", numProcs, actualNumProcs)
-	}
+    // Check if the setting was successful.
+    actualNumProcs := runtime.GOMAXPROCS(0)
+    if actualNumProcs != numProcs {
+        glog.Warningf("Specified max procs of %v but using %v", numProcs, actualNumProcs)
+    }
 }
 
 func installSignalHandler(containerManager manager.Manager) {
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGTERM)
+    c := make(chan os.Signal, 1)
+    signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGTERM)
 
-	// Block until a signal is received.
-	go func() {
-		sig := <-c
-		if err := containerManager.Stop(); err != nil {
-			glog.Errorf("Failed to stop container manager: %v", err)
-		}
-		glog.Infof("Exiting given signal: %v", sig)
-		os.Exit(0)
-	}()
+    // Block until a signal is received.
+    go func() {
+        sig := <-c
+        if err := containerManager.Stop(); err != nil {
+            glog.Errorf("Failed to stop container manager: %v", err)
+        }
+        glog.Infof("Exiting given signal: %v", sig)
+        os.Exit(0)
+    }()
 }

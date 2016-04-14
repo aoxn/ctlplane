@@ -13,54 +13,54 @@ package elastic
 // in any of the other buckets due to missing field data values.
 // See: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-aggregations-bucket-missing-aggregation.html
 type MissingAggregation struct {
-	field           string
-	subAggregations map[string]Aggregation
+    field           string
+    subAggregations map[string]Aggregation
 }
 
 func NewMissingAggregation() MissingAggregation {
-	a := MissingAggregation{
-		subAggregations: make(map[string]Aggregation),
-	}
-	return a
+    a := MissingAggregation{
+        subAggregations: make(map[string]Aggregation),
+    }
+    return a
 }
 
 func (a MissingAggregation) Field(field string) MissingAggregation {
-	a.field = field
-	return a
+    a.field = field
+    return a
 }
 
 func (a MissingAggregation) SubAggregation(name string, subAggregation Aggregation) MissingAggregation {
-	a.subAggregations[name] = subAggregation
-	return a
+    a.subAggregations[name] = subAggregation
+    return a
 }
 
 func (a MissingAggregation) Source() interface{} {
-	// Example:
-	//	{
-	//    "aggs" : {
-	//      "products_without_a_price" : {
-	//        "missing" : { "field" : "price" }
-	//      }
-	//    }
-	//	}
-	// This method returns only the { "missing" : { ... } } part.
+    // Example:
+    //	{
+    //    "aggs" : {
+    //      "products_without_a_price" : {
+    //        "missing" : { "field" : "price" }
+    //      }
+    //    }
+    //	}
+    // This method returns only the { "missing" : { ... } } part.
 
-	source := make(map[string]interface{})
-	opts := make(map[string]interface{})
-	source["missing"] = opts
+    source := make(map[string]interface{})
+    opts := make(map[string]interface{})
+    source["missing"] = opts
 
-	if a.field != "" {
-		opts["field"] = a.field
-	}
+    if a.field != "" {
+        opts["field"] = a.field
+    }
 
-	// AggregationBuilder (SubAggregations)
-	if len(a.subAggregations) > 0 {
-		aggsMap := make(map[string]interface{})
-		source["aggregations"] = aggsMap
-		for name, aggregate := range a.subAggregations {
-			aggsMap[name] = aggregate.Source()
-		}
-	}
+    // AggregationBuilder (SubAggregations)
+    if len(a.subAggregations) > 0 {
+        aggsMap := make(map[string]interface{})
+        source["aggregations"] = aggsMap
+        for name, aggregate := range a.subAggregations {
+            aggsMap[name] = aggregate.Source()
+        }
+    }
 
-	return source
+    return source
 }

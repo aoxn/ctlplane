@@ -3,10 +3,10 @@
 package cobra
 
 import (
-	"os"
-	"time"
+    "os"
+    "time"
 
-	"github.com/inconshreveable/mousetrap"
+    "github.com/inconshreveable/mousetrap"
 )
 
 var preExecHookFn = preExecHook
@@ -18,9 +18,9 @@ You need to open cmd.exe and run it from there.
 `
 
 func preExecHook(c *Command) {
-	if mousetrap.StartedByExplorer() {
-		c.Print(MousetrapHelpText)
-		time.Sleep(5 * time.Second)
-		os.Exit(1)
-	}
+    if mousetrap.StartedByExplorer() {
+        c.Print(MousetrapHelpText)
+        time.Sleep(5 * time.Second)
+        os.Exit(1)
+    }
 }

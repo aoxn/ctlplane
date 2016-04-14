@@ -15,200 +15,200 @@
 package libcontainer
 
 import (
-	"bufio"
-	"fmt"
-	"os"
-	"path"
-	"strconv"
-	"strings"
-	"time"
+    "bufio"
+    "fmt"
+    "os"
+    "path"
+    "strconv"
+    "strings"
+    "time"
 
-	info "github.com/google/cadvisor/info/v1"
+    info "github.com/google/cadvisor/info/v1"
 
-	"github.com/golang/glog"
-	"github.com/opencontainers/runc/libcontainer"
-	"github.com/opencontainers/runc/libcontainer/cgroups"
+    "github.com/golang/glog"
+    "github.com/opencontainers/runc/libcontainer"
+    "github.com/opencontainers/runc/libcontainer/cgroups"
 )
 
 type CgroupSubsystems struct {
-	// Cgroup subsystem mounts.
-	// e.g.: "/sys/fs/cgroup/cpu" -> ["cpu", "cpuacct"]
-	Mounts []cgroups.Mount
+    // Cgroup subsystem mounts.
+    // e.g.: "/sys/fs/cgroup/cpu" -> ["cpu", "cpuacct"]
+    Mounts      []cgroups.Mount
 
-	// Cgroup subsystem to their mount location.
-	// e.g.: "cpu" -> "/sys/fs/cgroup/cpu"
-	MountPoints map[string]string
+    // Cgroup subsystem to their mount location.
+    // e.g.: "cpu" -> "/sys/fs/cgroup/cpu"
+    MountPoints map[string]string
 }
 
 // Get information about the cgroup subsystems.
 func GetCgroupSubsystems() (CgroupSubsystems, error) {
-	// Get all cgroup mounts.
-	allCgroups, err := cgroups.GetCgroupMounts()
-	if err != nil {
-		return CgroupSubsystems{}, err
-	}
-	if len(allCgroups) == 0 {
-		return CgroupSubsystems{}, fmt.Errorf("failed to find cgroup mounts")
-	}
+    // Get all cgroup mounts.
+    allCgroups, err := cgroups.GetCgroupMounts()
+    if err != nil {
+        return CgroupSubsystems{}, err
+    }
+    if len(allCgroups) == 0 {
+        return CgroupSubsystems{}, fmt.Errorf("failed to find cgroup mounts")
+    }
 
-	// Trim the mounts to only the subsystems we care about.
-	supportedCgroups := make([]cgroups.Mount, 0, len(allCgroups))
-	mountPoints := make(map[string]string, len(allCgroups))
-	for _, mount := range allCgroups {
-		for _, subsystem := range mount.Subsystems {
-			if _, ok := supportedSubsystems[subsystem]; ok {
-				supportedCgroups = append(supportedCgroups, mount)
-				mountPoints[subsystem] = mount.Mountpoint
-			}
-		}
-	}
+    // Trim the mounts to only the subsystems we care about.
+    supportedCgroups := make([]cgroups.Mount, 0, len(allCgroups))
+    mountPoints := make(map[string]string, len(allCgroups))
+    for _, mount := range allCgroups {
+        for _, subsystem := range mount.Subsystems {
+            if _, ok := supportedSubsystems[subsystem]; ok {
+                supportedCgroups = append(supportedCgroups, mount)
+                mountPoints[subsystem] = mount.Mountpoint
+            }
+        }
+    }
 
-	return CgroupSubsystems{
-		Mounts:      supportedCgroups,
-		MountPoints: mountPoints,
-	}, nil
+    return CgroupSubsystems{
+        Mounts:      supportedCgroups,
+        MountPoints: mountPoints,
+    }, nil
 }
 
 // Cgroup subsystems we support listing (should be the minimal set we need stats from).
 var supportedSubsystems map[string]struct{} = map[string]struct{}{
-	"cpu":     {},
-	"cpuacct": {},
-	"memory":  {},
-	"cpuset":  {},
-	"blkio":   {},
+    "cpu":     {},
+    "cpuacct": {},
+    "memory":  {},
+    "cpuset":  {},
+    "blkio":   {},
 }
 
 // Get cgroup and networking stats of the specified container
 func GetStats(cgroupManager cgroups.Manager, rootFs string, pid int) (*info.ContainerStats, error) {
-	cgroupStats, err := cgroupManager.GetStats()
-	if err != nil {
-		return nil, err
-	}
-	libcontainerStats := &libcontainer.Stats{
-		CgroupStats: cgroupStats,
-	}
-	stats := toContainerStats(libcontainerStats)
+    cgroupStats, err := cgroupManager.GetStats()
+    if err != nil {
+        return nil, err
+    }
+    libcontainerStats := &libcontainer.Stats{
+        CgroupStats: cgroupStats,
+    }
+    stats := toContainerStats(libcontainerStats)
 
-	// If we know the pid then get network stats from /proc/<pid>/net/dev
-	if pid > 0 {
-		netStats, err := networkStatsFromProc(rootFs, pid)
-		if err != nil {
-			glog.V(2).Infof("Unable to get network stats from pid %d: %v", pid, err)
-		} else {
-			stats.Network.Interfaces = append(stats.Network.Interfaces, netStats...)
-		}
+    // If we know the pid then get network stats from /proc/<pid>/net/dev
+    if pid > 0 {
+        netStats, err := networkStatsFromProc(rootFs, pid)
+        if err != nil {
+            glog.V(2).Infof("Unable to get network stats from pid %d: %v", pid, err)
+        } else {
+            stats.Network.Interfaces = append(stats.Network.Interfaces, netStats...)
+        }
 
-		// Commenting out to disable: too CPU intensive
-		/*t, err := tcpStatsFromProc(rootFs, pid, "net/tcp")
-		if err != nil {
-			glog.V(2).Infof("Unable to get tcp stats from pid %d: %v", pid, err)
-		} else {
-			stats.Network.Tcp = t
-		}
+        // Commenting out to disable: too CPU intensive
+        /*t, err := tcpStatsFromProc(rootFs, pid, "net/tcp")
+        if err != nil {
+                glog.V(2).Infof("Unable to get tcp stats from pid %d: %v", pid, err)
+        } else {
+                stats.Network.Tcp = t
+        }
 
-		t6, err := tcpStatsFromProc(rootFs, pid, "net/tcp6")
-		if err != nil {
-			glog.V(2).Infof("Unable to get tcp6 stats from pid %d: %v", pid, err)
-		} else {
-			stats.Network.Tcp6 = t6
-		}*/
-	}
+        t6, err := tcpStatsFromProc(rootFs, pid, "net/tcp6")
+        if err != nil {
+                glog.V(2).Infof("Unable to get tcp6 stats from pid %d: %v", pid, err)
+        } else {
+                stats.Network.Tcp6 = t6
+        }*/
+    }
 
-	// For backwards compatibility.
-	if len(stats.Network.Interfaces) > 0 {
-		stats.Network.InterfaceStats = stats.Network.Interfaces[0]
-	}
+    // For backwards compatibility.
+    if len(stats.Network.Interfaces) > 0 {
+        stats.Network.InterfaceStats = stats.Network.Interfaces[0]
+    }
 
-	return stats, nil
+    return stats, nil
 }
 
 func networkStatsFromProc(rootFs string, pid int) ([]info.InterfaceStats, error) {
-	netStatsFile := path.Join(rootFs, "proc", strconv.Itoa(pid), "/net/dev")
+    netStatsFile := path.Join(rootFs, "proc", strconv.Itoa(pid), "/net/dev")
 
-	ifaceStats, err := scanInterfaceStats(netStatsFile)
-	if err != nil {
-		return []info.InterfaceStats{}, fmt.Errorf("couldn't read network stats: %v", err)
-	}
+    ifaceStats, err := scanInterfaceStats(netStatsFile)
+    if err != nil {
+        return []info.InterfaceStats{}, fmt.Errorf("couldn't read network stats: %v", err)
+    }
 
-	return ifaceStats, nil
+    return ifaceStats, nil
 }
 
 var (
-	ignoredDevicePrefixes = []string{"lo", "veth", "docker"}
+    ignoredDevicePrefixes = []string{"lo", "veth", "docker"}
 )
 
 func isIgnoredDevice(ifName string) bool {
-	for _, prefix := range ignoredDevicePrefixes {
-		if strings.HasPrefix(strings.ToLower(ifName), prefix) {
-			return true
-		}
-	}
-	return false
+    for _, prefix := range ignoredDevicePrefixes {
+        if strings.HasPrefix(strings.ToLower(ifName), prefix) {
+            return true
+        }
+    }
+    return false
 }
 
 func scanInterfaceStats(netStatsFile string) ([]info.InterfaceStats, error) {
-	file, err := os.Open(netStatsFile)
-	if err != nil {
-		return nil, fmt.Errorf("failure opening %s: %v", netStatsFile, err)
-	}
-	defer file.Close()
+    file, err := os.Open(netStatsFile)
+    if err != nil {
+        return nil, fmt.Errorf("failure opening %s: %v", netStatsFile, err)
+    }
+    defer file.Close()
 
-	scanner := bufio.NewScanner(file)
+    scanner := bufio.NewScanner(file)
 
-	// Discard header lines
-	for i := 0; i < 2; i++ {
-		if b := scanner.Scan(); !b {
-			return nil, scanner.Err()
-		}
-	}
+    // Discard header lines
+    for i := 0; i < 2; i++ {
+        if b := scanner.Scan(); !b {
+            return nil, scanner.Err()
+        }
+    }
 
-	stats := []info.InterfaceStats{}
-	for scanner.Scan() {
-		line := scanner.Text()
-		line = strings.Replace(line, ":", "", -1)
+    stats := []info.InterfaceStats{}
+    for scanner.Scan() {
+        line := scanner.Text()
+        line = strings.Replace(line, ":", "", -1)
 
-		fields := strings.Fields(line)
-		// If the format of the  line is invalid then don't trust any of the stats
-		// in this file.
-		if len(fields) != 17 {
-			return nil, fmt.Errorf("invalid interface stats line: %v", line)
-		}
+        fields := strings.Fields(line)
+        // If the format of the  line is invalid then don't trust any of the stats
+        // in this file.
+        if len(fields) != 17 {
+            return nil, fmt.Errorf("invalid interface stats line: %v", line)
+        }
 
-		devName := fields[0]
-		if isIgnoredDevice(devName) {
-			continue
-		}
+        devName := fields[0]
+        if isIgnoredDevice(devName) {
+            continue
+        }
 
-		i := info.InterfaceStats{
-			Name: devName,
-		}
+        i := info.InterfaceStats{
+            Name: devName,
+        }
 
-		statFields := append(fields[1:5], fields[9:13]...)
-		statPointers := []*uint64{
-			&i.RxBytes, &i.RxPackets, &i.RxErrors, &i.RxDropped,
-			&i.TxBytes, &i.TxPackets, &i.TxErrors, &i.TxDropped,
-		}
+        statFields := append(fields[1:5], fields[9:13]...)
+        statPointers := []*uint64{
+            &i.RxBytes, &i.RxPackets, &i.RxErrors, &i.RxDropped,
+            &i.TxBytes, &i.TxPackets, &i.TxErrors, &i.TxDropped,
+        }
 
-		err := setInterfaceStatValues(statFields, statPointers)
-		if err != nil {
-			return nil, fmt.Errorf("cannot parse interface stats (%v): %v", err, line)
-		}
+        err := setInterfaceStatValues(statFields, statPointers)
+        if err != nil {
+            return nil, fmt.Errorf("cannot parse interface stats (%v): %v", err, line)
+        }
 
-		stats = append(stats, i)
-	}
+        stats = append(stats, i)
+    }
 
-	return stats, nil
+    return stats, nil
 }
 
 func setInterfaceStatValues(fields []string, pointers []*uint64) error {
-	for i, v := range fields {
-		val, err := strconv.ParseUint(v, 10, 64)
-		if err != nil {
-			return err
-		}
-		*pointers[i] = val
-	}
-	return nil
+    for i, v := range fields {
+        val, err := strconv.ParseUint(v, 10, 64)
+        if err != nil {
+            return err
+        }
+        *pointers[i] = val
+    }
+    return nil
 }
 
 /*
@@ -289,158 +289,158 @@ func scanTcpStats(tcpStatsFile string) (info.TcpStat, error) {
 */
 
 func GetProcesses(cgroupManager cgroups.Manager) ([]int, error) {
-	pids, err := cgroupManager.GetPids()
-	if err != nil {
-		return nil, err
-	}
-	return pids, nil
+    pids, err := cgroupManager.GetPids()
+    if err != nil {
+        return nil, err
+    }
+    return pids, nil
 }
 
 func DockerStateDir(dockerRoot string) string {
-	return path.Join(dockerRoot, "containers")
+    return path.Join(dockerRoot, "containers")
 }
 
 func DiskStatsCopy0(major, minor uint64) *info.PerDiskStats {
-	disk := info.PerDiskStats{
-		Major: major,
-		Minor: minor,
-	}
-	disk.Stats = make(map[string]uint64)
-	return &disk
+    disk := info.PerDiskStats{
+        Major: major,
+        Minor: minor,
+    }
+    disk.Stats = make(map[string]uint64)
+    return &disk
 }
 
 type DiskKey struct {
-	Major uint64
-	Minor uint64
+    Major uint64
+    Minor uint64
 }
 
 func DiskStatsCopy1(disk_stat map[DiskKey]*info.PerDiskStats) []info.PerDiskStats {
-	i := 0
-	stat := make([]info.PerDiskStats, len(disk_stat))
-	for _, disk := range disk_stat {
-		stat[i] = *disk
-		i++
-	}
-	return stat
+    i := 0
+    stat := make([]info.PerDiskStats, len(disk_stat))
+    for _, disk := range disk_stat {
+        stat[i] = *disk
+        i++
+    }
+    return stat
 }
 
 func DiskStatsCopy(blkio_stats []cgroups.BlkioStatEntry) (stat []info.PerDiskStats) {
-	if len(blkio_stats) == 0 {
-		return
-	}
-	disk_stat := make(map[DiskKey]*info.PerDiskStats)
-	for i := range blkio_stats {
-		major := blkio_stats[i].Major
-		minor := blkio_stats[i].Minor
-		disk_key := DiskKey{
-			Major: major,
-			Minor: minor,
-		}
-		diskp, ok := disk_stat[disk_key]
-		if !ok {
-			diskp = DiskStatsCopy0(major, minor)
-			disk_stat[disk_key] = diskp
-		}
-		op := blkio_stats[i].Op
-		if op == "" {
-			op = "Count"
-		}
-		diskp.Stats[op] = blkio_stats[i].Value
-	}
-	return DiskStatsCopy1(disk_stat)
+    if len(blkio_stats) == 0 {
+        return
+    }
+    disk_stat := make(map[DiskKey]*info.PerDiskStats)
+    for i := range blkio_stats {
+        major := blkio_stats[i].Major
+        minor := blkio_stats[i].Minor
+        disk_key := DiskKey{
+            Major: major,
+            Minor: minor,
+        }
+        diskp, ok := disk_stat[disk_key]
+        if !ok {
+            diskp = DiskStatsCopy0(major, minor)
+            disk_stat[disk_key] = diskp
+        }
+        op := blkio_stats[i].Op
+        if op == "" {
+            op = "Count"
+        }
+        diskp.Stats[op] = blkio_stats[i].Value
+    }
+    return DiskStatsCopy1(disk_stat)
 }
 
 // Convert libcontainer stats to info.ContainerStats.
 func toContainerStats0(s *cgroups.Stats, ret *info.ContainerStats) {
-	ret.Cpu.Usage.User = s.CpuStats.CpuUsage.UsageInUsermode
-	ret.Cpu.Usage.System = s.CpuStats.CpuUsage.UsageInKernelmode
-	n := len(s.CpuStats.CpuUsage.PercpuUsage)
-	ret.Cpu.Usage.PerCpu = make([]uint64, n)
+    ret.Cpu.Usage.User = s.CpuStats.CpuUsage.UsageInUsermode
+    ret.Cpu.Usage.System = s.CpuStats.CpuUsage.UsageInKernelmode
+    n := len(s.CpuStats.CpuUsage.PercpuUsage)
+    ret.Cpu.Usage.PerCpu = make([]uint64, n)
 
-	ret.Cpu.Usage.Total = 0
-	for i := 0; i < n; i++ {
-		ret.Cpu.Usage.PerCpu[i] = s.CpuStats.CpuUsage.PercpuUsage[i]
-		ret.Cpu.Usage.Total += s.CpuStats.CpuUsage.PercpuUsage[i]
-	}
+    ret.Cpu.Usage.Total = 0
+    for i := 0; i < n; i++ {
+        ret.Cpu.Usage.PerCpu[i] = s.CpuStats.CpuUsage.PercpuUsage[i]
+        ret.Cpu.Usage.Total += s.CpuStats.CpuUsage.PercpuUsage[i]
+    }
 }
 
 func toContainerStats1(s *cgroups.Stats, ret *info.ContainerStats) {
-	ret.DiskIo.IoServiceBytes = DiskStatsCopy(s.BlkioStats.IoServiceBytesRecursive)
-	ret.DiskIo.IoServiced = DiskStatsCopy(s.BlkioStats.IoServicedRecursive)
-	ret.DiskIo.IoQueued = DiskStatsCopy(s.BlkioStats.IoQueuedRecursive)
-	ret.DiskIo.Sectors = DiskStatsCopy(s.BlkioStats.SectorsRecursive)
-	ret.DiskIo.IoServiceTime = DiskStatsCopy(s.BlkioStats.IoServiceTimeRecursive)
-	ret.DiskIo.IoWaitTime = DiskStatsCopy(s.BlkioStats.IoWaitTimeRecursive)
-	ret.DiskIo.IoMerged = DiskStatsCopy(s.BlkioStats.IoMergedRecursive)
-	ret.DiskIo.IoTime = DiskStatsCopy(s.BlkioStats.IoTimeRecursive)
+    ret.DiskIo.IoServiceBytes = DiskStatsCopy(s.BlkioStats.IoServiceBytesRecursive)
+    ret.DiskIo.IoServiced = DiskStatsCopy(s.BlkioStats.IoServicedRecursive)
+    ret.DiskIo.IoQueued = DiskStatsCopy(s.BlkioStats.IoQueuedRecursive)
+    ret.DiskIo.Sectors = DiskStatsCopy(s.BlkioStats.SectorsRecursive)
+    ret.DiskIo.IoServiceTime = DiskStatsCopy(s.BlkioStats.IoServiceTimeRecursive)
+    ret.DiskIo.IoWaitTime = DiskStatsCopy(s.BlkioStats.IoWaitTimeRecursive)
+    ret.DiskIo.IoMerged = DiskStatsCopy(s.BlkioStats.IoMergedRecursive)
+    ret.DiskIo.IoTime = DiskStatsCopy(s.BlkioStats.IoTimeRecursive)
 }
 
 func toContainerStats2(s *cgroups.Stats, ret *info.ContainerStats) {
-	ret.Memory.Usage = s.MemoryStats.Usage.Usage
-	ret.Memory.Failcnt = s.MemoryStats.Usage.Failcnt
-	ret.Memory.Cache = s.MemoryStats.Stats["cache"]
-	ret.Memory.RSS = s.MemoryStats.Stats["rss"]
-	if v, ok := s.MemoryStats.Stats["pgfault"]; ok {
-		ret.Memory.ContainerData.Pgfault = v
-		ret.Memory.HierarchicalData.Pgfault = v
-	}
-	if v, ok := s.MemoryStats.Stats["pgmajfault"]; ok {
-		ret.Memory.ContainerData.Pgmajfault = v
-		ret.Memory.HierarchicalData.Pgmajfault = v
-	}
-	if v, ok := s.MemoryStats.Stats["total_inactive_anon"]; ok {
-		workingSet := ret.Memory.Usage
-		if workingSet < v {
-			workingSet = 0
-		} else {
-			workingSet -= v
-		}
+    ret.Memory.Usage = s.MemoryStats.Usage.Usage
+    ret.Memory.Failcnt = s.MemoryStats.Usage.Failcnt
+    ret.Memory.Cache = s.MemoryStats.Stats["cache"]
+    ret.Memory.RSS = s.MemoryStats.Stats["rss"]
+    if v, ok := s.MemoryStats.Stats["pgfault"]; ok {
+        ret.Memory.ContainerData.Pgfault = v
+        ret.Memory.HierarchicalData.Pgfault = v
+    }
+    if v, ok := s.MemoryStats.Stats["pgmajfault"]; ok {
+        ret.Memory.ContainerData.Pgmajfault = v
+        ret.Memory.HierarchicalData.Pgmajfault = v
+    }
+    if v, ok := s.MemoryStats.Stats["total_inactive_anon"]; ok {
+        workingSet := ret.Memory.Usage
+        if workingSet < v {
+            workingSet = 0
+        } else {
+            workingSet -= v
+        }
 
-		if v, ok := s.MemoryStats.Stats["total_inactive_file"]; ok {
-			if workingSet < v {
-				workingSet = 0
-			} else {
-				workingSet -= v
-			}
-		}
-		ret.Memory.WorkingSet = workingSet
-	}
+        if v, ok := s.MemoryStats.Stats["total_inactive_file"]; ok {
+            if workingSet < v {
+                workingSet = 0
+            } else {
+                workingSet -= v
+            }
+        }
+        ret.Memory.WorkingSet = workingSet
+    }
 }
 
 func toContainerStats3(libcontainerStats *libcontainer.Stats, ret *info.ContainerStats) {
-	ret.Network.Interfaces = make([]info.InterfaceStats, len(libcontainerStats.Interfaces))
-	for i := range libcontainerStats.Interfaces {
-		ret.Network.Interfaces[i] = info.InterfaceStats{
-			Name:      libcontainerStats.Interfaces[i].Name,
-			RxBytes:   libcontainerStats.Interfaces[i].RxBytes,
-			RxPackets: libcontainerStats.Interfaces[i].RxPackets,
-			RxErrors:  libcontainerStats.Interfaces[i].RxErrors,
-			RxDropped: libcontainerStats.Interfaces[i].RxDropped,
-			TxBytes:   libcontainerStats.Interfaces[i].TxBytes,
-			TxPackets: libcontainerStats.Interfaces[i].TxPackets,
-			TxErrors:  libcontainerStats.Interfaces[i].TxErrors,
-			TxDropped: libcontainerStats.Interfaces[i].TxDropped,
-		}
-	}
+    ret.Network.Interfaces = make([]info.InterfaceStats, len(libcontainerStats.Interfaces))
+    for i := range libcontainerStats.Interfaces {
+        ret.Network.Interfaces[i] = info.InterfaceStats{
+            Name:      libcontainerStats.Interfaces[i].Name,
+            RxBytes:   libcontainerStats.Interfaces[i].RxBytes,
+            RxPackets: libcontainerStats.Interfaces[i].RxPackets,
+            RxErrors:  libcontainerStats.Interfaces[i].RxErrors,
+            RxDropped: libcontainerStats.Interfaces[i].RxDropped,
+            TxBytes:   libcontainerStats.Interfaces[i].TxBytes,
+            TxPackets: libcontainerStats.Interfaces[i].TxPackets,
+            TxErrors:  libcontainerStats.Interfaces[i].TxErrors,
+            TxDropped: libcontainerStats.Interfaces[i].TxDropped,
+        }
+    }
 
-	// Add to base struct for backwards compatibility.
-	if len(ret.Network.Interfaces) > 0 {
-		ret.Network.InterfaceStats = ret.Network.Interfaces[0]
-	}
+    // Add to base struct for backwards compatibility.
+    if len(ret.Network.Interfaces) > 0 {
+        ret.Network.InterfaceStats = ret.Network.Interfaces[0]
+    }
 }
 
 func toContainerStats(libcontainerStats *libcontainer.Stats) *info.ContainerStats {
-	s := libcontainerStats.CgroupStats
-	ret := new(info.ContainerStats)
-	ret.Timestamp = time.Now()
+    s := libcontainerStats.CgroupStats
+    ret := new(info.ContainerStats)
+    ret.Timestamp = time.Now()
 
-	if s != nil {
-		toContainerStats0(s, ret)
-		toContainerStats1(s, ret)
-		toContainerStats2(s, ret)
-	}
-	if len(libcontainerStats.Interfaces) > 0 {
-		toContainerStats3(libcontainerStats, ret)
-	}
-	return ret
+    if s != nil {
+        toContainerStats0(s, ret)
+        toContainerStats1(s, ret)
+        toContainerStats2(s, ret)
+    }
+    if len(libcontainerStats.Interfaces) > 0 {
+        toContainerStats3(libcontainerStats, ret)
+    }
+    return ret
 }

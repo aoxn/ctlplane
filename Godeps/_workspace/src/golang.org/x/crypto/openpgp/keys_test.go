@@ -1,274 +1,274 @@
 package openpgp
 
 import (
-	"bytes"
-	"strings"
-	"testing"
-	"time"
+    "bytes"
+    "strings"
+    "testing"
+    "time"
 
-	"golang.org/x/crypto/openpgp/errors"
-	"golang.org/x/crypto/openpgp/packet"
+    "golang.org/x/crypto/openpgp/errors"
+    "golang.org/x/crypto/openpgp/packet"
 )
 
 func TestKeyExpiry(t *testing.T) {
-	kring, _ := ReadKeyRing(readerFromHex(expiringKeyHex))
-	entity := kring[0]
+    kring, _ := ReadKeyRing(readerFromHex(expiringKeyHex))
+    entity := kring[0]
 
-	const timeFormat = "2006-01-02"
-	time1, _ := time.Parse(timeFormat, "2013-07-01")
+    const timeFormat = "2006-01-02"
+    time1, _ := time.Parse(timeFormat, "2013-07-01")
 
-	// The expiringKeyHex key is structured as:
-	//
-	// pub  1024R/5E237D8C  created: 2013-07-01                      expires: 2013-07-31  usage: SC
-	// sub  1024R/1ABB25A0  created: 2013-07-01 23:11:07 +0200 CEST  expires: 2013-07-08  usage: E
-	// sub  1024R/96A672F5  created: 2013-07-01 23:11:23 +0200 CEST  expires: 2013-07-31  usage: E
-	//
-	// So this should select the newest, non-expired encryption key.
-	key, _ := entity.encryptionKey(time1)
-	if id := key.PublicKey.KeyIdShortString(); id != "96A672F5" {
-		t.Errorf("Expected key 1ABB25A0 at time %s, but got key %s", time1.Format(timeFormat), id)
-	}
+    // The expiringKeyHex key is structured as:
+    //
+    // pub  1024R/5E237D8C  created: 2013-07-01                      expires: 2013-07-31  usage: SC
+    // sub  1024R/1ABB25A0  created: 2013-07-01 23:11:07 +0200 CEST  expires: 2013-07-08  usage: E
+    // sub  1024R/96A672F5  created: 2013-07-01 23:11:23 +0200 CEST  expires: 2013-07-31  usage: E
+    //
+    // So this should select the newest, non-expired encryption key.
+    key, _ := entity.encryptionKey(time1)
+    if id := key.PublicKey.KeyIdShortString(); id != "96A672F5" {
+        t.Errorf("Expected key 1ABB25A0 at time %s, but got key %s", time1.Format(timeFormat), id)
+    }
 
-	// Once the first encryption subkey has expired, the second should be
-	// selected.
-	time2, _ := time.Parse(timeFormat, "2013-07-09")
-	key, _ = entity.encryptionKey(time2)
-	if id := key.PublicKey.KeyIdShortString(); id != "96A672F5" {
-		t.Errorf("Expected key 96A672F5 at time %s, but got key %s", time2.Format(timeFormat), id)
-	}
+    // Once the first encryption subkey has expired, the second should be
+    // selected.
+    time2, _ := time.Parse(timeFormat, "2013-07-09")
+    key, _ = entity.encryptionKey(time2)
+    if id := key.PublicKey.KeyIdShortString(); id != "96A672F5" {
+        t.Errorf("Expected key 96A672F5 at time %s, but got key %s", time2.Format(timeFormat), id)
+    }
 
-	// Once all the keys have expired, nothing should be returned.
-	time3, _ := time.Parse(timeFormat, "2013-08-01")
-	if key, ok := entity.encryptionKey(time3); ok {
-		t.Errorf("Expected no key at time %s, but got key %s", time3.Format(timeFormat), key.PublicKey.KeyIdShortString())
-	}
+    // Once all the keys have expired, nothing should be returned.
+    time3, _ := time.Parse(timeFormat, "2013-08-01")
+    if key, ok := entity.encryptionKey(time3); ok {
+        t.Errorf("Expected no key at time %s, but got key %s", time3.Format(timeFormat), key.PublicKey.KeyIdShortString())
+    }
 }
 
 func TestMissingCrossSignature(t *testing.T) {
-	// This public key has a signing subkey, but the subkey does not
-	// contain a cross-signature.
-	keys, err := ReadArmoredKeyRing(bytes.NewBufferString(missingCrossSignatureKey))
-	if len(keys) != 0 {
-		t.Errorf("Accepted key with missing cross signature")
-	}
-	if err == nil {
-		t.Fatal("Failed to detect error in keyring with missing cross signature")
-	}
-	structural, ok := err.(errors.StructuralError)
-	if !ok {
-		t.Fatalf("Unexpected class of error: %T. Wanted StructuralError", err)
-	}
-	const expectedMsg = "signing subkey is missing cross-signature"
-	if !strings.Contains(string(structural), expectedMsg) {
-		t.Fatalf("Unexpected error: %q. Expected it to contain %q", err, expectedMsg)
-	}
+    // This public key has a signing subkey, but the subkey does not
+    // contain a cross-signature.
+    keys, err := ReadArmoredKeyRing(bytes.NewBufferString(missingCrossSignatureKey))
+    if len(keys) != 0 {
+        t.Errorf("Accepted key with missing cross signature")
+    }
+    if err == nil {
+        t.Fatal("Failed to detect error in keyring with missing cross signature")
+    }
+    structural, ok := err.(errors.StructuralError)
+    if !ok {
+        t.Fatalf("Unexpected class of error: %T. Wanted StructuralError", err)
+    }
+    const expectedMsg = "signing subkey is missing cross-signature"
+    if !strings.Contains(string(structural), expectedMsg) {
+        t.Fatalf("Unexpected error: %q. Expected it to contain %q", err, expectedMsg)
+    }
 }
 
 func TestInvalidCrossSignature(t *testing.T) {
-	// This public key has a signing subkey, and the subkey has an
-	// embedded cross-signature. However, the cross-signature does
-	// not correctly validate over the primary and subkey.
-	keys, err := ReadArmoredKeyRing(bytes.NewBufferString(invalidCrossSignatureKey))
-	if len(keys) != 0 {
-		t.Errorf("Accepted key with invalid cross signature")
-	}
-	if err == nil {
-		t.Fatal("Failed to detect error in keyring with an invalid cross signature")
-	}
-	structural, ok := err.(errors.StructuralError)
-	if !ok {
-		t.Fatalf("Unexpected class of error: %T. Wanted StructuralError", err)
-	}
-	const expectedMsg = "subkey signature invalid"
-	if !strings.Contains(string(structural), expectedMsg) {
-		t.Fatalf("Unexpected error: %q. Expected it to contain %q", err, expectedMsg)
-	}
+    // This public key has a signing subkey, and the subkey has an
+    // embedded cross-signature. However, the cross-signature does
+    // not correctly validate over the primary and subkey.
+    keys, err := ReadArmoredKeyRing(bytes.NewBufferString(invalidCrossSignatureKey))
+    if len(keys) != 0 {
+        t.Errorf("Accepted key with invalid cross signature")
+    }
+    if err == nil {
+        t.Fatal("Failed to detect error in keyring with an invalid cross signature")
+    }
+    structural, ok := err.(errors.StructuralError)
+    if !ok {
+        t.Fatalf("Unexpected class of error: %T. Wanted StructuralError", err)
+    }
+    const expectedMsg = "subkey signature invalid"
+    if !strings.Contains(string(structural), expectedMsg) {
+        t.Fatalf("Unexpected error: %q. Expected it to contain %q", err, expectedMsg)
+    }
 }
 
 func TestGoodCrossSignature(t *testing.T) {
-	// This public key has a signing subkey, and the subkey has an
-	// embedded cross-signature which correctly validates over the
-	// primary and subkey.
-	keys, err := ReadArmoredKeyRing(bytes.NewBufferString(goodCrossSignatureKey))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(keys) != 1 {
-		t.Errorf("Failed to accept key with good cross signature, %d", len(keys))
-	}
-	if len(keys[0].Subkeys) != 1 {
-		t.Errorf("Failed to accept good subkey, %d", len(keys[0].Subkeys))
-	}
+    // This public key has a signing subkey, and the subkey has an
+    // embedded cross-signature which correctly validates over the
+    // primary and subkey.
+    keys, err := ReadArmoredKeyRing(bytes.NewBufferString(goodCrossSignatureKey))
+    if err != nil {
+        t.Fatal(err)
+    }
+    if len(keys) != 1 {
+        t.Errorf("Failed to accept key with good cross signature, %d", len(keys))
+    }
+    if len(keys[0].Subkeys) != 1 {
+        t.Errorf("Failed to accept good subkey, %d", len(keys[0].Subkeys))
+    }
 }
 
 // TestExternallyRevokableKey attempts to load and parse a key with a third party revocation permission.
 func TestExternallyRevocableKey(t *testing.T) {
-	kring, _ := ReadKeyRing(readerFromHex(subkeyUsageHex))
+    kring, _ := ReadKeyRing(readerFromHex(subkeyUsageHex))
 
-	// The 0xA42704B92866382A key can be revoked by 0xBE3893CB843D0FE70C
-	// according to this signature that appears within the key:
-	// :signature packet: algo 1, keyid A42704B92866382A
-	//    version 4, created 1396409682, md5len 0, sigclass 0x1f
-	//    digest algo 2, begin of digest a9 84
-	//    hashed subpkt 2 len 4 (sig created 2014-04-02)
-	//    hashed subpkt 12 len 22 (revocation key: c=80 a=1 f=CE094AA433F7040BB2DDF0BE3893CB843D0FE70C)
-	//    hashed subpkt 7 len 1 (not revocable)
-	//    subpkt 16 len 8 (issuer key ID A42704B92866382A)
-	//    data: [1024 bits]
+    // The 0xA42704B92866382A key can be revoked by 0xBE3893CB843D0FE70C
+    // according to this signature that appears within the key:
+    // :signature packet: algo 1, keyid A42704B92866382A
+    //    version 4, created 1396409682, md5len 0, sigclass 0x1f
+    //    digest algo 2, begin of digest a9 84
+    //    hashed subpkt 2 len 4 (sig created 2014-04-02)
+    //    hashed subpkt 12 len 22 (revocation key: c=80 a=1 f=CE094AA433F7040BB2DDF0BE3893CB843D0FE70C)
+    //    hashed subpkt 7 len 1 (not revocable)
+    //    subpkt 16 len 8 (issuer key ID A42704B92866382A)
+    //    data: [1024 bits]
 
-	id := uint64(0xA42704B92866382A)
-	keys := kring.KeysById(id)
-	if len(keys) != 1 {
-		t.Errorf("Expected to find key id %X, but got %d matches", id, len(keys))
-	}
+    id := uint64(0xA42704B92866382A)
+    keys := kring.KeysById(id)
+    if len(keys) != 1 {
+        t.Errorf("Expected to find key id %X, but got %d matches", id, len(keys))
+    }
 }
 
 func TestKeyRevocation(t *testing.T) {
-	kring, _ := ReadKeyRing(readerFromHex(revokedKeyHex))
+    kring, _ := ReadKeyRing(readerFromHex(revokedKeyHex))
 
-	// revokedKeyHex contains these keys:
-	// pub   1024R/9A34F7C0 2014-03-25 [revoked: 2014-03-25]
-	// sub   1024R/1BA3CD60 2014-03-25 [revoked: 2014-03-25]
-	ids := []uint64{0xA401D9F09A34F7C0, 0x5CD3BE0A1BA3CD60}
+    // revokedKeyHex contains these keys:
+    // pub   1024R/9A34F7C0 2014-03-25 [revoked: 2014-03-25]
+    // sub   1024R/1BA3CD60 2014-03-25 [revoked: 2014-03-25]
+    ids := []uint64{0xA401D9F09A34F7C0, 0x5CD3BE0A1BA3CD60}
 
-	for _, id := range ids {
-		keys := kring.KeysById(id)
-		if len(keys) != 1 {
-			t.Errorf("Expected KeysById to find revoked key %X, but got %d matches", id, len(keys))
-		}
-		keys = kring.KeysByIdUsage(id, 0)
-		if len(keys) != 0 {
-			t.Errorf("Expected KeysByIdUsage to filter out revoked key %X, but got %d matches", id, len(keys))
-		}
-	}
+    for _, id := range ids {
+        keys := kring.KeysById(id)
+        if len(keys) != 1 {
+            t.Errorf("Expected KeysById to find revoked key %X, but got %d matches", id, len(keys))
+        }
+        keys = kring.KeysByIdUsage(id, 0)
+        if len(keys) != 0 {
+            t.Errorf("Expected KeysByIdUsage to filter out revoked key %X, but got %d matches", id, len(keys))
+        }
+    }
 }
 
 func TestSubkeyRevocation(t *testing.T) {
-	kring, _ := ReadKeyRing(readerFromHex(revokedSubkeyHex))
+    kring, _ := ReadKeyRing(readerFromHex(revokedSubkeyHex))
 
-	// revokedSubkeyHex contains these keys:
-	// pub   1024R/4EF7E4BECCDE97F0 2014-03-25
-	// sub   1024R/D63636E2B96AE423 2014-03-25
-	// sub   1024D/DBCE4EE19529437F 2014-03-25
-	// sub   1024R/677815E371C2FD23 2014-03-25 [revoked: 2014-03-25]
-	validKeys := []uint64{0x4EF7E4BECCDE97F0, 0xD63636E2B96AE423, 0xDBCE4EE19529437F}
-	revokedKey := uint64(0x677815E371C2FD23)
+    // revokedSubkeyHex contains these keys:
+    // pub   1024R/4EF7E4BECCDE97F0 2014-03-25
+    // sub   1024R/D63636E2B96AE423 2014-03-25
+    // sub   1024D/DBCE4EE19529437F 2014-03-25
+    // sub   1024R/677815E371C2FD23 2014-03-25 [revoked: 2014-03-25]
+    validKeys := []uint64{0x4EF7E4BECCDE97F0, 0xD63636E2B96AE423, 0xDBCE4EE19529437F}
+    revokedKey := uint64(0x677815E371C2FD23)
 
-	for _, id := range validKeys {
-		keys := kring.KeysById(id)
-		if len(keys) != 1 {
-			t.Errorf("Expected KeysById to find key %X, but got %d matches", id, len(keys))
-		}
-		keys = kring.KeysByIdUsage(id, 0)
-		if len(keys) != 1 {
-			t.Errorf("Expected KeysByIdUsage to find key %X, but got %d matches", id, len(keys))
-		}
-	}
+    for _, id := range validKeys {
+        keys := kring.KeysById(id)
+        if len(keys) != 1 {
+            t.Errorf("Expected KeysById to find key %X, but got %d matches", id, len(keys))
+        }
+        keys = kring.KeysByIdUsage(id, 0)
+        if len(keys) != 1 {
+            t.Errorf("Expected KeysByIdUsage to find key %X, but got %d matches", id, len(keys))
+        }
+    }
 
-	keys := kring.KeysById(revokedKey)
-	if len(keys) != 1 {
-		t.Errorf("Expected KeysById to find key %X, but got %d matches", revokedKey, len(keys))
-	}
+    keys := kring.KeysById(revokedKey)
+    if len(keys) != 1 {
+        t.Errorf("Expected KeysById to find key %X, but got %d matches", revokedKey, len(keys))
+    }
 
-	keys = kring.KeysByIdUsage(revokedKey, 0)
-	if len(keys) != 0 {
-		t.Errorf("Expected KeysByIdUsage to filter out revoked key %X, but got %d matches", revokedKey, len(keys))
-	}
+    keys = kring.KeysByIdUsage(revokedKey, 0)
+    if len(keys) != 0 {
+        t.Errorf("Expected KeysByIdUsage to filter out revoked key %X, but got %d matches", revokedKey, len(keys))
+    }
 }
 
 func TestKeyUsage(t *testing.T) {
-	kring, _ := ReadKeyRing(readerFromHex(subkeyUsageHex))
+    kring, _ := ReadKeyRing(readerFromHex(subkeyUsageHex))
 
-	// subkeyUsageHex contains these keys:
-	// pub  1024R/2866382A  created: 2014-04-01  expires: never       usage: SC
-	// sub  1024R/936C9153  created: 2014-04-01  expires: never       usage: E
-	// sub  1024R/64D5F5BB  created: 2014-04-02  expires: never       usage: E
-	// sub  1024D/BC0BA992  created: 2014-04-02  expires: never       usage: S
-	certifiers := []uint64{0xA42704B92866382A}
-	signers := []uint64{0xA42704B92866382A, 0x42CE2C64BC0BA992}
-	encrypters := []uint64{0x09C0C7D9936C9153, 0xC104E98664D5F5BB}
+    // subkeyUsageHex contains these keys:
+    // pub  1024R/2866382A  created: 2014-04-01  expires: never       usage: SC
+    // sub  1024R/936C9153  created: 2014-04-01  expires: never       usage: E
+    // sub  1024R/64D5F5BB  created: 2014-04-02  expires: never       usage: E
+    // sub  1024D/BC0BA992  created: 2014-04-02  expires: never       usage: S
+    certifiers := []uint64{0xA42704B92866382A}
+    signers := []uint64{0xA42704B92866382A, 0x42CE2C64BC0BA992}
+    encrypters := []uint64{0x09C0C7D9936C9153, 0xC104E98664D5F5BB}
 
-	for _, id := range certifiers {
-		keys := kring.KeysByIdUsage(id, packet.KeyFlagCertify)
-		if len(keys) == 1 {
-			if keys[0].PublicKey.KeyId != id {
-				t.Errorf("Expected to find certifier key id %X, but got %X", id, keys[0].PublicKey.KeyId)
-			}
-		} else {
-			t.Errorf("Expected one match for certifier key id %X, but got %d matches", id, len(keys))
-		}
-	}
+    for _, id := range certifiers {
+        keys := kring.KeysByIdUsage(id, packet.KeyFlagCertify)
+        if len(keys) == 1 {
+            if keys[0].PublicKey.KeyId != id {
+                t.Errorf("Expected to find certifier key id %X, but got %X", id, keys[0].PublicKey.KeyId)
+            }
+        } else {
+            t.Errorf("Expected one match for certifier key id %X, but got %d matches", id, len(keys))
+        }
+    }
 
-	for _, id := range signers {
-		keys := kring.KeysByIdUsage(id, packet.KeyFlagSign)
-		if len(keys) == 1 {
-			if keys[0].PublicKey.KeyId != id {
-				t.Errorf("Expected to find signing key id %X, but got %X", id, keys[0].PublicKey.KeyId)
-			}
-		} else {
-			t.Errorf("Expected one match for signing key id %X, but got %d matches", id, len(keys))
-		}
+    for _, id := range signers {
+        keys := kring.KeysByIdUsage(id, packet.KeyFlagSign)
+        if len(keys) == 1 {
+            if keys[0].PublicKey.KeyId != id {
+                t.Errorf("Expected to find signing key id %X, but got %X", id, keys[0].PublicKey.KeyId)
+            }
+        } else {
+            t.Errorf("Expected one match for signing key id %X, but got %d matches", id, len(keys))
+        }
 
-		// This keyring contains no encryption keys that are also good for signing.
-		keys = kring.KeysByIdUsage(id, packet.KeyFlagEncryptStorage|packet.KeyFlagEncryptCommunications)
-		if len(keys) != 0 {
-			t.Errorf("Unexpected match for encryption key id %X", id)
-		}
-	}
+        // This keyring contains no encryption keys that are also good for signing.
+        keys = kring.KeysByIdUsage(id, packet.KeyFlagEncryptStorage | packet.KeyFlagEncryptCommunications)
+        if len(keys) != 0 {
+            t.Errorf("Unexpected match for encryption key id %X", id)
+        }
+    }
 
-	for _, id := range encrypters {
-		keys := kring.KeysByIdUsage(id, packet.KeyFlagEncryptStorage|packet.KeyFlagEncryptCommunications)
-		if len(keys) == 1 {
-			if keys[0].PublicKey.KeyId != id {
-				t.Errorf("Expected to find encryption key id %X, but got %X", id, keys[0].PublicKey.KeyId)
-			}
-		} else {
-			t.Errorf("Expected one match for encryption key id %X, but got %d matches", id, len(keys))
-		}
+    for _, id := range encrypters {
+        keys := kring.KeysByIdUsage(id, packet.KeyFlagEncryptStorage | packet.KeyFlagEncryptCommunications)
+        if len(keys) == 1 {
+            if keys[0].PublicKey.KeyId != id {
+                t.Errorf("Expected to find encryption key id %X, but got %X", id, keys[0].PublicKey.KeyId)
+            }
+        } else {
+            t.Errorf("Expected one match for encryption key id %X, but got %d matches", id, len(keys))
+        }
 
-		// This keyring contains no encryption keys that are also good for signing.
-		keys = kring.KeysByIdUsage(id, packet.KeyFlagSign)
-		if len(keys) != 0 {
-			t.Errorf("Unexpected match for signing key id %X", id)
-		}
-	}
+        // This keyring contains no encryption keys that are also good for signing.
+        keys = kring.KeysByIdUsage(id, packet.KeyFlagSign)
+        if len(keys) != 0 {
+            t.Errorf("Unexpected match for signing key id %X", id)
+        }
+    }
 }
 
 func TestIdVerification(t *testing.T) {
-	kring, err := ReadKeyRing(readerFromHex(testKeys1And2PrivateHex))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := kring[1].PrivateKey.Decrypt([]byte("passphrase")); err != nil {
-		t.Fatal(err)
-	}
+    kring, err := ReadKeyRing(readerFromHex(testKeys1And2PrivateHex))
+    if err != nil {
+        t.Fatal(err)
+    }
+    if err := kring[1].PrivateKey.Decrypt([]byte("passphrase")); err != nil {
+        t.Fatal(err)
+    }
 
-	const identity = "Test Key 1 (RSA)"
-	if err := kring[0].SignIdentity(identity, kring[1], nil); err != nil {
-		t.Fatal(err)
-	}
+    const identity = "Test Key 1 (RSA)"
+    if err := kring[0].SignIdentity(identity, kring[1], nil); err != nil {
+        t.Fatal(err)
+    }
 
-	ident, ok := kring[0].Identities[identity]
-	if !ok {
-		t.Fatal("identity missing from key after signing")
-	}
+    ident, ok := kring[0].Identities[identity]
+    if !ok {
+        t.Fatal("identity missing from key after signing")
+    }
 
-	checked := false
-	for _, sig := range ident.Signatures {
-		if sig.IssuerKeyId == nil || *sig.IssuerKeyId != kring[1].PrimaryKey.KeyId {
-			continue
-		}
+    checked := false
+    for _, sig := range ident.Signatures {
+        if sig.IssuerKeyId == nil || *sig.IssuerKeyId != kring[1].PrimaryKey.KeyId {
+            continue
+        }
 
-		if err := kring[1].PrimaryKey.VerifyUserIdSignature(identity, kring[0].PrimaryKey, sig); err != nil {
-			t.Fatalf("error verifying new identity signature: %s", err)
-		}
-		checked = true
-		break
-	}
+        if err := kring[1].PrimaryKey.VerifyUserIdSignature(identity, kring[0].PrimaryKey, sig); err != nil {
+            t.Fatalf("error verifying new identity signature: %s", err)
+        }
+        checked = true
+        break
+    }
 
-	if !checked {
-		t.Fatal("didn't find identity signature in Entity")
-	}
+    if !checked {
+        t.Fatal("didn't find identity signature in Entity")
+    }
 }
 
 const expiringKeyHex = "988d0451d1ec5d010400ba3385721f2dc3f4ab096b2ee867ab77213f0a27a8538441c35d2fa225b08798a1439a66a5150e6bdc3f40f5d28d588c712394c632b6299f77db8c0d48d37903fb72ebd794d61be6aa774688839e5fdecfe06b2684cc115d240c98c66cb1ef22ae84e3aa0c2b0c28665c1e7d4d044e7f270706193f5223c8d44e0d70b7b8da830011010001b40f4578706972792074657374206b657988be041301020028050251d1ec5d021b03050900278d00060b090807030206150802090a0b0416020301021e01021780000a091072589ad75e237d8c033503fd10506d72837834eb7f994117740723adc39227104b0d326a1161871c0b415d25b4aedef946ca77ea4c05af9c22b32cf98be86ab890111fced1ee3f75e87b7cc3c00dc63bbc85dfab91c0dc2ad9de2c4d13a34659333a85c6acc1a669c5e1d6cecb0cf1e56c10e72d855ae177ddc9e766f9b2dda57ccbb75f57156438bbdb4e42b88d0451d1ec5d0104009c64906559866c5cb61578f5846a94fcee142a489c9b41e67b12bb54cfe86eb9bc8566460f9a720cb00d6526fbccfd4f552071a8e3f7744b1882d01036d811ee5a3fb91a1c568055758f43ba5d2c6a9676b012f3a1a89e47bbf624f1ad571b208f3cc6224eb378f1645dd3d47584463f9eadeacfd1ce6f813064fbfdcc4b5a53001101000188a504180102000f021b0c050251d1f06b050900093e89000a091072589ad75e237d8c20e00400ab8310a41461425b37889c4da28129b5fae6084fafbc0a47dd1adc74a264c6e9c9cc125f40462ee1433072a58384daef88c961c390ed06426a81b464a53194c4e291ddd7e2e2ba3efced01537d713bd111f48437bde2363446200995e8e0d4e528dda377fd1e8f8ede9c8e2198b393bd86852ce7457a7e3daf74d510461a5b77b88d0451d1ece8010400b3a519f83ab0010307e83bca895170acce8964a044190a2b368892f7a244758d9fc193482648acb1fb9780d28cc22d171931f38bb40279389fc9bf2110876d4f3db4fcfb13f22f7083877fe56592b3b65251312c36f83ffcb6d313c6a17f197dd471f0712aad15a8537b435a92471ba2e5b0c72a6c72536c3b567c558d7b6051001101000188a504180102000f021b0c050251d1f07b050900279091000a091072589ad75e237d8ce69e03fe286026afacf7c97ee20673864d4459a2240b5655219950643c7dba0ac384b1d4359c67805b21d98211f7b09c2a0ccf6410c8c04d4ff4a51293725d8d6570d9d8bb0e10c07d22357caeb49626df99c180be02d77d1fe8ed25e7a54481237646083a9f89a11566cd20b9e995b1487c5f9e02aeb434f3a1897cd416dd0a87861838da3e9e"

@@ -5,46 +5,46 @@
 package elastic
 
 import (
-	"fmt"
+    "fmt"
 
-	"gopkg.in/olivere/elastic.v2/uritemplates"
+    "gopkg.in/olivere/elastic.v2/uritemplates"
 )
 
 type IndexExistsService struct {
-	client *Client
-	index  string
+    client *Client
+    index  string
 }
 
 func NewIndexExistsService(client *Client) *IndexExistsService {
-	builder := &IndexExistsService{
-		client: client,
-	}
-	return builder
+    builder := &IndexExistsService{
+        client: client,
+    }
+    return builder
 }
 
 func (b *IndexExistsService) Index(index string) *IndexExistsService {
-	b.index = index
-	return b
+    b.index = index
+    return b
 }
 
 func (b *IndexExistsService) Do() (bool, error) {
-	// Build url
-	path, err := uritemplates.Expand("/{index}", map[string]string{
-		"index": b.index,
-	})
-	if err != nil {
-		return false, err
-	}
+    // Build url
+    path, err := uritemplates.Expand("/{index}", map[string]string{
+        "index": b.index,
+    })
+    if err != nil {
+        return false, err
+    }
 
-	// Get response
-	res, err := b.client.PerformRequest("HEAD", path, nil, nil)
-	if err != nil {
-		return false, err
-	}
-	if res.StatusCode == 200 {
-		return true, nil
-	} else if res.StatusCode == 404 {
-		return false, nil
-	}
-	return false, fmt.Errorf("elastic: got HTTP code %d when it should have been either 200 or 404", res.StatusCode)
+    // Get response
+    res, err := b.client.PerformRequest("HEAD", path, nil, nil)
+    if err != nil {
+        return false, err
+    }
+    if res.StatusCode == 200 {
+        return true, nil
+    } else if res.StatusCode == 404 {
+        return false, nil
+    }
+    return false, fmt.Errorf("elastic: got HTTP code %d when it should have been either 200 or 404", res.StatusCode)
 }

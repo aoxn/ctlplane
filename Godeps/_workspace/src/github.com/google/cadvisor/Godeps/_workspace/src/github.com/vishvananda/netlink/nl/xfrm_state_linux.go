@@ -1,16 +1,16 @@
 package nl
 
 import (
-	"unsafe"
+    "unsafe"
 )
 
 const (
-	SizeofXfrmUsersaId   = 0x18
-	SizeofXfrmStats      = 0x0c
-	SizeofXfrmUsersaInfo = 0xe0
-	SizeofXfrmAlgo       = 0x44
-	SizeofXfrmAlgoAuth   = 0x48
-	SizeofXfrmEncapTmpl  = 0x18
+    SizeofXfrmUsersaId = 0x18
+    SizeofXfrmStats = 0x0c
+    SizeofXfrmUsersaInfo = 0xe0
+    SizeofXfrmAlgo = 0x44
+    SizeofXfrmAlgoAuth = 0x48
+    SizeofXfrmEncapTmpl = 0x18
 )
 
 // struct xfrm_usersa_id {
@@ -21,23 +21,23 @@ const (
 // };
 
 type XfrmUsersaId struct {
-	Daddr  XfrmAddress
-	Spi    uint32 // big endian
-	Family uint16
-	Proto  uint8
-	Pad    byte
+    Daddr  XfrmAddress
+    Spi    uint32 // big endian
+    Family uint16
+    Proto  uint8
+    Pad    byte
 }
 
 func (msg *XfrmUsersaId) Len() int {
-	return SizeofXfrmUsersaId
+    return SizeofXfrmUsersaId
 }
 
 func DeserializeXfrmUsersaId(b []byte) *XfrmUsersaId {
-	return (*XfrmUsersaId)(unsafe.Pointer(&b[0:SizeofXfrmUsersaId][0]))
+    return (*XfrmUsersaId)(unsafe.Pointer(&b[0:SizeofXfrmUsersaId][0]))
 }
 
 func (msg *XfrmUsersaId) Serialize() []byte {
-	return (*(*[SizeofXfrmUsersaId]byte)(unsafe.Pointer(msg)))[:]
+    return (*(*[SizeofXfrmUsersaId]byte)(unsafe.Pointer(msg)))[:]
 }
 
 // struct xfrm_stats {
@@ -47,21 +47,21 @@ func (msg *XfrmUsersaId) Serialize() []byte {
 // };
 
 type XfrmStats struct {
-	ReplayWindow    uint32
-	Replay          uint32
-	IntegrityFailed uint32
+    ReplayWindow    uint32
+    Replay          uint32
+    IntegrityFailed uint32
 }
 
 func (msg *XfrmStats) Len() int {
-	return SizeofXfrmStats
+    return SizeofXfrmStats
 }
 
 func DeserializeXfrmStats(b []byte) *XfrmStats {
-	return (*XfrmStats)(unsafe.Pointer(&b[0:SizeofXfrmStats][0]))
+    return (*XfrmStats)(unsafe.Pointer(&b[0:SizeofXfrmStats][0]))
 }
 
 func (msg *XfrmStats) Serialize() []byte {
-	return (*(*[SizeofXfrmStats]byte)(unsafe.Pointer(msg)))[:]
+    return (*(*[SizeofXfrmStats]byte)(unsafe.Pointer(msg)))[:]
 }
 
 // struct xfrm_usersa_info {
@@ -91,31 +91,31 @@ func (msg *XfrmStats) Serialize() []byte {
 //
 
 type XfrmUsersaInfo struct {
-	Sel          XfrmSelector
-	Id           XfrmId
-	Saddr        XfrmAddress
-	Lft          XfrmLifetimeCfg
-	Curlft       XfrmLifetimeCur
-	Stats        XfrmStats
-	Seq          uint32
-	Reqid        uint32
-	Family       uint16
-	Mode         uint8
-	ReplayWindow uint8
-	Flags        uint8
-	Pad          [7]byte
+    Sel          XfrmSelector
+    Id           XfrmId
+    Saddr        XfrmAddress
+    Lft          XfrmLifetimeCfg
+    Curlft       XfrmLifetimeCur
+    Stats        XfrmStats
+    Seq          uint32
+    Reqid        uint32
+    Family       uint16
+    Mode         uint8
+    ReplayWindow uint8
+    Flags        uint8
+    Pad          [7]byte
 }
 
 func (msg *XfrmUsersaInfo) Len() int {
-	return SizeofXfrmUsersaInfo
+    return SizeofXfrmUsersaInfo
 }
 
 func DeserializeXfrmUsersaInfo(b []byte) *XfrmUsersaInfo {
-	return (*XfrmUsersaInfo)(unsafe.Pointer(&b[0:SizeofXfrmUsersaInfo][0]))
+    return (*XfrmUsersaInfo)(unsafe.Pointer(&b[0:SizeofXfrmUsersaInfo][0]))
 }
 
 func (msg *XfrmUsersaInfo) Serialize() []byte {
-	return (*(*[SizeofXfrmUsersaInfo]byte)(unsafe.Pointer(msg)))[:]
+    return (*(*[SizeofXfrmUsersaInfo]byte)(unsafe.Pointer(msg)))[:]
 }
 
 // struct xfrm_algo {
@@ -125,29 +125,29 @@ func (msg *XfrmUsersaInfo) Serialize() []byte {
 // };
 
 type XfrmAlgo struct {
-	AlgName   [64]byte
-	AlgKeyLen uint32
-	AlgKey    []byte
+    AlgName   [64]byte
+    AlgKeyLen uint32
+    AlgKey    []byte
 }
 
 func (msg *XfrmAlgo) Len() int {
-	return SizeofXfrmAlgo + int(msg.AlgKeyLen/8)
+    return SizeofXfrmAlgo + int(msg.AlgKeyLen / 8)
 }
 
 func DeserializeXfrmAlgo(b []byte) *XfrmAlgo {
-	ret := XfrmAlgo{}
-	copy(ret.AlgName[:], b[0:64])
-	ret.AlgKeyLen = *(*uint32)(unsafe.Pointer(&b[64]))
-	ret.AlgKey = b[68:ret.Len()]
-	return &ret
+    ret := XfrmAlgo{}
+    copy(ret.AlgName[:], b[0:64])
+    ret.AlgKeyLen = *(*uint32)(unsafe.Pointer(&b[64]))
+    ret.AlgKey = b[68:ret.Len()]
+    return &ret
 }
 
 func (msg *XfrmAlgo) Serialize() []byte {
-	b := make([]byte, msg.Len())
-	copy(b[0:64], msg.AlgName[:])
-	copy(b[64:68], (*(*[4]byte)(unsafe.Pointer(&msg.AlgKeyLen)))[:])
-	copy(b[68:msg.Len()], msg.AlgKey[:])
-	return b
+    b := make([]byte, msg.Len())
+    copy(b[0:64], msg.AlgName[:])
+    copy(b[64:68], (*(*[4]byte)(unsafe.Pointer(&msg.AlgKeyLen)))[:])
+    copy(b[68:msg.Len()], msg.AlgKey[:])
+    return b
 }
 
 // struct xfrm_algo_auth {
@@ -158,32 +158,32 @@ func (msg *XfrmAlgo) Serialize() []byte {
 // };
 
 type XfrmAlgoAuth struct {
-	AlgName     [64]byte
-	AlgKeyLen   uint32
-	AlgTruncLen uint32
-	AlgKey      []byte
+    AlgName     [64]byte
+    AlgKeyLen   uint32
+    AlgTruncLen uint32
+    AlgKey      []byte
 }
 
 func (msg *XfrmAlgoAuth) Len() int {
-	return SizeofXfrmAlgoAuth + int(msg.AlgKeyLen/8)
+    return SizeofXfrmAlgoAuth + int(msg.AlgKeyLen / 8)
 }
 
 func DeserializeXfrmAlgoAuth(b []byte) *XfrmAlgoAuth {
-	ret := XfrmAlgoAuth{}
-	copy(ret.AlgName[:], b[0:64])
-	ret.AlgKeyLen = *(*uint32)(unsafe.Pointer(&b[64]))
-	ret.AlgTruncLen = *(*uint32)(unsafe.Pointer(&b[68]))
-	ret.AlgKey = b[72:ret.Len()]
-	return &ret
+    ret := XfrmAlgoAuth{}
+    copy(ret.AlgName[:], b[0:64])
+    ret.AlgKeyLen = *(*uint32)(unsafe.Pointer(&b[64]))
+    ret.AlgTruncLen = *(*uint32)(unsafe.Pointer(&b[68]))
+    ret.AlgKey = b[72:ret.Len()]
+    return &ret
 }
 
 func (msg *XfrmAlgoAuth) Serialize() []byte {
-	b := make([]byte, msg.Len())
-	copy(b[0:64], msg.AlgName[:])
-	copy(b[64:68], (*(*[4]byte)(unsafe.Pointer(&msg.AlgKeyLen)))[:])
-	copy(b[68:72], (*(*[4]byte)(unsafe.Pointer(&msg.AlgTruncLen)))[:])
-	copy(b[72:msg.Len()], msg.AlgKey[:])
-	return b
+    b := make([]byte, msg.Len())
+    copy(b[0:64], msg.AlgName[:])
+    copy(b[64:68], (*(*[4]byte)(unsafe.Pointer(&msg.AlgKeyLen)))[:])
+    copy(b[68:72], (*(*[4]byte)(unsafe.Pointer(&msg.AlgTruncLen)))[:])
+    copy(b[72:msg.Len()], msg.AlgKey[:])
+    return b
 }
 
 // struct xfrm_algo_aead {
@@ -201,21 +201,21 @@ func (msg *XfrmAlgoAuth) Serialize() []byte {
 // };
 
 type XfrmEncapTmpl struct {
-	EncapType  uint16
-	EncapSport uint16 // big endian
-	EncapDport uint16 // big endian
-	Pad        [2]byte
-	EncapOa    XfrmAddress
+    EncapType  uint16
+    EncapSport uint16 // big endian
+    EncapDport uint16 // big endian
+    Pad        [2]byte
+    EncapOa    XfrmAddress
 }
 
 func (msg *XfrmEncapTmpl) Len() int {
-	return SizeofXfrmEncapTmpl
+    return SizeofXfrmEncapTmpl
 }
 
 func DeserializeXfrmEncapTmpl(b []byte) *XfrmEncapTmpl {
-	return (*XfrmEncapTmpl)(unsafe.Pointer(&b[0:SizeofXfrmEncapTmpl][0]))
+    return (*XfrmEncapTmpl)(unsafe.Pointer(&b[0:SizeofXfrmEncapTmpl][0]))
 }
 
 func (msg *XfrmEncapTmpl) Serialize() []byte {
-	return (*(*[SizeofXfrmEncapTmpl]byte)(unsafe.Pointer(msg)))[:]
+    return (*(*[SizeofXfrmEncapTmpl]byte)(unsafe.Pointer(msg)))[:]
 }

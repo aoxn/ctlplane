@@ -21,5 +21,5 @@ func (f *sysICMPFilter) setAll(block bool) {
 }
 
 func (f *sysICMPFilter) willBlock(typ ICMPType) bool {
-	return false
+    return false
 }

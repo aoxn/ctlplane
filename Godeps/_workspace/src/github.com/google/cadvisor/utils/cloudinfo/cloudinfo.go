@@ -17,71 +17,71 @@
 package cloudinfo
 
 import (
-	info "github.com/google/cadvisor/info/v1"
+    info "github.com/google/cadvisor/info/v1"
 )
 
 type CloudInfo interface {
-	GetCloudProvider() info.CloudProvider
-	GetInstanceType() info.InstanceType
+    GetCloudProvider() info.CloudProvider
+    GetInstanceType() info.InstanceType
 }
 
 type realCloudInfo struct {
-	cloudProvider info.CloudProvider
-	instanceType  info.InstanceType
+    cloudProvider info.CloudProvider
+    instanceType  info.InstanceType
 }
 
 func NewRealCloudInfo() CloudInfo {
-	cloudProvider := detectCloudProvider()
-	instanceType := detectInstanceType(cloudProvider)
-	return &realCloudInfo{
-		cloudProvider: cloudProvider,
-		instanceType:  instanceType,
-	}
+    cloudProvider := detectCloudProvider()
+    instanceType := detectInstanceType(cloudProvider)
+    return &realCloudInfo{
+        cloudProvider: cloudProvider,
+        instanceType:  instanceType,
+    }
 }
 
 func (self *realCloudInfo) GetCloudProvider() info.CloudProvider {
-	return self.cloudProvider
+    return self.cloudProvider
 }
 
 func (self *realCloudInfo) GetInstanceType() info.InstanceType {
-	return self.instanceType
+    return self.instanceType
 }
 
 func detectCloudProvider() info.CloudProvider {
-	switch {
-	case onGCE():
-		return info.GCE
-	case onAWS():
-		return info.AWS
-	case onBaremetal():
-		return info.Baremetal
-	}
-	return info.UnkownProvider
+    switch {
+    case onGCE():
+        return info.GCE
+    case onAWS():
+        return info.AWS
+    case onBaremetal():
+        return info.Baremetal
+    }
+    return info.UnkownProvider
 }
 
 func detectInstanceType(cloudProvider info.CloudProvider) info.InstanceType {
-	switch cloudProvider {
-	case info.GCE:
-		return getGceInstanceType()
-	case info.AWS:
-		return getAwsInstanceType()
-	case info.Baremetal:
-		return info.NoInstance
-	}
-	return info.UnknownInstance
+    switch cloudProvider {
+    case info.GCE:
+        return getGceInstanceType()
+    case info.AWS:
+        return getAwsInstanceType()
+    case info.Baremetal:
+        return info.NoInstance
+    }
+    return info.UnknownInstance
 }
 
 //TODO: Implement method.
 func onAWS() bool {
-	return false
+    return false
 }
 
 //TODO: Implement method.
 func getAwsInstanceType() info.InstanceType {
-	return info.UnknownInstance
+    return info.UnknownInstance
 }
 
 //TODO: Implement method.
 func onBaremetal() bool {
-	return false
+    return false
 }

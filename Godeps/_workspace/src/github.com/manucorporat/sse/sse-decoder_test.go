@@ -5,15 +5,15 @@
 package sse
 
 import (
-	"bytes"
-	"testing"
+    "bytes"
+    "testing"
 
-	"github.com/stretchr/testify/assert"
+    "github.com/stretchr/testify/assert"
 )
 
 func TestDecodeSingle1(t *testing.T) {
-	events, err := Decode(bytes.NewBufferString(
-		`data: this is a text
+    events, err := Decode(bytes.NewBufferString(
+        `data: this is a text
 event: message
 fake:
 id: 123456789010
@@ -21,15 +21,15 @@ id: 123456789010
 : and multiple comments should not break it
 data: a very nice one`))
 
-	assert.NoError(t, err)
-	assert.Len(t, events, 1)
-	assert.Equal(t, events[0].Event, "message")
-	assert.Equal(t, events[0].Id, "123456789010")
+    assert.NoError(t, err)
+    assert.Len(t, events, 1)
+    assert.Equal(t, events[0].Event, "message")
+    assert.Equal(t, events[0].Id, "123456789010")
 }
 
 func TestDecodeSingle2(t *testing.T) {
-	events, err := Decode(bytes.NewBufferString(
-		`: starting with a comment
+    events, err := Decode(bytes.NewBufferString(
+        `: starting with a comment
 fake:
 
 data:this is a \ntext
@@ -42,15 +42,15 @@ data:a very nice one\n!
 
 
 `))
-	assert.NoError(t, err)
-	assert.Len(t, events, 1)
-	assert.Equal(t, events[0].Event, "a message\\n\\n")
-	assert.Equal(t, events[0].Id, "1234567890\\n10")
+    assert.NoError(t, err)
+    assert.Len(t, events, 1)
+    assert.Equal(t, events[0].Event, "a message\\n\\n")
+    assert.Equal(t, events[0].Id, "1234567890\\n10")
 }
 
 func TestDecodeSingle3(t *testing.T) {
-	events, err := Decode(bytes.NewBufferString(
-		`
+    events, err := Decode(bytes.NewBufferString(
+        `
 id:123456ABCabc789010
 event: message123
 : we can append data
@@ -60,15 +60,15 @@ data:
 data
 : ending with a comment`))
 
-	assert.NoError(t, err)
-	assert.Len(t, events, 1)
-	assert.Equal(t, events[0].Event, "message123")
-	assert.Equal(t, events[0].Id, "123456ABCabc789010")
+    assert.NoError(t, err)
+    assert.Len(t, events, 1)
+    assert.Equal(t, events[0].Event, "message123")
+    assert.Equal(t, events[0].Id, "123456ABCabc789010")
 }
 
 func TestDecodeMulti1(t *testing.T) {
-	events, err := Decode(bytes.NewBufferString(
-		`
+    events, err := Decode(bytes.NewBufferString(
+        `
 id:
 event: weird event
 data:this is a text
@@ -96,21 +96,21 @@ data
 event:
 
 id`))
-	assert.NoError(t, err)
-	assert.Len(t, events, 3)
-	assert.Equal(t, events[0].Event, "weird event")
-	assert.Equal(t, events[0].Id, "")
+    assert.NoError(t, err)
+    assert.Len(t, events, 3)
+    assert.Equal(t, events[0].Event, "weird event")
+    assert.Equal(t, events[0].Id, "")
 }
 
 func TestDecodeW3C(t *testing.T) {
-	events, err := Decode(bytes.NewBufferString(
-		`data
+    events, err := Decode(bytes.NewBufferString(
+        `data
 
 data
 data
 
 data:
 `))
-	assert.NoError(t, err)
-	assert.Len(t, events, 1)
+    assert.NoError(t, err)
+    assert.Len(t, events, 1)
 }

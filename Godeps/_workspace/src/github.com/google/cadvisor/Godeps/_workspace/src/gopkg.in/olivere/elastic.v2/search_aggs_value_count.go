@@ -13,99 +13,99 @@ package elastic
 // number of values the average is computed over.
 // See: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-aggregations-metrics-valuecount-aggregation.html
 type ValueCountAggregation struct {
-	field           string
-	script          string
-	scriptFile      string
-	lang            string
-	format          string
-	params          map[string]interface{}
-	subAggregations map[string]Aggregation
+    field           string
+    script          string
+    scriptFile      string
+    lang            string
+    format          string
+    params          map[string]interface{}
+    subAggregations map[string]Aggregation
 }
 
 func NewValueCountAggregation() ValueCountAggregation {
-	a := ValueCountAggregation{
-		params:          make(map[string]interface{}),
-		subAggregations: make(map[string]Aggregation),
-	}
-	return a
+    a := ValueCountAggregation{
+        params:          make(map[string]interface{}),
+        subAggregations: make(map[string]Aggregation),
+    }
+    return a
 }
 
 func (a ValueCountAggregation) Field(field string) ValueCountAggregation {
-	a.field = field
-	return a
+    a.field = field
+    return a
 }
 
 func (a ValueCountAggregation) Script(script string) ValueCountAggregation {
-	a.script = script
-	return a
+    a.script = script
+    return a
 }
 
 func (a ValueCountAggregation) ScriptFile(scriptFile string) ValueCountAggregation {
-	a.scriptFile = scriptFile
-	return a
+    a.scriptFile = scriptFile
+    return a
 }
 
 func (a ValueCountAggregation) Lang(lang string) ValueCountAggregation {
-	a.lang = lang
-	return a
+    a.lang = lang
+    return a
 }
 
 func (a ValueCountAggregation) Format(format string) ValueCountAggregation {
-	a.format = format
-	return a
+    a.format = format
+    return a
 }
 
 func (a ValueCountAggregation) Param(name string, value interface{}) ValueCountAggregation {
-	a.params[name] = value
-	return a
+    a.params[name] = value
+    return a
 }
 
 func (a ValueCountAggregation) SubAggregation(name string, subAggregation Aggregation) ValueCountAggregation {
-	a.subAggregations[name] = subAggregation
-	return a
+    a.subAggregations[name] = subAggregation
+    return a
 }
 
 func (a ValueCountAggregation) Source() interface{} {
-	// Example:
-	//	{
-	//    "aggs" : {
-	//      "grades_count" : { "value_count" : { "field" : "grade" } }
-	//    }
-	//	}
-	// This method returns only the { "value_count" : { "field" : "grade" } } part.
+    // Example:
+    //	{
+    //    "aggs" : {
+    //      "grades_count" : { "value_count" : { "field" : "grade" } }
+    //    }
+    //	}
+    // This method returns only the { "value_count" : { "field" : "grade" } } part.
 
-	source := make(map[string]interface{})
-	opts := make(map[string]interface{})
-	source["value_count"] = opts
+    source := make(map[string]interface{})
+    opts := make(map[string]interface{})
+    source["value_count"] = opts
 
-	// ValuesSourceAggregationBuilder
-	if a.field != "" {
-		opts["field"] = a.field
-	}
-	if a.script != "" {
-		opts["script"] = a.script
-	}
-	if a.scriptFile != "" {
-		opts["script_file"] = a.scriptFile
-	}
-	if a.lang != "" {
-		opts["lang"] = a.lang
-	}
-	if a.format != "" {
-		opts["format"] = a.format
-	}
-	if len(a.params) > 0 {
-		opts["params"] = a.params
-	}
+    // ValuesSourceAggregationBuilder
+    if a.field != "" {
+        opts["field"] = a.field
+    }
+    if a.script != "" {
+        opts["script"] = a.script
+    }
+    if a.scriptFile != "" {
+        opts["script_file"] = a.scriptFile
+    }
+    if a.lang != "" {
+        opts["lang"] = a.lang
+    }
+    if a.format != "" {
+        opts["format"] = a.format
+    }
+    if len(a.params) > 0 {
+        opts["params"] = a.params
+    }
 
-	// AggregationBuilder (SubAggregations)
-	if len(a.subAggregations) > 0 {
-		aggsMap := make(map[string]interface{})
-		source["aggregations"] = aggsMap
-		for name, aggregate := range a.subAggregations {
-			aggsMap[name] = aggregate.Source()
-		}
-	}
+    // AggregationBuilder (SubAggregations)
+    if len(a.subAggregations) > 0 {
+        aggsMap := make(map[string]interface{})
+        source["aggregations"] = aggsMap
+        for name, aggregate := range a.subAggregations {
+            aggsMap[name] = aggregate.Source()
+        }
+    }
 
-	return source
+    return source
 }

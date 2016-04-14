@@ -7,48 +7,48 @@
 package proxy // import "golang.org/x/net/proxy"
 
 import (
-	"errors"
-	"net"
-	"net/url"
-	"os"
+    "errors"
+    "net"
+    "net/url"
+    "os"
 )
 
 // A Dialer is a means to establish a connection.
 type Dialer interface {
-	// Dial connects to the given address via the proxy.
-	Dial(network, addr string) (c net.Conn, err error)
+    // Dial connects to the given address via the proxy.
+    Dial(network, addr string) (c net.Conn, err error)
 }
 
 // Auth contains authentication parameters that specific Dialers may require.
 type Auth struct {
-	User, Password string
+    User, Password string
 }
 
 // FromEnvironment returns the dialer specified by the proxy related variables in
 // the environment.
 func FromEnvironment() Dialer {
-	allProxy := os.Getenv("all_proxy")
-	if len(allProxy) == 0 {
-		return Direct
-	}
+    allProxy := os.Getenv("all_proxy")
+    if len(allProxy) == 0 {
+        return Direct
+    }
 
-	proxyURL, err := url.Parse(allProxy)
-	if err != nil {
-		return Direct
-	}
-	proxy, err := FromURL(proxyURL, Direct)
-	if err != nil {
-		return Direct
-	}
+    proxyURL, err := url.Parse(allProxy)
+    if err != nil {
+        return Direct
+    }
+    proxy, err := FromURL(proxyURL, Direct)
+    if err != nil {
+        return Direct
+    }
 
-	noProxy := os.Getenv("no_proxy")
-	if len(noProxy) == 0 {
-		return proxy
-	}
+    noProxy := os.Getenv("no_proxy")
+    if len(noProxy) == 0 {
+        return proxy
+    }
 
-	perHost := NewPerHost(proxy, Direct)
-	perHost.AddFromString(noProxy)
-	return perHost
+    perHost := NewPerHost(proxy, Direct)
+    perHost.AddFromString(noProxy)
+    return perHost
 }
 
 // proxySchemes is a map from URL schemes to a function that creates a Dialer
@@ -59,36 +59,36 @@ var proxySchemes map[string]func(*url.URL, Dialer) (Dialer, error)
 // a URL with that scheme and a forwarding Dialer. Registered schemes are used
 // by FromURL.
 func RegisterDialerType(scheme string, f func(*url.URL, Dialer) (Dialer, error)) {
-	if proxySchemes == nil {
-		proxySchemes = make(map[string]func(*url.URL, Dialer) (Dialer, error))
-	}
-	proxySchemes[scheme] = f
+    if proxySchemes == nil {
+        proxySchemes = make(map[string]func(*url.URL, Dialer) (Dialer, error))
+    }
+    proxySchemes[scheme] = f
 }
 
 // FromURL returns a Dialer given a URL specification and an underlying
 // Dialer for it to make network requests.
 func FromURL(u *url.URL, forward Dialer) (Dialer, error) {
-	var auth *Auth
-	if u.User != nil {
-		auth = new(Auth)
-		auth.User = u.User.Username()
-		if p, ok := u.User.Password(); ok {
-			auth.Password = p
-		}
-	}
+    var auth *Auth
+    if u.User != nil {
+        auth = new(Auth)
+        auth.User = u.User.Username()
+        if p, ok := u.User.Password(); ok {
+            auth.Password = p
+        }
+    }
 
-	switch u.Scheme {
-	case "socks5":
-		return SOCKS5("tcp", u.Host, auth, forward)
-	}
+    switch u.Scheme {
+    case "socks5":
+        return SOCKS5("tcp", u.Host, auth, forward)
+    }
 
-	// If the scheme doesn't match any of the built-in schemes, see if it
-	// was registered by another package.
-	if proxySchemes != nil {
-		if f, ok := proxySchemes[u.Scheme]; ok {
-			return f(u, forward)
-		}
-	}
+    // If the scheme doesn't match any of the built-in schemes, see if it
+    // was registered by another package.
+    if proxySchemes != nil {
+        if f, ok := proxySchemes[u.Scheme]; ok {
+            return f(u, forward)
+        }
+    }
 
-	return nil, errors.New("proxy: unknown scheme: " + u.Scheme)
+    return nil, errors.New("proxy: unknown scheme: " + u.Scheme)
 }

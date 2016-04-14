@@ -12,72 +12,72 @@ package elastic
 // For more details, see:
 // http://www.elasticsearch.org/guide/reference/query-dsl/dis-max-query/
 type DisMaxQuery struct {
-	queries    []Query
-	boost      *float32
-	tieBreaker *float32
+    queries    []Query
+    boost      *float32
+    tieBreaker *float32
 }
 
 // Creates a new dis_max query.
 func NewDisMaxQuery() DisMaxQuery {
-	q := DisMaxQuery{
-		queries: make([]Query, 0),
-	}
-	return q
+    q := DisMaxQuery{
+        queries: make([]Query, 0),
+    }
+    return q
 }
 
 func (q DisMaxQuery) Query(query Query) DisMaxQuery {
-	q.queries = append(q.queries, query)
-	return q
+    q.queries = append(q.queries, query)
+    return q
 }
 
 func (q DisMaxQuery) Boost(boost float32) DisMaxQuery {
-	q.boost = &boost
-	return q
+    q.boost = &boost
+    return q
 }
 
 func (q DisMaxQuery) TieBreaker(tieBreaker float32) DisMaxQuery {
-	q.tieBreaker = &tieBreaker
-	return q
+    q.tieBreaker = &tieBreaker
+    return q
 }
 
 // Creates the query source for the dis_max query.
 func (q DisMaxQuery) Source() interface{} {
-	// {
-	//  "dis_max" : {
-	//    "tie_breaker" : 0.7,
-	//    "boost" : 1.2,
-	//    "queries" : {
-	//      {
-	//        "term" : { "age" : 34 }
-	//      },
-	//      {
-	//        "term" : { "age" : 35 }
-	//      }
-	//    ]
-	//  }
-	// }
+    // {
+    //  "dis_max" : {
+    //    "tie_breaker" : 0.7,
+    //    "boost" : 1.2,
+    //    "queries" : {
+    //      {
+    //        "term" : { "age" : 34 }
+    //      },
+    //      {
+    //        "term" : { "age" : 35 }
+    //      }
+    //    ]
+    //  }
+    // }
 
-	query := make(map[string]interface{})
+    query := make(map[string]interface{})
 
-	disMax := make(map[string]interface{})
-	query["dis_max"] = disMax
+    disMax := make(map[string]interface{})
+    query["dis_max"] = disMax
 
-	// tieBreaker
-	if q.tieBreaker != nil {
-		disMax["tie_breaker"] = *q.tieBreaker
-	}
+    // tieBreaker
+    if q.tieBreaker != nil {
+        disMax["tie_breaker"] = *q.tieBreaker
+    }
 
-	// boost
-	if q.boost != nil {
-		disMax["boost"] = *q.boost
-	}
+    // boost
+    if q.boost != nil {
+        disMax["boost"] = *q.boost
+    }
 
-	// queries
-	clauses := make([]interface{}, 0)
-	for _, subQuery := range q.queries {
-		clauses = append(clauses, subQuery.Source())
-	}
-	disMax["queries"] = clauses
+    // queries
+    clauses := make([]interface{}, 0)
+    for _, subQuery := range q.queries {
+        clauses = append(clauses, subQuery.Source())
+    }
+    disMax["queries"] = clauses
 
-	return query
+    return query
 }

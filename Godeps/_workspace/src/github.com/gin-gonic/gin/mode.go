@@ -5,23 +5,23 @@
 package gin
 
 import (
-	"io"
-	"os"
+    "io"
+    "os"
 
-	"github.com/gin-gonic/gin/binding"
+    "github.com/gin-gonic/gin/binding"
 )
 
 const ENV_GIN_MODE = "GIN_MODE"
 
 const (
-	DebugMode   string = "debug"
-	ReleaseMode string = "release"
-	TestMode    string = "test"
+    DebugMode string = "debug"
+    ReleaseMode string = "release"
+    TestMode string = "test"
 )
 const (
-	debugCode   = iota
-	releaseCode = iota
-	testCode    = iota
+    debugCode = iota
+    releaseCode = iota
+    testCode = iota
 )
 
 // DefaultWriter is the default io.Writer used the Gin for debug output and
@@ -38,32 +38,32 @@ var ginMode int = debugCode
 var modeName string = DebugMode
 
 func init() {
-	mode := os.Getenv(ENV_GIN_MODE)
-	if len(mode) == 0 {
-		SetMode(DebugMode)
-	} else {
-		SetMode(mode)
-	}
+    mode := os.Getenv(ENV_GIN_MODE)
+    if len(mode) == 0 {
+        SetMode(DebugMode)
+    } else {
+        SetMode(mode)
+    }
 }
 
 func SetMode(value string) {
-	switch value {
-	case DebugMode:
-		ginMode = debugCode
-	case ReleaseMode:
-		ginMode = releaseCode
-	case TestMode:
-		ginMode = testCode
-	default:
-		panic("gin mode unknown: " + value)
-	}
-	modeName = value
+    switch value {
+    case DebugMode:
+        ginMode = debugCode
+    case ReleaseMode:
+        ginMode = releaseCode
+    case TestMode:
+        ginMode = testCode
+    default:
+        panic("gin mode unknown: " + value)
+    }
+    modeName = value
 }
 
 func DisableBindValidation() {
-	binding.Validator = nil
+    binding.Validator = nil
 }
 
 func Mode() string {
-	return modeName
+    return modeName
 }

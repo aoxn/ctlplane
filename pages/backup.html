@@ -4,12 +4,12 @@
 <div class="main">
 
     <div class="row">
-    <div class="col-sm-4 col-sm-offset-4">
-    This content and its sibling..
-    </div>
-    <div class="col-sm-4">
-    are
-    </div>
+        <div class="col-sm-4 col-sm-offset-4">
+            This content and its sibling..
+        </div>
+        <div class="col-sm-4">
+            are
+        </div>
     </div>
 
     {{if .has}}
@@ -17,8 +17,10 @@
     <div class="container panel panel-default panel-success">
         <div class="row panel-body padded-right-middle btn-block">
                 <span class="col-xs-8 col-md-8 center-block">
-                    <span class="col-xs-1 col-md-1 center-block"><span class="glyphicon glyphicon-th-list"></span></span>
-                    <span class="col-xs-11 col-md-11 center-block"><span class="strong"><a href="/detail?it={{$item.RepoName}}">{{$item.RepoName}}</a></span></span>
+                    <span class="col-xs-1 col-md-1 center-block"><span
+                            class="glyphicon glyphicon-th-list"></span></span>
+                    <span class="col-xs-11 col-md-11 center-block"><span class="strong"><a
+                            href="/detail?it={{$item.RepoName}}">{{$item.RepoName}}</a></span></span>
                 </span>
                 <span class="col-xs-4 col-md-4 center-block">
                     <span class="col-xs-4 col-md-5 center-block">520 <strong>STARS</strong></span>
@@ -45,7 +47,7 @@
                     <span aria-hidden="true">&laquo;Prev</span>
                 </a>
             </li>
-            <li> <a href="/repository?index={{.page.Index}}&search={{.page.Search}}">{{.page.Index}}</a></li>
+            <li><a href="/repository?index={{.page.Index}}&search={{.page.Search}}">{{.page.Index}}</a></li>
             <li>
                 <a href="/repository?index={{.page.Next}}&search={{.page.Search}}">
                     <span aria-hidden="true">Next&raquo;</span>

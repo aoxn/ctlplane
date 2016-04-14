@@ -9,54 +9,54 @@ package elastic
 // For details, see:
 // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-not-filter.html#query-dsl-not-filter.
 type NotFilter struct {
-	filter     Filter
-	cache      *bool
-	cacheKey   string
-	filterName string
+    filter     Filter
+    cache      *bool
+    cacheKey   string
+    filterName string
 }
 
 func NewNotFilter(filter Filter) NotFilter {
-	return NotFilter{
-		filter: filter,
-	}
+    return NotFilter{
+        filter: filter,
+    }
 }
 
 func (f NotFilter) Cache(cache bool) NotFilter {
-	f.cache = &cache
-	return f
+    f.cache = &cache
+    return f
 }
 
 func (f NotFilter) CacheKey(cacheKey string) NotFilter {
-	f.cacheKey = cacheKey
-	return f
+    f.cacheKey = cacheKey
+    return f
 }
 
 func (f NotFilter) FilterName(filterName string) NotFilter {
-	f.filterName = filterName
-	return f
+    f.filterName = filterName
+    return f
 }
 
 func (f NotFilter) Source() interface{} {
-	// {
-	//   "not" : {
-	//      "filter" : { ... }
-	//   }
-	// }
+    // {
+    //   "not" : {
+    //      "filter" : { ... }
+    //   }
+    // }
 
-	source := make(map[string]interface{})
+    source := make(map[string]interface{})
 
-	params := make(map[string]interface{})
-	source["not"] = params
-	params["filter"] = f.filter.Source()
+    params := make(map[string]interface{})
+    source["not"] = params
+    params["filter"] = f.filter.Source()
 
-	if f.cache != nil {
-		params["_cache"] = *f.cache
-	}
-	if f.cacheKey != "" {
-		params["_cache_key"] = f.cacheKey
-	}
-	if f.filterName != "" {
-		params["_name"] = f.filterName
-	}
-	return source
+    if f.cache != nil {
+        params["_cache"] = *f.cache
+    }
+    if f.cacheKey != "" {
+        params["_cache_key"] = f.cacheKey
+    }
+    if f.filterName != "" {
+        params["_name"] = f.filterName
+    }
+    return source
 }

@@ -1,13 +1,13 @@
 package nl
 
 import (
-	"unsafe"
+    "unsafe"
 )
 
 const (
-	SizeofXfrmUserpolicyId   = 0x40
-	SizeofXfrmUserpolicyInfo = 0xa8
-	SizeofXfrmUserTmpl       = 0x40
+    SizeofXfrmUserpolicyId = 0x40
+    SizeofXfrmUserpolicyInfo = 0xa8
+    SizeofXfrmUserTmpl = 0x40
 )
 
 // struct xfrm_userpolicy_id {
@@ -18,22 +18,22 @@ const (
 //
 
 type XfrmUserpolicyId struct {
-	Sel   XfrmSelector
-	Index uint32
-	Dir   uint8
-	Pad   [3]byte
+    Sel   XfrmSelector
+    Index uint32
+    Dir   uint8
+    Pad   [3]byte
 }
 
 func (msg *XfrmUserpolicyId) Len() int {
-	return SizeofXfrmUserpolicyId
+    return SizeofXfrmUserpolicyId
 }
 
 func DeserializeXfrmUserpolicyId(b []byte) *XfrmUserpolicyId {
-	return (*XfrmUserpolicyId)(unsafe.Pointer(&b[0:SizeofXfrmUserpolicyId][0]))
+    return (*XfrmUserpolicyId)(unsafe.Pointer(&b[0:SizeofXfrmUserpolicyId][0]))
 }
 
 func (msg *XfrmUserpolicyId) Serialize() []byte {
-	return (*(*[SizeofXfrmUserpolicyId]byte)(unsafe.Pointer(msg)))[:]
+    return (*(*[SizeofXfrmUserpolicyId]byte)(unsafe.Pointer(msg)))[:]
 }
 
 // struct xfrm_userpolicy_info {
@@ -54,28 +54,28 @@ func (msg *XfrmUserpolicyId) Serialize() []byte {
 // };
 
 type XfrmUserpolicyInfo struct {
-	Sel      XfrmSelector
-	Lft      XfrmLifetimeCfg
-	Curlft   XfrmLifetimeCur
-	Priority uint32
-	Index    uint32
-	Dir      uint8
-	Action   uint8
-	Flags    uint8
-	Share    uint8
-	Pad      [4]byte
+    Sel      XfrmSelector
+    Lft      XfrmLifetimeCfg
+    Curlft   XfrmLifetimeCur
+    Priority uint32
+    Index    uint32
+    Dir      uint8
+    Action   uint8
+    Flags    uint8
+    Share    uint8
+    Pad      [4]byte
 }
 
 func (msg *XfrmUserpolicyInfo) Len() int {
-	return SizeofXfrmUserpolicyInfo
+    return SizeofXfrmUserpolicyInfo
 }
 
 func DeserializeXfrmUserpolicyInfo(b []byte) *XfrmUserpolicyInfo {
-	return (*XfrmUserpolicyInfo)(unsafe.Pointer(&b[0:SizeofXfrmUserpolicyInfo][0]))
+    return (*XfrmUserpolicyInfo)(unsafe.Pointer(&b[0:SizeofXfrmUserpolicyInfo][0]))
 }
 
 func (msg *XfrmUserpolicyInfo) Serialize() []byte {
-	return (*(*[SizeofXfrmUserpolicyInfo]byte)(unsafe.Pointer(msg)))[:]
+    return (*(*[SizeofXfrmUserpolicyInfo]byte)(unsafe.Pointer(msg)))[:]
 }
 
 // struct xfrm_user_tmpl {
@@ -92,28 +92,28 @@ func (msg *XfrmUserpolicyInfo) Serialize() []byte {
 // }
 
 type XfrmUserTmpl struct {
-	XfrmId   XfrmId
-	Family   uint16
-	Pad1     [2]byte
-	Saddr    XfrmAddress
-	Reqid    uint32
-	Mode     uint8
-	Share    uint8
-	Optional uint8
-	Pad2     byte
-	Aalgos   uint32
-	Ealgos   uint32
-	Calgos   uint32
+    XfrmId   XfrmId
+    Family   uint16
+    Pad1     [2]byte
+    Saddr    XfrmAddress
+    Reqid    uint32
+    Mode     uint8
+    Share    uint8
+    Optional uint8
+    Pad2     byte
+    Aalgos   uint32
+    Ealgos   uint32
+    Calgos   uint32
 }
 
 func (msg *XfrmUserTmpl) Len() int {
-	return SizeofXfrmUserTmpl
+    return SizeofXfrmUserTmpl
 }
 
 func DeserializeXfrmUserTmpl(b []byte) *XfrmUserTmpl {
-	return (*XfrmUserTmpl)(unsafe.Pointer(&b[0:SizeofXfrmUserTmpl][0]))
+    return (*XfrmUserTmpl)(unsafe.Pointer(&b[0:SizeofXfrmUserTmpl][0]))
 }
 
 func (msg *XfrmUserTmpl) Serialize() []byte {
-	return (*(*[SizeofXfrmUserTmpl]byte)(unsafe.Pointer(msg)))[:]
+    return (*(*[SizeofXfrmUserTmpl]byte)(unsafe.Pointer(msg)))[:]
 }
