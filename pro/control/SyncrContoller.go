@@ -120,7 +120,10 @@ func (c *SyncController) RegRepositories() (map[string]api.Repository, error) {
     for i := 0; i < cnt; i++ {
         r := api.Repository{RepoName:entry[i]}
         ctx := context.Background()
-        repo, _ := reference.ParseNamed(entry[i])
+        repo, err := reference.ParseNamed(entry[i])
+        if err != nil {
+            return nil,err
+        }
         if rp, err := client.NewRepository(ctx, repo, c.BaseUrl, nil); err == nil {
             //fmt.Printf("REPOSITORY: %+v\n", rp)
             ts := rp.Tags(ctx)

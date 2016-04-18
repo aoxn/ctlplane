@@ -12,12 +12,14 @@ import (
     "github.com/golang/glog"
     "github.com/spacexnice/ctlplane/pro/web"
     "github.com/spacexnice/ctlplane/pro/util"
+    "os"
 )
 
 //var REPO_SERVER = "http://61.160.36.122:8080/"
-
+var ENV_REPO_SERVER = "REPO_SERVER"
 //var REPO_SERVER = "http://192.168.139.128:5000/"
 var REPO_SERVER = "http://192.168.139.131:5000/"
+
 type Config struct {
     Port              int
     Address           net.IP
@@ -46,13 +48,17 @@ func NewPlaneServer() *PlaneServer{
     if err != nil{
         glog.Errorf("creat Registry error while NewPlaneServer ! [%v]",err)
     }
+    rs := os.Getenv(ENV_REPO_SERVER)
+    if rs ==""{
+        rs = REPO_SERVER
+    }
     return &PlaneServer{
         DB:      db,
         Cnf:     cnf,
         Backend: r,
         Sync:    control.NewSyncContoller(cnf.RegURL,db),
         eng:     gin.Default(),
-        Handler: web.NewWebHandler(db,REPO_SERVER),
+        Handler: web.NewWebHandler(db,rs),
     }
 }
 
