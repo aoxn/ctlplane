@@ -16,7 +16,7 @@ func open() *gorm.DB {
         panic(err)
         return nil
     }
-    return &db
+    return db
 }
 func OpenInit() *gorm.DB {
     var db *gorm.DB
