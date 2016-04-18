@@ -46,11 +46,7 @@ func NewPlaneServer() *PlaneServer{
     db  := util.OpenInit()
     r,err := client.NewRegistry(context.Background(),cnf.RegURL,nil)
     if err != nil{
-        glog.Errorf("creat Registry error while NewPlaneServer ! [%v]",err)
-    }
-    rs := os.Getenv(ENV_REPO_SERVER)
-    if rs ==""{
-        rs = REPO_SERVER
+        glog.Errorf("create Registry error while NewPlaneServer ! [%v]",err)
     }
     return &PlaneServer{
         DB:      db,
@@ -58,16 +54,20 @@ func NewPlaneServer() *PlaneServer{
         Backend: r,
         Sync:    control.NewSyncContoller(cnf.RegURL,db),
         eng:     gin.Default(),
-        Handler: web.NewWebHandler(db,rs),
+        Handler: web.NewWebHandler(db,cnf.RegURL),
     }
 }
 
 
 
 func createConfig()* Config{
+    rs := os.Getenv(ENV_REPO_SERVER)
+    if rs == ""{
+        rs = REPO_SERVER
+    }
     return &Config{
-        RegURL:REPO_SERVER,
-        Port:8080,
+        RegURL: rs,
+        Port:   8080,
         Address:net.IPv4(0,0,0,0),
     }
 }
