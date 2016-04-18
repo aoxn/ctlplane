@@ -14,6 +14,9 @@ import (
     _ "github.com/docker/distribution/manifest/schema2"
     "github.com/spacexnice/ctlplane/pro/api"
 )
+
+var SYNC_PERIOD = 60 * time.Second
+
 type SyncController struct {
     BaseUrl    string
     Backend    client.Registry
@@ -32,7 +35,7 @@ func NewSyncContoller(url string, db *gorm.DB) *SyncController {
         BaseUrl:    url,
         Backend:    b,
         DB:         db,
-        syncPeriod: time.Second * 10,
+        syncPeriod: SYNC_PERIOD,
         syncStop:   make(chan struct{}),
     }
 }
@@ -68,7 +71,7 @@ func (c *SyncController) Start() {
             }
         }
         return
-    }, time.Second * 20, c.syncStop)
+    }, c.syncPeriod, c.syncStop)
 }
 
 func (c *SyncController) Update(dbRep, regRep *api.Repository) {
