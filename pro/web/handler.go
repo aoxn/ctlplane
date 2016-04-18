@@ -180,7 +180,7 @@ func (h * WebHandler) DeleteTag(c *gin.Context) {
     h.GetTag(c)
 }
 func (h *WebHandler) GetTag(c *gin.Context) {
-    repoName, suc := c.GetQuery("it")
+    repoName, suc := c.GetQuery(QUERY_REPOSITORY)
     if !suc {
         c.HTML(http.StatusOK,
             "contags",
@@ -208,36 +208,37 @@ func (h *WebHandler) GetTag(c *gin.Context) {
         )
         return
     }
-    p, _ := c.GetQuery("tag")
-    tag := h.getSelectedTag(repo.Tags, p)
-    if tag == nil {
-        c.HTML(http.StatusOK,
-            "contags",
-            gin.H{
-                "title":     "Error",
-                "repo" :     api.Repository{},
-                "has":       false,
-                "currtag":   "",
-                "errorinfo": "No Tags Found!",
-            },
-        )
-        return
-    }
-
-    fmt.Printf("TAGS: %+v \n", tag)
+    //p, _ := c.GetQuery(QUERY_TAG)
+    //fmt.Printf("%+v::::::::::::::::%+v:::::::::::::: %+v\n",p,repoName,repo)
+    //tag := h.getSelectedTag(repo.Tags, p)
+    //if tag == nil {
+    //    c.HTML(http.StatusOK,
+    //        "contags",
+    //        gin.H{
+    //            "title":     "Error",
+    //            "repo" :     api.Repository{},
+    //            "has":       false,
+    //            "currtag":   "",
+    //            "errorinfo": "No Tags Found!",
+    //        },
+    //    )
+    //    return
+    //}
+    //
+    //fmt.Printf("TAGS: %+v \n", tag)
     c.HTML(http.StatusOK, "contags",
         gin.H{
             "title":     "REPOSITORY",
             "repo" : repo,
             "has": len(repo.Tags) > 0,
-            "currtag":tag,
+            "currtag":"woca",
         })
     return
 }
 
 
 func (h *WebHandler) PutTag(c *gin.Context) {
-    stag, suc := c.GetQuery("tag")
+    stag, suc := c.GetQuery(QUERY_TAG)
     if !suc {
         c.HTML(http.StatusOK,
             "contags",
@@ -265,7 +266,7 @@ func (h *WebHandler) PutTag(c *gin.Context) {
         )
         return
     }
-    repoName, suc := c.GetQuery("it")
+    repoName, suc := c.GetQuery(QUERY_REPOSITORY)
     if !suc {
         c.HTML(http.StatusOK,
             "contags",

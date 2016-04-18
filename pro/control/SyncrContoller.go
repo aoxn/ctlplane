@@ -12,7 +12,7 @@ import (
     "github.com/spacexnice/ctlplane/pro/util"
     "io"
     _ "github.com/docker/distribution/manifest/schema2"
-"github.com/spacexnice/ctlplane/pro/api"
+    "github.com/spacexnice/ctlplane/pro/api"
 )
 type SyncController struct {
     BaseUrl    string
@@ -119,15 +119,15 @@ func (c *SyncController) RegRepositories() (map[string]api.Repository, error) {
         ctx := context.Background()
         repo, _ := reference.ParseNamed(entry[i])
         if rp, err := client.NewRepository(ctx, repo, c.BaseUrl, nil); err == nil {
-            fmt.Printf("REPOSITORY: %+v\n", rp)
+            //fmt.Printf("REPOSITORY: %+v\n", rp)
             ts := rp.Tags(ctx)
 
             all, err := ts.All(ctx)
-            fmt.Printf("TAGS: %+v\n", all)
+            //fmt.Printf("TAGS: %+v\n", all)
             if err == nil {
                 for _, t := range all {
                     if des, err := ts.Get(ctx, t); err == nil {
-                        fmt.Printf("Tag ::  %+v\n", des)
+                        //fmt.Printf("Tag ::  %+v\n", des)
                         tag := api.Tag{Name:t, Digest:des.Digest.String()}
                         r.Tags = append(r.Tags, tag)
                     }
