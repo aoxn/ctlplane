@@ -7,13 +7,13 @@ IMAGE=${REPO}/${PROJECT}/${APP}:${VERSION}
 
 
 all:
-    bash build.sh
-    docker build -t ${IMAGE} build
-    docker push ${IMAGE}
+	bash build.sh
+	docker build -t ${IMAGE} build
+	docker push ${IMAGE}
 
 tag:
-    docker build -t ${IMAGE} build
-    docker push ${IMAGE}
+	docker build -t ${IMAGE} build
+	docker push ${IMAGE}
 push:
-    docker push ${IMAGE}
+	docker push ${IMAGE}
 .PHONY: all
