@@ -16,9 +16,14 @@ import (
 )
 
 //var REPO_SERVER = "http://61.160.36.122:8080/"
-var ENV_REPO_SERVER = "REPO_SERVER"
+var (
+    ENV_REPO_SERVER = "REPO_SERVER"
+    ENV_DB_DATA_PATH= "DB_DATA_PATH"
+)
 //var REPO_SERVER = "http://192.168.139.128:5000/"
-var REPO_SERVER = "http://192.168.139.131:5000/"
+var (
+    REPO_SERVER = "http://192.168.139.131:5000/"
+)
 
 type Config struct {
     Port              int
@@ -43,7 +48,7 @@ type PlaneServer struct {
 
 func NewPlaneServer() *PlaneServer{
     cnf := createConfig()
-    db  := util.OpenInit()
+    db  := util.OpenInit(cnf.DataPath)
     r,err := client.NewRegistry(context.Background(),cnf.RegURL,nil)
     if err != nil{
         glog.Errorf("create Registry error while NewPlaneServer ! [%v]",err)
@@ -65,10 +70,16 @@ func createConfig()* Config{
     if rs == ""{
         rs = REPO_SERVER
     }
+    dpath := os.Getenv(ENV_DB_DATA_PATH)
+    if dpath == ""{
+        p,_ := os.Getwd()
+        dpath = p
+    }
     return &Config{
-        RegURL: rs,
-        Port:   8080,
-        Address:net.IPv4(0,0,0,0),
+        DataPath:   dpath,
+        RegURL:     rs,
+        Port:       8080,
+        Address:    net.IPv4(0,0,0,0),
     }
 }
 

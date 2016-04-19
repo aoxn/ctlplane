@@ -14,4 +14,6 @@ all:
 tag:
     docker build -t ${IMAGE} build
     docker push ${IMAGE}
+push:
+    docker push ${IMAGE}
 .PHONY: all
