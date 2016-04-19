@@ -5,7 +5,7 @@
     <div class="container">
         <ol class="breadcrumb">
             <li><a href="/repository">仓库列表</a></li>
-            <li class="active"><a href="#">标签列表<strong>[ {{.repo.RepoName}} ]</strong></a></li>
+            <li class="active"><a href="/detail?it={{.repo.RepoName}}">标签列表<strong>[ {{.repo.RepoName}} ]</strong></a></li>
         </ol>
 
         <div id="accord" class="panel-group">
@@ -51,10 +51,11 @@
                     </div>
                 </div>
             </div>
+
             {{end}}
             {{else}}
             <div class="container">
-                <p><strong>{{.errorinfo}}</strong></p>
+                <div class="alert alert-danger" role="alert">Error: {{.errorinfo}}</div>
             </div>
             {{end}}
 

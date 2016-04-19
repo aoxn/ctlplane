@@ -75,35 +75,32 @@ func (c *SyncController) Start() {
 }
 
 func (c *SyncController) Update(dbRep, regRep *api.Repository) {
-    var found bool = false
-    for _, dt := range (dbRep.Tags) {
-        found = false
-        for _, rt := range (regRep.Tags) {
-            if dt.Name == rt.Name {
-                found = true
-                break
-            }
-        }
-        if !found {
-            //fmt.Printf("DELETE UpdateTAG: %+v\n",dt)
-            if err := c.DB.Unscoped().Delete(&dt).Error; err != nil {
-                fmt.Println("DELETE Tag ERROR: %s", err.Error())
+
+    var dbtag map[string]*api.Tag = make(map[string]*api.Tag)
+    var rgtag map[string]*api.Tag = make(map[string]*api.Tag)
+    for idx,_ := range dbRep.Tags {
+        dbtag[fmt.Sprintf("%s/%s",dbRep.RepoName,dbRep.Tags[idx].Name)] = &dbRep.Tags[idx]
+    }
+    for idx,_ := range regRep.Tags {
+        rgtag[fmt.Sprintf("%s/%s",regRep.RepoName,regRep.Tags[idx].Name)] = &regRep.Tags[idx]
+    }
+
+    for k,v := range dbtag{
+        if _,e := rgtag[k];!e{
+            // Found tag not in registry any more,delete it from database
+            fmt.Printf("UPDATE_TAG: DATABASE DELETE  [%+v]\n",v)
+            if err := c.DB.Unscoped().Delete(&v).Error; err != nil {
+                fmt.Println("UPDATE_TAG: DATABASE DELETE ERROR: [%s]", err.Error())
             }
         }
     }
-    for _, dt := range (regRep.Tags) {
-        found = false
-        for _, rt := range (dbRep.Tags) {
-            if dt.Name == rt.Name {
-                found = true
-                break
-            }
-        }
-        if !found {
-            dt.RepositoryID = dbRep.ID
-            //fmt.Printf("ADDED UpdateTAG: %+v\n",dt)
-            if err := c.DB.Create(&dt).Error; err != nil {
-                fmt.Println("Create Tag ERROR: %s", err)
+
+    for k,v := range rgtag{
+        if _,e := dbtag[k]; !e{
+            v.RepositoryID = dbRep.ID
+            fmt.Printf("UPDATE_TAG: DATABASE ADD [%+v]\n",v)
+            if err := c.DB.Create(&v).Error; err != nil {
+                fmt.Println("UPDATE_TAG: DATABASE ADD ERROR: [%s]", err)
             }
         }
     }

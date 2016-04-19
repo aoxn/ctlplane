@@ -62,7 +62,7 @@ func (h * WebHandler) Index(c *gin.Context) {
                     "repo" : api.Repository{},
                     "has": false,
                     "currtag": "",
-                    "errorinfo": fmt.Sprintf("Get Repository Error,[%s]", err.Error()),
+                    "errorinfo": fmt.Sprintf("List Repository Error with search[%s]! Reason[%s]", sea,err.Error()),
                 },
             )
             return
@@ -77,7 +77,7 @@ func (h * WebHandler) Index(c *gin.Context) {
                     "repo" :    api.Repository{},
                     "has":      false,
                     "currtag":  "",
-                    "errorinfo": fmt.Sprintf("Get Repository Error,[%s]", err.Error()),
+                    "errorinfo": fmt.Sprintf("List Repository Error[%s]", err.Error()),
                 },
             )
             return
@@ -103,7 +103,7 @@ func (h * WebHandler) DeleteTag(c *gin.Context) {
                 "repo" : api.Repository{},
                 "has": false,
                 "currtag": "",
-                "errorinfo": "error parameter tag name needed by it=?",
+                "errorinfo": "No Tag Name Provided",
             },
         )
         return
@@ -117,7 +117,7 @@ func (h * WebHandler) DeleteTag(c *gin.Context) {
                 "repo" : api.Repository{},
                 "has": false,
                 "currtag": "",
-                "errorinfo": fmt.Sprintf("error parameter repository name needed by it"),
+                "errorinfo": fmt.Sprintf("No Repository Query Parameter provided!"),
             },
         )
         return
@@ -131,7 +131,7 @@ func (h * WebHandler) DeleteTag(c *gin.Context) {
                 "repo" :     api.Repository{},
                 "has":       false,
                 "currtag":   "",
-                "errorinfo": fmt.Sprintf("error get Repository by it=?[%s]", err.Error()),
+                "errorinfo": fmt.Sprintf("No Matched Repository found by repository name[%s]! Reason[%s]", repo,err.Error()),
             },
         )
         return
@@ -145,8 +145,7 @@ func (h * WebHandler) DeleteTag(c *gin.Context) {
                 "title":     "Error",
                 "repo" :     api.Repository{},
                 "has":       false,
-                "currtag":   "",
-                "errorinfo": fmt.Sprintf("No curresponed Tag found by it=?[%s]", tag),
+                "errorinfo": fmt.Sprintf("No Matched Tag found by tagname[%s]! Reason[%s]",stag, err.Error()),
             },
         )
         return
@@ -158,8 +157,7 @@ func (h * WebHandler) DeleteTag(c *gin.Context) {
                 "title":     "Error",
                 "repo" :     api.Repository{},
                 "has":       false,
-                "currtag":   "",
-                "errorinfo": fmt.Sprintf("error delete Tag[%s][%s][%s] by it?[%s]",repoName, tag.Name, tag.Digest,err.Error()),
+                "errorinfo": fmt.Sprintf("Delete Tag[%s][%s][%s] from registry[%s] ERROR! Reason[%s]",repoName, tag.Name, tag.Digest,h.RegURL,err.Error()),
             },
         )
         return
@@ -169,10 +167,9 @@ func (h * WebHandler) DeleteTag(c *gin.Context) {
             "contags",
             gin.H{
                 "title":     "Error",
-                "repo" :     api.Repository{},
+                "repo" :     api.Repository{RepoName:repoName},
                 "has":       false,
-                "currtag":   "",
-                "errorinfo": fmt.Sprintf("error delete Tag[%s] by it?[%s]", tag.Name, err.Error()),
+                "errorinfo": fmt.Sprintf("Delete Tag[%s][%s] from database error! Reason[%s]", repoName,tag.Name, err.Error()),
             },
         )
         return
@@ -189,7 +186,7 @@ func (h *WebHandler) GetTag(c *gin.Context) {
                 "repo" :     api.Repository{},
                 "has":       false,
                 "currtag":   "",
-                "errorinfo": "error parameter repository name needed by it=?",
+                "errorinfo": "Repository name must be provide in Query Parameter! [etc. detail?it=repository]",
             },
         )
         return
@@ -200,38 +197,25 @@ func (h *WebHandler) GetTag(c *gin.Context) {
             "contags",
             gin.H{
                 "title":     "Error",
-                "repo" :     api.Repository{},
+                "repo" :     api.Repository{RepoName:repoName},
                 "has":       false,
                 "currtag":   "",
-                "errorinfo": fmt.Sprintf("error get repository name needed by it=?,[%s]", err.Error()),
+                "errorinfo": fmt.Sprintf("There is no repository by name of [%s]! Reason[%s]",repoName, err.Error()),
             },
         )
         return
     }
-    //p, _ := c.GetQuery(QUERY_TAG)
-    //fmt.Printf("%+v::::::::::::::::%+v:::::::::::::: %+v\n",p,repoName,repo)
-    //tag := h.getSelectedTag(repo.Tags, p)
-    //if tag == nil {
-    //    c.HTML(http.StatusOK,
-    //        "contags",
-    //        gin.H{
-    //            "title":     "Error",
-    //            "repo" :     api.Repository{},
-    //            "has":       false,
-    //            "currtag":   "",
-    //            "errorinfo": "No Tags Found!",
-    //        },
-    //    )
-    //    return
-    //}
-    //
-    //fmt.Printf("TAGS: %+v \n", tag)
+    errInfo := ""
+    if len(repo.Tags) <= 0{
+        errInfo = "No more Tags found!"
+    }
     c.HTML(http.StatusOK, "contags",
         gin.H{
             "title":     "REPOSITORY",
-            "repo" : repo,
-            "has": len(repo.Tags) > 0,
-            "currtag":"woca",
+            "repo" :     repo,
+            "has":       len(repo.Tags)>0,
+            "currtag":   "woca",
+            "errorinfo": errInfo,
         })
     return
 }
@@ -247,7 +231,7 @@ func (h *WebHandler) PutTag(c *gin.Context) {
                 "repo" :     api.Repository{},
                 "has":       false,
                 "currtag":   "",
-                "errorinfo": "error parameter tag name needed by it=?",
+                "errorinfo": "Tag Name to be modified must be provided!",
             },
         )
         return
@@ -261,7 +245,7 @@ func (h *WebHandler) PutTag(c *gin.Context) {
                 "repo" :     api.Repository{},
                 "has":       false,
                 "currtag":   "",
-                "errorinfo": fmt.Sprintf("error parameter txtbody name needed by it=%s", stag),
+                "errorinfo": fmt.Sprintf("The description Content must be provided by txtbody[%s]", stag),
             },
         )
         return
@@ -275,7 +259,7 @@ func (h *WebHandler) PutTag(c *gin.Context) {
                 "repo" :     api.Repository{},
                 "has":       false,
                 "currtag":   "",
-                "errorinfo": fmt.Sprintf("error parameter repository name needed by it"),
+                "errorinfo": fmt.Sprintf("Repository Name must be provided!"),
             },
         )
         return
@@ -289,7 +273,7 @@ func (h *WebHandler) PutTag(c *gin.Context) {
                 "repo" :     api.Repository{},
                 "has":       false,
                 "currtag":   "",
-                "errorinfo": fmt.Sprintf("error get Repository by it=?[%s]", err.Error()),
+                "errorinfo": fmt.Sprintf("No matched repository was found by name[%s]! Reason[%s]",repoName, err.Error()),
             },
         )
         return
@@ -318,7 +302,7 @@ func (h *WebHandler) PutTag(c *gin.Context) {
                 "repo" :     api.Repository{},
                 "has":       false,
                 "currtag":   "",
-                "errorinfo": fmt.Sprintf("error save Description by it=?[%s]", err.Error()),
+                "errorinfo": fmt.Sprintf("Save Description Error by name[%s][%s]! Reason[%s]",repoName,tag, err.Error()),
             },
         )
         return
@@ -332,7 +316,7 @@ func (h *WebHandler) PutTag(c *gin.Context) {
                 "repo" :     api.Repository{},
                 "has":       false,
                 "currtag":   "",
-                "errorinfo": fmt.Sprintf("error get Repository by it=?[%s]", err.Error()),
+                "errorinfo": fmt.Sprintf("Get Repository by name[%s]Error! Reason[%s]",repoName, err.Error()),
             },
         )
         return
