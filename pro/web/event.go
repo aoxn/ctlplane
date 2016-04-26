@@ -132,5 +132,6 @@ func (h * WebHandler) Ok(c * gin.Context){
 }
 func (h * WebHandler) Retry(c * gin.Context,e error){
     // registry will continue retry send this event as long as we do not return statusok
+    glog.Errorf("Notifcation error,need retry! [%s]",e.Error())
     c.JSON(http.StatusInternalServerError, gin.H{"status": e.Error()})
 }
