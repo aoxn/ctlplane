@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 PRO_ROOT=$(pwd)
-
+set -e -x
+rm -rf $PRO_ROOT/build
 mkdir -p $PRO_ROOT/build
 go build -o $PRO_ROOT/build/registry-console
 cp -rf $PRO_ROOT/js $PRO_ROOT/build/js

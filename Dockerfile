@@ -1,6 +1,6 @@
 FROM 61.160.36.122:8080/lightvm:latest
 
-# °²×°½ø³Ì¿ÉÖ´ĞĞÎÄ¼ş£¨ÓÉ myapp.go ±àÒë£©
+# å®‰è£…è¿›ç¨‹å¯æ‰§è¡Œæ–‡ä»¶ï¼ˆç”± myapp.go ç¼–è¯‘ï¼‰
 COPY registry-console /app/
 COPY js /app/js
 COPY pages /app/pages
@@ -8,7 +8,7 @@ COPY fonts /app/fonts
 COPY css /app/css
 COPY entrypoint.sh /app/
 
-# ÉèÖÃ×Ô¶¯À­Æğ½ø³Ì
+# è®¾ç½®è‡ªåŠ¨æ‹‰èµ·è¿›ç¨‹
 RUN mkdir /etc/service/registry-console
 COPY entrypoint.sh /etc/service/registry-console/run
 RUN chmod +x /etc/service/registry-console/run
