@@ -103,6 +103,23 @@ func (s * PlaneServer) route(){
     r.GET("/help", s.Handler.Help)
     r.GET("/callback/event",s.Handler.Event)
     r.POST("/callback/event",s.Handler.Event)
+
+    //// Authorization group
+    //// authorized := r.Group("/", AuthRequired())
+    //// exactly the same as:
+    //authorized := r.Group("/")
+    //// per group middleware! in this case we use the custom created
+    //// AuthRequired() middleware just in the "authorized" group.
+    //authorized.Use(AuthRequired())
+    //{
+    //    authorized.POST("/login", loginEndpoint)
+    //    authorized.POST("/submit", submitEndpoint)
+    //    authorized.POST("/read", readEndpoint)
+    //
+    //    // nested group
+    //    testing := authorized.Group("testing")
+    //    testing.GET("/analytics", analyticsEndpoint)
+    //}
 }
 
 

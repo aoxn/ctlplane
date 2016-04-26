@@ -93,8 +93,6 @@ func (c *SyncController) Update(dbRep, regRep *api.Repository) {
     for k,v := range dbtag{
         if _,e := rgtag[k];!e{
             // Found tag not in registry any more,delete it from database
-            panic("fucj")
-            fmt.Println("xlllllllllllllllll")
             glog.Infof("UPDATE_TAG: DATABASE DELETE  [%+v]\n",v)
             if err := c.DB.Unscoped().Delete(&v).Error; err != nil {
                 glog.Errorln("UPDATE_TAG: DATABASE DELETE ERROR: [%s]", err.Error())
@@ -159,7 +157,7 @@ func (c *SyncController) getImage(ctx context.Context,r *api.Repository)error{
         tag := api.Tag{
             Name:       t,
             Digest:     des.Digest.String(),
-            PushTime:   time.Now(),
+            PushTime:   time.Now().Format("2006-01-02 15:04:05"),
             Size:       c.getTagSize(rp,ctx,des.Digest,t),
         }
         r.Tags = append(r.Tags, tag)
@@ -172,10 +170,12 @@ func (c *SyncController) getTagSize(rp distribution.Repository,ctx context.Conte
     var ok int64 = 0
     m,err  := rp.Manifests(ctx)
     if err != nil {
+        glog.Errorf("Error while get tagsize[GET LAYERS] [%s]",err.Error())
         return -1
     }
     mi,err := m.Get(ctx,des)
     if err != nil {
+        glog.Errorf("Error while get tagsize[GET MANIFEST] [%s]",err.Error())
         return -1
     }
     for _,d := range mi.References(){

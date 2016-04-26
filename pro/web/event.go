@@ -32,11 +32,11 @@ func (h *WebHandler) Event(c * gin.Context){
             c.JSON(http.StatusOK, gin.H{"status": "OK"})
             return
         }
-        if strings.Index(e.Target.MediaType,USER_MEDIATYPE) == -1 {
-            glog.Infof("Only statistic mediatype=[%s] operation",USER_MEDIATYPE)
-            c.JSON(http.StatusOK, gin.H{"status": "OK"})
-            return
-        }
+        //if strings.Index(e.Target.MediaType,USER_MEDIATYPE) == -1 {
+        //    glog.Infof("Only statistic mediatype=[%s] operation",USER_MEDIATYPE)
+        //    c.JSON(http.StatusOK, gin.H{"status": "OK"})
+        //    return
+        //}
         if strings.Index(e.Action,"pull") != -1 {
             //pull action , add 1
             r,t,e := h.getRepoTag(e.Target.Repository,e.Target.Tag)
