@@ -4,10 +4,10 @@ import (
     "github.com/gin-gonic/gin"
     "github.com/docker/distribution/notifications"
     "strings"
-    "github.com/Azure/azure-sdk-for-go/core/http"
     "github.com/spacexnice/ctlplane/pro/api"
     "github.com/golang/glog"
     //"encoding/json"
+    "net/http"
 )
 
 const (
