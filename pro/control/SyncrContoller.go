@@ -103,7 +103,7 @@ func (c *SyncController) Update(dbRep, regRep *api.Repository) {
     for k,v := range rgtag{
         if _,e := dbtag[k]; !e{
             v.RepositoryID = dbRep.ID
-            v.PushTime = time.Now()
+            v.PushTime = time.Now().Format("2006-01-02 15:04:05")
             glog.Infof("UPDATE_TAG: DATABASE ADD [%+v][%s]\n",v,v.PushTime)
             if err := c.DB.Create(&v).Error; err != nil {
                 glog.Errorln("UPDATE_TAG: DATABASE ADD ERROR: [%s]", err)

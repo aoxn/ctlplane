@@ -1,8 +1,7 @@
 package api
 
 import (
-"github.com/jinzhu/gorm"
-"time"
+    "github.com/jinzhu/gorm"
 )
 
 type Repository struct {
@@ -19,7 +18,7 @@ type Tag struct {
     Name         string
     Description  string `sql:"type:varchar(255)"`
     Digest       string
-    PushTime     time.Time
+    PushTime     string
     PullCount    uint
     Size         int64
 }
