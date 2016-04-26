@@ -3,7 +3,7 @@ PRO_ROOT=$(pwd)
 set -e -x
 rm -rf $PRO_ROOT/build
 mkdir -p $PRO_ROOT/build
-go build -o $PRO_ROOT/build/registry-console
+go build -o $PRO_ROOT/build/registry-console $PRO_ROOT/cmd/plane/planectl.go
 cp -rf $PRO_ROOT/js $PRO_ROOT/build/js
 cp -rf $PRO_ROOT/pages $PRO_ROOT/build/pages
 cp -rf $PRO_ROOT/fonts $PRO_ROOT/build/fonts

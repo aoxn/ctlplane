@@ -19,7 +19,7 @@ func open(path string) *gorm.DB {
     }
     return db
 }
-func OpenInit(path string) *gorm.DB {
+func OpenInit2(path string) *gorm.DB {
     var db *gorm.DB
     fdb := fmt.Sprintf("%s/%s",path,DEFAULT_DB)
     if Exist(fdb) {
@@ -35,6 +35,18 @@ func OpenInit(path string) *gorm.DB {
     db.AutoMigrate(&api.Repository{},&api.Tag{})
     //db.CreateTable(&api.Repository{})
     //db.CreateTable(&api.Tag{})
+    return db
+}
+
+func OpenInit(path string) *gorm.DB{
+    db, err := gorm.Open("sqlite3", fmt.Sprintf("%s/%s",path,DEFAULT_DB))
+    if err != nil {
+        panic(err)
+        return nil
+    }
+    db.LogMode(true)
+    db.AutoMigrate(&api.Repository{},&api.Tag{})
+    glog.Infof("DATABASE INIT: database [%s] dose not exist,create database and tables... ",fmt.Sprintf("%s/%s",path,DEFAULT_DB))
     return db
 }
 
