@@ -118,7 +118,7 @@ func (h * WebHandler) getRepoTag(rs , ts string) (*api.Repository,*api.Tag,error
         return nil,nil,err
     }
     t :=  api.Tag{Name:ts,RepositoryID:r.ID}
-    if err := h.DB.Where(&t).Find(&t).Error ;err != nil{
+    if err := h.DB.Where(&t).First(&t).Error ;err != nil{
         glog.Errorf("PUSH: error select tag[%s][%s]",rs,ts)
         return nil,nil,err
     }

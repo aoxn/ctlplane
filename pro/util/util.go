@@ -44,7 +44,7 @@ func OpenInit(path string) *gorm.DB{
         panic(err)
         return nil
     }
-    //db.LogMode(true)
+    db.LogMode(true)
     db.AutoMigrate(&api.Repository{},&api.Tag{})
     glog.Infof("DATABASE INIT: database [%s] init database and tables... ",fmt.Sprintf("%s/%s",path,DEFAULT_DB))
     return db
