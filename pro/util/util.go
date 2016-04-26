@@ -32,8 +32,9 @@ func OpenInit(path string) *gorm.DB {
     }
     glog.Info("DATABASE INIT: database [%s] dose not exist,create database and tables... ",fdb)
     db.LogMode(true)
-    db.CreateTable(&api.Repository{})
-    db.CreateTable(&api.Tag{})
+    db.AutoMigrate(&api.Repository{},&api.Tag{})
+    //db.CreateTable(&api.Repository{})
+    //db.CreateTable(&api.Tag{})
     return db
 }
 
