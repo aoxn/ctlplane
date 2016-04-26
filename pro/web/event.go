@@ -100,11 +100,11 @@ func (h * WebHandler) doPush(e notifications.Event) error{
     //push action , add 1, record push time
     _,t,er := h.getRepoTag(e.Target.Repository,e.Target.Tag)
     if er != nil {
-
+        glog.Errorf("PUSH: error get tag[%s][%s]",e.Target.Repository,e.Target.Tag)
         return er
     }
     if err := h.DB.Model(&t).Update(api.Tag{PushTime:e.Timestamp.Format("2006-01-02 15:04:05")}).Error; err != nil{
-
+        glog.Errorf("PUSH: error update pushtime.[%s][%s]",e.Target.Repository,e.Target.Tag)
         return err
     }
     glog.Infoln("PUSH DETECTED !  update timestamp[%s]",e.Timestamp.Format("2006-01-02 15:04:05"))
@@ -114,10 +114,12 @@ func (h * WebHandler) doPush(e notifications.Event) error{
 func (h * WebHandler) getRepoTag(rs , ts string) (*api.Repository,*api.Tag,error){
     r := api.Repository{RepoName:rs}
     if err :=h.DB.First(&r).Error;err != nil{
+        glog.Errorf("PUSH: error select Repo[%s][%s]",rs,ts)
         return nil,nil,err
     }
     t :=  api.Tag{Name:ts,RepositoryID:r.ID}
     if err := h.DB.Where(&t).Find(&t).Error ;err != nil{
+        glog.Errorf("PUSH: error select tag[%s][%s]",rs,ts)
         return nil,nil,err
     }
     if t.ID == 0{
