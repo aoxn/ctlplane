@@ -25,12 +25,12 @@
                             <tbody>
                             {{range $v := $item}}
                             <tr>
-                                <td class="col-md-10"><a class="center-block" href="/detail?it={{$v.RepoName}}"><span
-                                        class="glyphicon glyphicon-th-list"></span> {{$v.RepoName}}</a></td>
-                                <!-- <td>520 <strong>STARS</strong> </td>
-                                <td>500k <strong>PULL</strong></td> -->
-                                <td class="col-md-2"><a class="center-block"
-                                                        href="/detail?it={{$v.RepoName}}">Detail</a></td>
+                                <td class="hidden-xs col-sm-9 list-inline"><a class="center-block" href="/detail?it={{$v.RepoName}}">
+                                    <span class="glyphicon glyphicon-th-list"></span> {{$v.RepoName}}</a>
+                                </td>
+                                <td class="hidden-xs col-sm-2 list-inline"><strong><span class="badge">总PULL次数: {{$v.TPullCount}} </span></strong> </td>
+                                <!-- <td>500k <strong>PULL</strong></td> -->
+                                <td class="hidden-xs col-sm-1 list-inline"><a class="center-block" href="/detail?it={{$v.RepoName}}">Detail</a></td>
                             </tr>
                             {{end}}
                             </tbody>

@@ -30,7 +30,14 @@
                         <form role="form" id="descform-{{$idx}}" method="post" name="descform-{{$idx}}"
                               action="/detail?it={{$repName}}&tag={{$item.Name}}">
                             <div class="row ">
-                                <div class="hidden-xs col-sm-12 list-inline text-right">
+                                <div class="hidden-xs col-sm-8 list-inline">
+                                    <ul class="nav nav-pills" role="tablist">
+                                        <li role="presentation"><a href="#"><span class="badge">大小:&nbsp;&nbsp;{{$item.Size}} KB</span></a></li>
+                                        <li role="presentation"><a href="#"><span class="badge">PULL次数:&nbsp;&nbsp;{{$item.PullCount}}</span></a></li>
+                                        <li role="presentation"><a><span class="badge">上传时间:&nbsp;&nbsp;{{$item.PushTime}}</span></a></li>
+                                    </ul>
+                                </div>
+                                <div class="hidden-xs col-sm-4 list-inline text-right">
                                     <button id="edittag-{{$idx}}" class="btn" name="edittag-{{$idx}}">
                                         <span class="hidden">{{$idx}}</span>
                                         <span class="hidden">{{$item.Name}}</span>

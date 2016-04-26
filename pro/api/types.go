@@ -1,12 +1,16 @@
 package api
 
-import "github.com/jinzhu/gorm"
+import (
+"github.com/jinzhu/gorm"
+"time"
+)
 
 type Repository struct {
     gorm.Model
     RepoName string
     Group    string
     Tags     []Tag
+    TPullCount uint
 }
 
 type Tag struct {
@@ -15,5 +19,8 @@ type Tag struct {
     Name         string
     Description  string `sql:"type:varchar(255)"`
     Digest       string
+    PushTime     time.Time
+    PullCount    uint
+    Size         int64
 }
 

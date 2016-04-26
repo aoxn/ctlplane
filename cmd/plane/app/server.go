@@ -13,6 +13,7 @@ import (
     "github.com/spacexnice/ctlplane/pro/web"
     "github.com/spacexnice/ctlplane/pro/util"
     "os"
+    "flag"
 )
 
 //var REPO_SERVER = "http://61.160.36.122:8080/"
@@ -84,8 +85,7 @@ func createConfig()* Config{
 }
 
 func (s * PlaneServer) AddFlags(){
-
-
+    flag.Set("logtostderr", "true")
 }
 func (s * PlaneServer) route(){
     r := s.eng
@@ -106,16 +106,8 @@ func (s * PlaneServer) route(){
 }
 
 
-func (s * PlaneServer) Run() error{
-
-
+func (s * PlaneServer) Run(){
     s.Sync.Start()
-
     s.route()
-
     s.eng.Run(":8080")
-
-    select {
-    }
-    return nil
 }

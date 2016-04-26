@@ -25,8 +25,5 @@ func main() {
     runtime.GOMAXPROCS(runtime.NumCPU())
     s := app.NewPlaneServer()
     s.AddFlags()
-    //util.InitLogs()
-    //defer util.FlushLogs()
-
     s.Run()
 }

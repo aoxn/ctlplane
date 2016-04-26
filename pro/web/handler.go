@@ -430,11 +430,5 @@ func (h *WebHandler) groupRepos(rs []api.Repository) map[string][]api.Repository
         }
         se[it.Group] = key
     }
-    fmt.Printf("%+v\n", se)
-    //    var result [][]api.Repository
-    //    for it,_ := range(se){
-    //        fmt.Printf("%+v\n",it)
-    //        result = append(result,it)
-    //    }
     return se
 }

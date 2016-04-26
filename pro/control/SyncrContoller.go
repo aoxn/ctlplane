@@ -13,6 +13,9 @@ import (
     "io"
     _ "github.com/docker/distribution/manifest/schema2"
     "github.com/spacexnice/ctlplane/pro/api"
+    "flag"
+"github.com/docker/distribution"
+"github.com/docker/distribution/digest"
 )
 
 var SYNC_PERIOD = 60 * time.Second
@@ -26,6 +29,9 @@ type SyncController struct {
     syncPeriod time.Duration
 }
 
+func init()  {
+    flag.Set("logtostderr", "true")
+}
 func NewSyncContoller(url string, db *gorm.DB) *SyncController {
     b, err := client.NewRegistry(context.Background(), url, nil)
     if err != nil {
@@ -54,7 +60,6 @@ func (c *SyncController) Start() {
             return
         }
         for idx, _ := range r {
-            //fmt.Printf("%+v,, %+v\n",idx,r[idx])
             it := r[idx]
             if m, e := d[it.RepoName]; e {
                 c.Update(&m, &it)
@@ -88,9 +93,11 @@ func (c *SyncController) Update(dbRep, regRep *api.Repository) {
     for k,v := range dbtag{
         if _,e := rgtag[k];!e{
             // Found tag not in registry any more,delete it from database
-            fmt.Printf("UPDATE_TAG: DATABASE DELETE  [%+v]\n",v)
+            panic("fucj")
+            fmt.Println("xlllllllllllllllll")
+            glog.Infof("UPDATE_TAG: DATABASE DELETE  [%+v]\n",v)
             if err := c.DB.Unscoped().Delete(&v).Error; err != nil {
-                fmt.Println("UPDATE_TAG: DATABASE DELETE ERROR: [%s]", err.Error())
+                glog.Errorln("UPDATE_TAG: DATABASE DELETE ERROR: [%s]", err.Error())
             }
         }
     }
@@ -98,9 +105,10 @@ func (c *SyncController) Update(dbRep, regRep *api.Repository) {
     for k,v := range rgtag{
         if _,e := dbtag[k]; !e{
             v.RepositoryID = dbRep.ID
-            fmt.Printf("UPDATE_TAG: DATABASE ADD [%+v]\n",v)
+            v.PushTime = time.Now()
+            glog.Infof("UPDATE_TAG: DATABASE ADD [%+v][%s]\n",v,v.PushTime)
             if err := c.DB.Create(&v).Error; err != nil {
-                fmt.Println("UPDATE_TAG: DATABASE ADD ERROR: [%s]", err)
+                glog.Errorln("UPDATE_TAG: DATABASE ADD ERROR: [%s]", err)
             }
         }
     }
@@ -116,33 +124,67 @@ func (c *SyncController) RegRepositories() (map[string]api.Repository, error) {
     //fmt.Printf("cnt::  %v\n",cnt)
     for i := 0; i < cnt; i++ {
         r := api.Repository{RepoName:entry[i]}
-        ctx := context.Background()
-        repo, err := reference.ParseNamed(entry[i])
-        if err != nil {
-            return nil,err
-        }
-        if rp, err := client.NewRepository(ctx, repo, c.BaseUrl, nil); err == nil {
-            //fmt.Printf("REPOSITORY: %+v\n", rp)
-            ts := rp.Tags(ctx)
-
-            all, err := ts.All(ctx)
-            //fmt.Printf("TAGS: %+v\n", all)
-            if err == nil {
-                for _, t := range all {
-                    if des, err := ts.Get(ctx, t); err == nil {
-                        //fmt.Printf("Tag ::  %+v\n", des)
-                        tag := api.Tag{Name:t, Digest:des.Digest.String()}
-                        r.Tags = append(r.Tags, tag)
-                    }
-                }
-            }
-            parseGroup(&r)
-            repos[r.RepoName] = r
+        if e := c.getImage(context.Background(),&r);e !=nil{
+            return nil,e
         }
 
+        repos[r.RepoName] = r
     }
     return repos, nil
 }
+
+func (c *SyncController) getImage(ctx context.Context,r *api.Repository)error{
+    repo, err := reference.ParseNamed(r.RepoName)
+    if err != nil {
+        return err
+    }
+    rp, err := client.NewRepository(ctx, repo, c.BaseUrl, nil)
+    if err != nil {
+        return err
+    }
+    //fmt.Printf("REPOSITORY: %+v\n", rp)
+    all, err := rp.Tags(ctx).All(ctx)
+    //fmt.Printf("TAGS: %+v\n", all)
+    if err != nil{
+        return err
+    }
+
+    for _, t := range all {
+        des, err := rp.Tags(ctx).Get(ctx, t);
+        if err != nil {
+            return err
+        }
+
+        //fmt.Printf("Tag ::  %+v\n", des)
+        tag := api.Tag{
+            Name:       t,
+            Digest:     des.Digest.String(),
+            PushTime:   time.Now(),
+            Size:       c.getTagSize(rp,ctx,des.Digest,t),
+        }
+        r.Tags = append(r.Tags, tag)
+    }
+    parseGroup(r)
+    return nil
+}
+
+func (c *SyncController) getTagSize(rp distribution.Repository,ctx context.Context,des digest.Digest,tag string)int64{
+    var ok int64 = 0
+    m,err  := rp.Manifests(ctx)
+    if err != nil {
+        return -1
+    }
+    mi,err := m.Get(ctx,des)
+    if err != nil {
+        return -1
+    }
+    for _,d := range mi.References(){
+        //glog.Info(tag,des,d.Digest,d.Size,d.MediaType)
+        ok += d.Size
+    }
+    return ok/1024
+}
+
 
 func (c *SyncController) DbRepositories() (map[string]api.Repository, error) {
     var dbRep []api.Repository
