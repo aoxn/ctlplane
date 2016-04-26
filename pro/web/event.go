@@ -113,7 +113,7 @@ func (h * WebHandler) doPush(e notifications.Event) error{
 
 func (h * WebHandler) getRepoTag(rs , ts string) (*api.Repository,*api.Tag,error){
     r := api.Repository{RepoName:rs}
-    if err :=h.DB.First(&r).Error;err != nil{
+    if err :=h.DB.Where(&r).First(&r).Error;err != nil{
         glog.Errorf("PUSH: error select Repo[%s][%s]",rs,ts)
         return nil,nil,err
     }
