@@ -11,7 +11,7 @@ import (
     "fmt"
     "errors"
     "github.com/docker/distribution/manifest/schema2"
-"github.com/docker/distribution/manifest/schema1"
+    "github.com/docker/distribution/manifest/schema1"
 )
 
 const (

@@ -367,7 +367,7 @@ func (h *WebHandler) getRepository(repoName string) (*api.Repository, error) {
         fmt.Errorf("Find repository [%s] Error,[%+v]", repoName, err)
         return nil, err
     }
-    if err := h.DB.Model(&repo).Related(&tags).Error; err != nil {
+    if err := h.DB.Model(&repo).Order("push_time desc").Related(&tags).Error; err != nil {
         fmt.Errorf("Find Tags [%s] Error,[%+v]", repoName, err)
         return nil, err
     }
