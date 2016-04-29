@@ -28,7 +28,7 @@ func (h *WebHandler) Event(c * gin.Context){
     //x,_ := json.MarshalIndent(ev, "", "    ")
     //glog.Info(string(x))
     for _,e := range ev.Events{
-        glog.Infof("%s   %s   %s   %s    %s    %s    %s   %s",e.Timestamp,e.ID,e.Action,e.Request.UserAgent,e.Target.MediaType,e.Target.Repository,e.Target.Tag,e.Request.Method)
+        glog.Infof("%s   %s   %s   %s    %s    %s    %s   %s",e.Timestamp.Format("2006-01-02 15:04:05"),e.ID,e.Action,e.Request.UserAgent,e.Target.MediaType,e.Target.Repository,e.Target.Tag,e.Request.Method)
 
         if h.skip(e){
             h.Ok(c)

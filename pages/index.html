@@ -6,7 +6,7 @@
     <div class="container">
 
         <ol class="breadcrumb">
-            <li class="active"><a href="#">仓库列表</a></li>
+            <li class="active"><a href="#">项目列表</a></li>
         </ol>
         <div id="accord" class="panel-group">
 
@@ -15,8 +15,8 @@
 
             <div class="panel panel-info">
                 <div class="panel-heading">
-                    Group <strong>[{{$key}}]</strong>
-                    <a class="pull-right" data-toggle="collapse" data-parent="#accord" href="#accord-{{$key}}">Show <i
+                    项目 <strong>[{{$key}}]</strong>
+                    <a class="pull-right" data-toggle="collapse" data-parent="#accord" href="#accord-{{$key}}">显示 <i
                             class="glyphicon glyphicon-collapse-down"></i></a>
                 </div>
                 <div id="accord-{{$key}}" class="panel-collapse collapse">
@@ -28,7 +28,7 @@
                                 <td class="hidden-xs col-sm-9 list-inline"><a class="center-block" href="/detail?it={{$v.RepoName}}">
                                     <span class="glyphicon glyphicon-th-list"></span> {{$v.RepoName}}</a>
                                 </td>
-                                <td class="hidden-xs col-sm-2 list-inline"><strong><span class="badge">总PULL次数: {{$v.TPullCount}} </span></strong> </td>
+                                <td class="hidden-xs col-sm-2 list-inline"><strong><span class="badge">总下载次数: {{$v.TPullCount}} </span></strong> </td>
                                 <!-- <td>500k <strong>PULL</strong></td> -->
                                 <td class="hidden-xs col-sm-1 list-inline"><a class="center-block" href="/detail?it={{$v.RepoName}}">Detail</a></td>
                             </tr>

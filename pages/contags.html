@@ -4,8 +4,9 @@
 <div class="main">
     <div class="container">
         <ol class="breadcrumb">
-            <li><a href="/repository">仓库列表</a></li>
-            <li class="active"><a href="/detail?it={{.repo.RepoName}}">标签列表<strong>[ {{.repo.RepoName}} ]</strong></a></li>
+            <li><a href="/repository">项目列表</a></li>
+            <li class="active"><a href="/detail?it={{.repo.RepoName}}"><strong>[ {{.repo.RepoName}} ]</strong></a></li>
+            <li class="active">版本列表</li>
         </ol>
 
         <div id="accord" class="panel-group">
@@ -17,7 +18,7 @@
 
             <div class="panel panel-success">
                 <div class="panel-heading">
-                    标签： <strong>[{{$item.Name}}]</strong>
+                    版本： <strong>[{{$item.Name}}]</strong>
                     <a class="pull-right" data-toggle="collapse" data-parent="#accord" href="#accord-{{$idx}}">描述 <i
                             class="glyphicon glyphicon-collapse-down"></i></a>
                     <label class="pull-right">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
@@ -32,8 +33,8 @@
                             <div class="row ">
                                 <div class="hidden-xs col-sm-8 list-inline">
                                     <ul class="nav nav-pills" role="tablist">
-                                        <li role="presentation"><a href="#"><span class="badge">大小:&nbsp;&nbsp;{{$item.Size}} KB</span></a></li>
-                                        <li role="presentation"><a href="#"><span class="badge">PULL次数:&nbsp;&nbsp;{{$item.PullCount}}</span></a></li>
+                                        <li role="presentation"><a><span class="badge">大小:&nbsp;&nbsp;{{$item.Size}} KB</span></a></li>
+                                        <li role="presentation"><a><span class="badge">下载次数:&nbsp;&nbsp;{{$item.PullCount}}</span></a></li>
                                         <li role="presentation"><a><span class="badge">上传时间:&nbsp;&nbsp;{{$item.PushTime}}</span></a></li>
                                     </ul>
                                 </div>
