@@ -103,7 +103,7 @@ func (h * WebHandler) doPush(e notifications.Event) error{
         glog.Errorf("PUSH: error get tag[%s][%s]",e.Target.Repository,e.Target.Tag)
         return er
     }
-    if err := h.DB.Model(&t).Update(api.Tag{PushTime:e.Timestamp.Format("2006-01-02 15:04:05")}).Error; err != nil{
+    if err := h.DB.Model(&t).Update(api.Tag{PushTime:e.Timestamp}).Error; err != nil{
         glog.Errorf("PUSH: error update pushtime.[%s][%s]",e.Target.Repository,e.Target.Tag)
         return err
     }

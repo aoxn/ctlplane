@@ -10,19 +10,20 @@ import (
 var ps * process.Process
 
 func main() {
-    fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
-    mem(1)
+    //t,e := time.Parse("2006-01-02 15:04:05.999999 +0000 UTC","2016-04-29 03:59:28.3553002 +0000 UTC")
+    //fmt.Printf("xxx:%v,\nyyy:%v\n",t,e)
+    //fmt.Println("YYY",t.Format("2006-01-02 15:04:05.999999999 +0100 MST"))
 
-    data:=new([10][1024*1024]byte)
-    mem(2)
+    Bdate := "2014-06-24 02:30"//时间字符串
 
-    //
-    for i := range data{
-        for x,n := 0,len(data[i]);x<n ;x++{
-            data[i][x]=1
-        }
-        mem(3)
-    }
+    t, err := time.ParseInLocation("2006-01-02 15:04", Bdate, time.UTC)//t被转为本地时间的time.Time
+    fmt.Printf("LOCAL:%s\n",time.Unix(t.Unix(),0 ))
+    z,off := t.Zone()
+    fmt.Printf("Zone:%s, offset:%v\n",z,off)
+    //t,err = time.Parse("2006-01-02 15:04", Bdate)//t被转为UTC时间的time.Time
+    fmt.Printf("LOCAL:%s\n",time.Unix(t.Unix() + int64(off),0))
+
+    fmt.Printf("xxx:%v,\nyyy:%v\n",t.Format(time.RFC3339),err)
 }
 
 func mem(n int){

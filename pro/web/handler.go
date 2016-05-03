@@ -11,6 +11,8 @@ import (
     "github.com/docker/distribution/context"
 "github.com/docker/distribution/digest"
 "github.com/docker/distribution/reference"
+    "github.com/golang/glog"
+    "time"
 )
 
 type WebHandler struct {
@@ -370,6 +372,12 @@ func (h *WebHandler) getRepository(repoName string) (*api.Repository, error) {
     if err := h.DB.Model(&repo).Order("push_time desc").Related(&tags).Error; err != nil {
         fmt.Errorf("Find Tags [%s] Error,[%+v]", repoName, err)
         return nil, err
+    }
+    for idx,_ := range tags{
+        //format displaytime
+        tags[idx].PushTimeEX = time.Unix(tags[idx].PushTime.Unix(),0).Format("2006-01-02 15:04:05")
+        tags[idx].UpdatedAtEX = time.Unix(tags[idx].UpdatedAt.Unix(),0).Format("2006-01-02 15:04:05")
+        glog.Infoln("UTC TIME: ",tags[idx].PushTime,"    LOCAL TIME: ",time.Unix(tags[idx].PushTime.Unix(),0).Format("2006-01-02 15:04:05"))
     }
     repo.Tags = tags
     return &repo, nil

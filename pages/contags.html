@@ -19,7 +19,7 @@
             <div class="panel panel-success">
                 <div class="panel-heading">
                     版本： <strong>[{{$item.Name}}]</strong>
-                    <a class="pull-right" data-toggle="collapse" data-parent="#accord" href="#accord-{{$idx}}">描述 <i
+                    <a class="pull-right" data-toggle="collapse" data-parent="#accord-{{$idx}}12" href="#accord-{{$idx}}">描述 <i
                             class="glyphicon glyphicon-collapse-down"></i></a>
                     <label class="pull-right">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                     <a id="dmark-{{$idx}}" name="dmark-{{$idx}}" class="pull-right"
@@ -31,18 +31,20 @@
                         <form role="form" id="descform-{{$idx}}" method="post" name="descform-{{$idx}}"
                               action="/detail?it={{$repName}}&tag={{$item.Name}}">
                             <div class="row ">
-                                <div class="hidden-xs col-sm-8 list-inline">
+                                <div class="hidden-xs col-sm-10 list-inline">
                                     <ul class="nav nav-pills" role="tablist">
                                         <li role="presentation"><a><span class="badge">大小:&nbsp;&nbsp;{{$item.Size}} KB</span></a></li>
                                         <li role="presentation"><a><span class="badge">下载次数:&nbsp;&nbsp;{{$item.PullCount}}</span></a></li>
-                                        <li role="presentation"><a><span class="badge">上传时间:&nbsp;&nbsp;{{$item.PushTime}}</span></a></li>
+                                        <li role="presentation"><a><span class="badge">上传时间:&nbsp;&nbsp;{{$item.PushTimeEX}}</span></a></li>
+                                        <li role="presentation"><a><span class="badge">修改时间:&nbsp;&nbsp;{{$item.UpdatedAtEX}}</span></a></li>
                                     </ul>
                                 </div>
-                                <div class="hidden-xs col-sm-4 list-inline text-right">
+                                <div class="hidden-xs col-sm-2 list-inline text-right">
                                     <button id="edittag-{{$idx}}" class="btn" name="edittag-{{$idx}}">
                                         <span class="hidden">{{$idx}}</span>
                                         <span class="hidden">{{$item.Name}}</span>
-                                        <span>Edit</span>
+                                        <span class="hidden">{{$repName}}</span>
+                                        <span>保存</span>
                                     </button>
                                 </div>
                             </div>
@@ -50,9 +52,15 @@
                                 <h6></h6>
                             </div>
                             <div class="popover-content">
-                                <span id="content-{{$idx}}" name="content-{{$idx}}">{{$item.Description}}</span>
-                                <textarea id="txtbody-{{$item.Name}}" name="txtbody-{{$item.Name}}"
-                                          class="hidden center-block">{{$item.Description}}</textarea>
+                                <!--<span id="content-{{$idx}}" name="content-{{$idx}}">{{$item.Description}}</span>
+                                <div class="alert alert-warning " id="alert-{{$idx}}" >
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    <strong>警告！</strong> <span id="alert-info-{{$idx}}">daiyaos</span>
+                                </div>
+                                -->
+
+                                <div class="editable" data-toggle="tooltip" title="单击编辑！然后保存" id="txtbody-{{$item.Name}}" name="txtbody-{{$item.Name}}">{{$item.Description}}</div>
+
                             </div>
 
                         </form>
@@ -87,10 +95,26 @@
                 </div>
                 <!-- /.modal-dialog -->
             </div>
-            <!-- /.modal -->
-
-        </div>
-
+            <!-- 对话框 -->
+            <div id="savestatus" class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">保存描述</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>描述内容保存成功&hellip;</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
     </div>
 
 
@@ -100,45 +124,37 @@
 <script>
     function edit(e) {
         var idx = e.data.idx
-        $("#content-" + idx).hide()
-        var TAG = $("#edittag-" + idx).find("span")[2]
-        var txt = TAG.textContent
-        if (txt == "Edit") {
-            TAG.innerText = "Save"
-            tinymce.init({
-                selector: 'textarea',
-                height: 500,
-                plugins: [
-                    'advlist autolink lists link image charmap print preview anchor',
-                    'searchreplace visualblocks code fullscreen',
-                    'insertdatetime media table contextmenu paste code'
-                ],
-                toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
-                content_css: [
-                    '//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
-                    '//www.tinymce.com/css/codepen.min.css'
-                ]
-            });
-            e.preventDefault()
-        }
+        var REPO= e.data.repo
+        var TAG = e.data.tag
 
-        if (txt == "Save") {
-            $("#descform-" + idx).submit()
-        }
+        $("#descform-" + idx).submit(function(e) {
+            var url = "/detail?it=" + REPO + "&tag=" + TAG; // the script where you handle the form input.
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: $("#descform-" + idx).serialize(), // serializes the form's elements.
+                success: function (data) {
+                    $('#savestatus').modal('show')
+                },
+                failure: function () {
+                    $("#alert-"+idx).show()
+                }
+            });
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+        });
 
     }
 
     $(document).ready(function () {
 
-        $.each($("span[id*=content]"), function (idx, s) {
-            var span = $("#content-" + idx)
-            span.html(span.text())
+        $.each($("div[id*=txtbody]"), function (idx, s) {
+            s.innerHTML=s.innerText
         })
 
         $.each($("button[id*=edittag]"), function (idx, btn) {
             var b = $("#" + btn.id)
             var x = b.find("span")
-            b.click({idx: x[0].textContent, tag: x[1].textContent}, edit)
+            b.click({idx: x[0].textContent, tag: x[1].textContent,repo:x[2].textContent}, edit)
         })
 
         $.each($("a[id*=dmark]"), function (idx, a) {
@@ -152,7 +168,16 @@
                 return false
             })
         })
-
+        tinymce.init({
+            selector: "div.editable",
+            inline: true,
+            plugins: [
+                'advlist autolink lists link image charmap print preview anchor',
+                'searchreplace visualblocks code fullscreen',
+                'insertdatetime media table contextmenu paste'
+            ],
+            toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
+        });
 
     });
 
