@@ -8,9 +8,9 @@ import (
     "fmt"
     "github.com/gin-gonic/gin"
     "github.com/docker/distribution/manifest/schema2"
-    "github.com/jfrazelle/go/canonical/json"
     "github.com/spacexnice/ctlplane/pro/api"
     "strings"
+"encoding/json"
 )
 
 
