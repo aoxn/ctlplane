@@ -12,10 +12,11 @@ import (
     "github.com/spacexnice/ctlplane/pro/util"
     "io"
     _ "github.com/docker/distribution/manifest/schema2"
+    _ "github.com/docker/distribution/manifest/schema1"
     "github.com/spacexnice/ctlplane/pro/api"
     "flag"
-"github.com/docker/distribution"
-"github.com/docker/distribution/digest"
+    "github.com/docker/distribution"
+    "github.com/docker/distribution/digest"
 )
 
 var SYNC_PERIOD = 60 * time.Second

@@ -10,57 +10,60 @@ import (
     "github.com/docker/distribution/manifest/schema2"
     "github.com/spacexnice/ctlplane/pro/api"
     "strings"
-"encoding/json"
+    "encoding/json"
+    "github.com/docker/distribution/manifest/schema1"
+    "github.com/golang/glog"
 )
 
 
 
 func (h *WebHandler)  PTest(c *gin.Context){
-    h.image("admin/bob","v2")
+    h.imageLayers("admin/bob","v2")
 }
 
-func (h * WebHandler) image(vrepo,vtag string)(*schema2.DeserializedManifest,*image.Image,error){
+func (h * WebHandler) imageLayers(vrepo,vtag string)([]api.Layer,error){
     ctx := context.Background()
     repo, err := reference.ParseNamed(vrepo)
     if err != nil {
-        return nil,nil,err
+        return nil,err
     }
     rp, err := client.NewRepository(ctx, repo, h.RegURL, nil)
     if err != nil {
-        return nil,nil,err
+        return nil,err
     }
 
     descriptor, err := rp.Tags(ctx).Get(ctx,vtag)
     if err != nil{
-        return nil,nil,err
+        return nil,err
     }
 
     msvc,err := rp.Manifests(ctx)
     if err != nil{
-        return nil,nil,err
+        return nil,err
     }
 
-    mf,err := msvc.Get(ctx,descriptor.Digest)
+    manifest,err := msvc.Get(ctx,descriptor.Digest)
     if err != nil{
-        return nil,nil,err
+        return nil,err
     }
 
-    smanifest,cfg := mf.(*schema2.DeserializedManifest),&image.Image{}
+    switch manifest.(type) {
+    case *schema1.SignedManifest:
+        return h.v1Layer(manifest.(*schema1.SignedManifest)),nil
+    case *schema2.DeserializedManifest:
+        cfg,smanifest := &image.Image{},manifest.(*schema2.DeserializedManifest)
+        bconfig,err   := rp.Blobs(ctx).Get(ctx,smanifest.Config.Digest)
+        if err != nil{
+            return nil,err
+        }
 
-    bconfig,err   := rp.Blobs(ctx).Get(ctx,smanifest.Config.Digest)
-    if err != nil{
-        return nil,nil,err
+        e:=json.Unmarshal(bconfig,cfg)
+        if e != nil{
+            fmt.Println("Wrong Type of Image!",e.Error())
+        }
+        return h.v2layer(cfg),nil
     }
-
-    e:=json.Unmarshal(bconfig,cfg)
-    if e != nil{
-        fmt.Println("Wrong Type of Image!",e.Error())
-    }
-    //for k,v := range cfg.History{
-    //    fmt.Println(k,":HHHH:",v)
-    //}
-
-    return smanifest,cfg,err
+    return nil,nil
 }
 
 const (
@@ -77,7 +80,7 @@ const (
     CMD     = "/bin/sh -c #(nop) "
 )
 
-func (h *WebHandler) layer(img *image.Image) []api.Layer{
+func (h *WebHandler) v2layer(img *image.Image) []api.Layer{
     var layer []api.Layer
     for _,v := range img.History{
         color := ""
@@ -102,4 +105,41 @@ func (h *WebHandler) layer(img *image.Image) []api.Layer{
         })
     }
     return layer
+}
+
+
+func (h *WebHandler) v1Layer(mani *schema1.SignedManifest)[]api.Layer{
+    var layers []api.Layer
+    for _,v := range mani.History{
+        v1image := image.V1Image{}
+        err := json.Unmarshal([]byte(v.V1Compatibility),&v1image)
+        if err != nil {
+            glog.Errorf("Unmarshal V1Compatibility Error [%s]\n",err.Error())
+            continue
+        }
+        color,scmd := "",""
+        for _,s := range v1image.ContainerConfig.Cmd{
+            scmd += fmt.Sprintf("%s ",s)
+        }
+        if strings.Index(scmd,CMD_ADD) != -1 {
+            color = COLOR_INFO
+        }
+        if strings.Index(scmd,CMD_CMD) != -1 {
+            color = COLOR_WARNING
+        }
+        if strings.Index(scmd,CMD_COPY) != -1 {
+            color = COLOR_SUCCESS
+        }
+        if strings.Index(scmd,CMD_ENV) != -1 {
+            color = COLOR_DANGER
+        }
+
+        layers = append(layers,api.Layer{
+            Created:    v1image.Created,
+            CreatedBy:  scmd,
+            Author:     v1image.Author,
+            Color:      color,
+        })
+    }
+    return layers
 }

@@ -377,11 +377,11 @@ func (h *WebHandler) getRepository(repoName string) (*api.Repository, error) {
         //format displaytime
         tags[idx].PushTimeEX = time.Unix(tags[idx].PushTime.Unix(),0).Format("2006-01-02 15:04:05")
         tags[idx].UpdatedAtEX = time.Unix(tags[idx].UpdatedAt.Unix(),0).Format("2006-01-02 15:04:05")
-        _,image,err := h.image(repoName,tags[idx].Name)
+        layers,err := h.imageLayers(repoName,tags[idx].Name)
         if err != nil {
             glog.Errorf("Error: while get image layer infomation![%s]",err.Error())
         }
-        tags[idx].Layers = h.layer(image)
+        tags[idx].Layers = layers
         glog.Infoln("UTC TIME: ",tags[idx].PushTime,"    LOCAL TIME: ",time.Unix(tags[idx].PushTime.Unix(),0).Format("2006-01-02 15:04:05"))
     }
     repo.Tags = tags
