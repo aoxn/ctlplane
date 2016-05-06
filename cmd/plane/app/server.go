@@ -104,6 +104,8 @@ func (s * PlaneServer) route(){
     r.GET("/callback/event",s.Handler.Event)
     r.POST("/callback/event",s.Handler.Event)
 
+    r.GET("/test",s.Handler.PTest)
+
     //// Authorization group
     //// authorized := r.Group("/", AuthRequired())
     //// exactly the same as:

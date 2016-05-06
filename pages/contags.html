@@ -59,10 +59,27 @@
                                 </div>
                                 -->
 
-                                <div class="editable" data-toggle="tooltip" title="单击编辑！然后保存" id="txtbody-{{$item.Name}}" name="txtbody-{{$item.Name}}">{{$item.Description}}</div>
+                                <div class="editable" data-toggle="tooltip" title="单击编辑！然后保存" id="txtbody-{{$item.Name}}" name="txtbody-{{$item.Name}}">{{if $item.Description}}{{$item.Description}}{{else }}请单击输入版本描述信息！然后保存{{end}}</div>
 
                             </div>
-
+                            <div class="page-header">
+                                <h6></h6>
+                                <a class="pull-right" data-toggle="collapse" data-parent="#accord-{{$idx}}12" href="#layer-{{$idx}}">展开IMAGE层 <i
+                                        class="glyphicon glyphicon-collapse-down"></i></a>
+                            </div>
+                            <div id="layer-{{$idx}}" class="row panel-collapse collapse" >
+                                <div class=" col-sm-2 list-group ">
+                                </div>
+                                <div class=" col-sm-8 list-group ">
+                                    {{range $num,$layer := $item.Layers}}
+                                    <a href="#" class="list-group-item truncate {{$layer.Color}}" data-toggle="tooltip" data-placement="left" title="{{$layer.CreatedBy}}">
+                                        <span class="badge">{{$num}}</span><span class="badge">{{$layer.Author}}</span>{{$layer.CreatedBy}}
+                                    </a>
+                                    {{end}}
+                                </div>
+                                <div class=" col-sm-2 list-group ">
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>

@@ -24,5 +24,15 @@ type Tag struct {
     UpdatedAtEX  string `gorm:"-"`
     PullCount    uint
     Size         int64
+
+    Layers       []Layer `gorm:"-"`
+}
+
+type Layer struct {
+
+    CreatedBy   string
+    Color       string
+    Author      string
+    Created     time.Time
 }
 
