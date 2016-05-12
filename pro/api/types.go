@@ -34,5 +34,6 @@ type Layer struct {
     Color       string
     Author      string
     Created     time.Time
+    Size        string
 }
 

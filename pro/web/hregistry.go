@@ -61,7 +61,7 @@ func (h * WebHandler) imageLayers(vrepo,vtag string)([]api.Layer,error){
         if e != nil{
             fmt.Println("Wrong Type of Image!",e.Error())
         }
-        return h.v2layer(cfg),nil
+        return h.v2layer(cfg,smanifest),nil
     }
     return nil,nil
 }
@@ -80,9 +80,9 @@ const (
     CMD     = "/bin/sh -c #(nop) "
 )
 
-func (h *WebHandler) v2layer(img *image.Image) []api.Layer{
+func (h *WebHandler) v2layer(img *image.Image,mani *schema2.DeserializedManifest) []api.Layer{
     var layer []api.Layer
-    for _,v := range img.History{
+    for k,v := range img.History{
         color := ""
         if strings.Index(v.CreatedBy,CMD_ADD) != -1 {
             color = COLOR_INFO
@@ -96,12 +96,21 @@ func (h *WebHandler) v2layer(img *image.Image) []api.Layer{
         if strings.Index(v.CreatedBy,CMD_ENV) != -1 {
             color = COLOR_DANGER
         }
+        lsize := "-1"
+        for _,vm := range mani.References(){
+            if mani.Layers[k].Digest == vm.Digest{
+                lsize = fmt.Sprintf("%d",vm.Size/1024)
+                break
+            }
+        }
+
         //fmt.Println(v.CreatedBy,CMD_ADD,"HHH",strings.Index(v.CreatedBy,CMD_ADD),color)
         layer = append(layer,api.Layer{
             Created:        v.Created,
             CreatedBy:      strings.Replace(v.CreatedBy,CMD,"",-1),
             Author:         v.Author,
             Color:          color,
+            Size:           lsize,
         })
     }
     return layer
@@ -110,7 +119,7 @@ func (h *WebHandler) v2layer(img *image.Image) []api.Layer{
 
 func (h *WebHandler) v1Layer(mani *schema1.SignedManifest)[]api.Layer{
     var layers []api.Layer
-    for _,v := range mani.History{
+    for k,v := range mani.History{
         v1image := image.V1Image{}
         err := json.Unmarshal([]byte(v.V1Compatibility),&v1image)
         if err != nil {
@@ -134,11 +143,20 @@ func (h *WebHandler) v1Layer(mani *schema1.SignedManifest)[]api.Layer{
             color = COLOR_DANGER
         }
 
+        lsize := "-1"
+        for _,vm := range mani.References(){
+            if mani.FSLayers[k].BlobSum == vm.Digest{
+                lsize = fmt.Sprintf("%d",vm.Size/1024)
+                break
+            }
+        }
+
         layers = append(layers,api.Layer{
             Created:    v1image.Created,
-            CreatedBy:  scmd,
+            CreatedBy:  strings.Replace(scmd,CMD,"",-1),
             Author:     v1image.Author,
             Color:      color,
+            Size:       lsize,
         })
     }
     return layers

@@ -73,7 +73,7 @@
                                 <div class=" col-sm-8 list-group ">
                                     {{range $num,$layer := $item.Layers}}
                                     <a href="#" class="list-group-item truncate {{$layer.Color}}" data-toggle="tooltip" data-placement="left" title="{{$layer.CreatedBy}}">
-                                        <span class="badge">{{$num}}</span><span class="badge">{{$layer.Author}}</span>{{$layer.CreatedBy}}
+                                        <span class="badge">{{$num}}</span><span class="badge">{{$layer.Author}}</span><span class="badge">{{$layer.Size}} KB</span>{{$layer.CreatedBy}}
                                     </a>
                                     {{end}}
                                 </div>

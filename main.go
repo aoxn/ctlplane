@@ -5,6 +5,8 @@ import (
     "time"
     "os"
 "github.com/shirou/gopsutil/process"
+    "encoding/gob"
+    "bytes"
 )
 
 var ps * process.Process
@@ -24,6 +26,10 @@ func main() {
     fmt.Printf("LOCAL:%s\n",time.Unix(t.Unix() + int64(off),0))
 
     fmt.Printf("xxx:%v,\nyyy:%v\n",t.Format(time.RFC3339),err)
+
+    x := Test("")
+
+    fmt.Printf("%p",&x)
 }
 
 func mem(n int){
@@ -40,4 +46,39 @@ func mem(n int){
     }
     fmt.Printf("%+v\n",mem)
     //fmt.Printf("%d. VMS: %d MB, RSS: %d MB\n",n,mem.VMS>>20,mem.RSS>>20)
+}
+
+
+type Estimate struct {
+    S string
+}
+
+func Test(s string) []Estimate{
+
+    obj := []Estimate{
+        Estimate{
+            S : "hahhah",
+        },
+    }
+
+    var m *[]Estimate
+
+    deepCopy(m,obj)
+    fmt.Printf("DEEPCOPY:%v\n",m)
+    fmt.Printf("xxxxm%p\n",&obj)
+    //ts(&obj)
+    return obj
+}
+
+func ts(p *[]Estimate){
+    (*p)[0].S="p"
+    fmt.Printf("yyy%p,mmmm:%v\n",p,p)
+}
+
+func deepCopy(dst, src interface{}) error {
+    var buf bytes.Buffer
+    if err := gob.NewEncoder(&buf).Encode(src); err != nil {
+        return err
+    }
+    return gob.NewDecoder(bytes.NewBuffer(buf.Bytes())).Decode(dst)
 }
