@@ -147,7 +147,7 @@ func (h * WebHandler) DeleteTag(c *gin.Context) {
                 "title":     "Error",
                 "repo" :     api.Repository{},
                 "has":       false,
-                "errorinfo": fmt.Sprintf("No Matched Tag found by tagname[%s]! Reason[%s]",stag, err.Error()),
+                "errorinfo": fmt.Sprintf("No Matched Tag found by tagname[%s]! Reason[%s]",stag, "Tag not found"),
             },
         )
         return
