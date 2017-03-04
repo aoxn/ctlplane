@@ -1,9 +1,9 @@
-REPO=61.160.36.122:8080
-PROJECT=sigma
-APP=registry-console
-VERSION=1.0.0
+REPO?=registry.cn-hangzhou.aliyuncs.com
+NAMESPACE?=spacexnice
+APP_NAME?=hub-console
+TAG?=1.0.0
 
-IMAGE=${REPO}/${PROJECT}/${APP}:${VERSION}
+IMAGE=${REPO}/${NAMESPACE}/${APP_NAME}:${TAG}
 
 
 all:
@@ -11,9 +11,16 @@ all:
 	docker build -t ${IMAGE} build
 	docker push ${IMAGE}
 
-tag:
+build:
 	docker build -t ${IMAGE} build
+
+test:
+    echo test
+
+push: build
 	docker push ${IMAGE}
-push:
-	docker push ${IMAGE}
+
+clean:
+    rm -rf build
+
 .PHONY: all

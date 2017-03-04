@@ -83,6 +83,7 @@ const (
 func (h *WebHandler) v2layer(img *image.Image,mani *schema2.DeserializedManifest) []api.Layer{
     var layer []api.Layer
     for k,v := range img.History{
+        fmt.Printf("K=%d, len=%d\n",k,len(img.History))
         color := ""
         if strings.Index(v.CreatedBy,CMD_ADD) != -1 {
             color = COLOR_INFO
@@ -98,10 +99,11 @@ func (h *WebHandler) v2layer(img *image.Image,mani *schema2.DeserializedManifest
         }
         lsize := "-1"
         for _,vm := range mani.References(){
-            if mani.Layers[k].Digest == vm.Digest{
-                lsize = fmt.Sprintf("%d",vm.Size/1024)
-                break
-            }
+            //if mani.Layers[k].Digest == vm.Digest{
+            //    lsize = fmt.Sprintf("%d",vm.Size/1024)
+            //    break
+            //}
+            fmt.Printf("%+v",vm)
         }
 
         //fmt.Println(v.CreatedBy,CMD_ADD,"HHH",strings.Index(v.CreatedBy,CMD_ADD),color)

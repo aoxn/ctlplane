@@ -21,9 +21,10 @@ var (
     ENV_REPO_SERVER = "REPO_SERVER"
     ENV_DB_DATA_PATH= "DB_DATA_PATH"
 )
+//docker run -d -p 5000:5000 --name registry registry:2
 //var REPO_SERVER = "http://192.168.139.128:5000/"
 var (
-    REPO_SERVER = "http://192.168.139.131:5000/"
+    REPO_SERVER = "http://hubregistry/"
 )
 
 type Config struct {
